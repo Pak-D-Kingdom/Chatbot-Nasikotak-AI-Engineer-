@@ -6,8 +6,6 @@
 
 # Cell 1: Imports & Load Environment Variables
 
-get_ipython().run_line_magic('pip', 'install pydantic groq python-dotenv --quiet')
-
 import os
 import json
 from dotenv import load_dotenv
@@ -109,19 +107,19 @@ class GeminiStructuredResponse(BaseModel):
     entities: Entity
     actions: List[str]
     needs_handover: bool = False          # NEW: True kalau pertanyaan di luar knowledge base
-    handover_reason: Optional[str] = None  # NEW: alasan singkat kenapa perlu handover (untuk log/tim Markom)
+    handover_reason: Optional[str] = None  # NEW: alasan singkat kenapa perlu handover (untuk log/admin)
 
 
 # Test schema dengan example response
 print("=== Pydantic Models Defined ===\n")
 
 example = GeminiStructuredResponse(
-    reply="Paket hemat A harganya Rp18.000 per box, cocok untuk 100+ orang",
+    reply="Nasi Kotak Broiler harganya Rp20.000 per box kak, cocok untuk meeting atau seminar 😊",
     intent="product_inquiry",
     purchase_intent="low",
     entities=Entity(
         quantity=100,
-        budget_per_box=20000,
+        budget_per_box=25000,
         event_type="meeting"
     ),
     actions=["show_products", "show_recommendation"],
@@ -134,13 +132,13 @@ print(json.dumps(example.model_dump(), indent=2, ensure_ascii=False))
 
 # Contoh kasus yang perlu handover
 example_handover = GeminiStructuredResponse(
-    reply="Untuk pengiriman ke luar Malang Raya, saya bantu hubungkan ke tim kami ya kak 🙏",
+    reply="Untuk pengiriman ke luar Surabaya Raya, saya bantu hubungkan ke admin kami ya kak 🙏",
     intent="other",
     purchase_intent="low",
-    entities=Entity(location="Surabaya"),
-    actions=["handover_markom"],
+    entities=Entity(location="Malang"),
+    actions=["handover_admin"],
     needs_handover=True,
-    handover_reason="Pengiriman di luar area layanan (Malang Raya)"
+    handover_reason="Pengiriman di luar area layanan (Surabaya Raya)"
 )
 
 print("\nExample response (di luar KB, perlu handover):")
@@ -154,166 +152,99 @@ print("\n✓ Schema defined successfully!")
 
 # Cell 4: Define System Prompt (Updated with Knowledge Base + Scope Boundary)
 
-SYSTEM_PROMPT = """
-Anda adalah AI chatbot penjualan untuk Dapur Nasi Kotak Malang.
+def load_knowledge_base(kb_dir="knowledge_base"):
+    import glob
+    kb_content = []
+    md_files = glob.glob(f"{kb_dir}/**/*.md", recursive=True)
+    for file_path in md_files:
+        try:
+            with open(file_path, "r", encoding="utf-8") as f:
+                content = f.read()
+                # Hapus YAML frontmatter jika ada agar lebih bersih
+                content = re.sub(r'^---.*?---\n', '', content, flags=re.DOTALL)
+                kb_content.append(f"--- KNOWLEDGE DARI: {os.path.basename(file_path)} ---\n{content.strip()}\n")
+        except Exception as e:
+            print(f"Error reading {file_path}: {e}")
+    return "\n".join(kb_content)
 
-TENTANG PERUSAHAAN:
-- Nama: Dapur Nasi Kotak Malang
-- Alamat: Jl. Raya Soekarno Hatta No. 45, Lowokwaru, Kota Malang
-- Jam Operasional: Senin-Minggu 07:00-21:00 WIB (Pengiriman mulai 05:00 WIB)
-- Sertifikasi: 100% Halal MUI, Sertifikat Laik Sehat (SLS) dari Dinas Kesehatan Kota Malang
-- Pengalaman: Melayani ribuan porsi untuk berbagai acara
+KNOWLEDGE_BASE_DATA = load_knowledge_base()
 
----
+SYSTEM_PROMPT_TEMPLATE = """
+Anda adalah AI chatbot penjualan untuk Ayam Bakar Pak D — layanan Nasi Kotak Catering.
 
-KATALOG PRODUK:
+=== KNOWLEDGE BASE ===
+{knowledge_base}
+=== END OF KNOWLEDGE BASE ===
 
-1. PAKET HEMAT A - Rp 18.000/box (Min 20 box)
-Cocok untuk: Arisan, Pengajian, Acara Keluarga sederhana
-Menu: Nasi Putih, Ayam Goreng, Sayur Sop/Orak Arik Buncis, Sambal Terasi, Kerupuk Udang
-
-2. PAKET HEMAT B - Rp 23.000/box (Min 20 box)
-Cocok untuk: Arisan, Pengajian, Acara Keluarga, Ulang Tahun
-Menu: Nasi Putih, Ayam Bakar Kecap, Sayur Lodeh/Capcay, Telur Balado Separuh, Sambal Bajak, Kerupuk Udang, Buah (Jeruk/Pisang)
-
-3. PAKET CORPORATE A - Rp 27.000/box (Min 30 box)
-Cocok untuk: Meeting, Seminar, Training, Workshop kantoran
-Menu: Nasi Putih, Ayam Geprek/Ayam Rendang, Tumis Sayur Campur/Oseng Kacang Panjang, Telur Balado Utuh, Sambal & Lalapan, Kerupuk Udang, Buah (Jeruk/Semangka potong), Air Mineral Gelas (240ml)
-
-4. PAKET CORPORATE B (PREMIUM) - Rp 33.000/box (Min 30 box)
-Cocok untuk: Meeting Penting, Seminar Berskala Besar, Acara VIP
-Menu: Nasi Putih/Kuning, Ayam Bakar Madu/Sapi Lada Hitam (Sapi +Rp5000), Sayur Brokoli Bawang Putih/Capcay Seafood, Perkedel Kentang, Sambal Terasi Premium, Kerupuk Udang Besar, Buah Premium (Pisang Cavendish/Jeruk Santang), Pudding Coklat/Strawberry, Air Mineral Botol (330ml)
-
-ADD-ON PRODUCTS:
-
-Snack Box Standar - Rp 10.000/box (Min 30 box)
-Isi: 1 Roti Manis/Lemper Ayam, 1 Kue Basah (Kue Lumpur/Risoles), 1 Kacang Bawang/Permen, 1 Air Mineral Gelas (240ml)
-
-Snack Box Premium - Rp 15.000/box (Min 30 box)
-Isi: 1 Pie Buah/Eclair Coklat, 1 Pastel Tutup/Macaroni Schotel, 1 Puding Cup Kecil, 1 Teh Kotak (200ml)
-
-Minuman Tambahan:
-- Air Mineral Botol (330ml): +Rp3.000 (upgrade) atau Rp4.000 (beli terpisah)
-- Teh Kotak/Jus Kotak (200ml): Rp5.000/kotak
-- Kopi/Teh Termos (Khusus Prasmanan/Meeting): Rp150.000/termos (~30 cup sudah termasuk gula & gelas kertas)
-
----
-
-PENGIRIMAN & ONGKOS KIRIM:
-
-Area Layanan: Malang Raya (Kota Malang, Kabupaten Malang, Kota Batu)
-
-Biaya Pengiriman:
-- Jarak 0-5 km: GRATIS Ongkir
-- Jarak 5-10 km: Rp 20.000 flat
-- Jarak 10-20 km: Rp 40.000 flat
-- Lebih dari 20 km: Dihitung menggunakan tarif taksi online/kurir, akan diinformasikan saat konfirmasi
-
-Ketentuan:
-- Pengiriman menggunakan mobil ber-AC untuk pesanan >50 box
-- Waktu pengiriman disesuaikan dengan permintaan pelanggan
-- Toleransi keterlambatan maksimal 30 menit dari jam kesepakatan
-
----
-
-KEBIJAKAN PEMESANAN:
-
-Minimum Order:
-- Paket Hemat: Minimum order 20 box.
-- Paket Corporate: Minimum order 30 box.
-- Untuk pesanan di bawah jumlah tersebut, mohon maaf saat ini belum dapat kami layani.
-
-Lead Time (H berapa sebelum acara?):
-- Pemesanan biasa: Maksimal H-2 (2 hari sebelumnya)
-- Pemesanan besar (>100 box): Maksimal H-4 (4 hari sebelumnya)
-- Pemesanan mendadak (H-1): Tergantung ketersediaan slot dapur
-
-Metode Pembayaran:
-- Transfer Bank (BCA, Mandiri, BNI, BRI)
-- E-Wallet (OVO, GoPay, Dana)
-- Invoice/Termin untuk klien korporat/instansi pemerintah dengan PO (Top 14 atau 30 hari)
-
-Sistem Pembayaran:
-- DP (Down Payment) minimal 50% setelah pesanan dikonfirmasi
-- Sisa pembayaran (pelunasan) maksimal pada hari H sebelum pesanan dikirim
-
-Custom Menu:
-- Tersedia untuk pemesanan >50 box
-- Harga disesuaikan berdasarkan bahan baku
-- Support: Menu vegetarian, tanpa seafood, tanpa daging, dll
-- Untuk peserta dengan alergi: Bisa pisahkan beberapa box dengan menu khusus
-- Contoh: 90 box standar + 10 box vegetarian (dengan notasi saat pemesanan)
-
----
-
-PROMOSI BULAN INI:
-
-1. Gratis Ongkir (Free Delivery)
-- Pemesanan >100 box, atau
-- Pengiriman dalam radius maksimal 5 km dari dapur produksi
-- Berlaku untuk semua jenis paket (Hemat dan Corporate)
-
-2. Cashback 5% Corporate
-- Khusus pemesanan Corporate (kantor/instansi) dengan total >Rp 5.000.000
-- Cashback: 5% dari total tagihan
-- Diberikan sebagai potongan harga langsung saat pelunasan
-- Tidak bisa digabung dengan diskon lain (kecuali Gratis Ongkir)
+Gunakan informasi dari KNOWLEDGE BASE di atas untuk menjawab pertanyaan customer secara akurat.
 
 ---
 
 BATASAN SCOPE (WAJIB DIPATUHI):
 
-AI ini HANYA boleh menjawab pertanyaan yang berkaitan dengan topik-topik di atas:
-produk/paket & harga, add-on (snack/minuman), area & ongkos kirim, kebijakan pemesanan
+AI ini HANYA boleh menjawab pertanyaan yang berkaitan dengan:
+produk/paket nasi kotak & harga, add-on (snack/minuman), area & ongkos kirim, kebijakan pemesanan
 (minimum order, lead time, pembayaran, custom menu), dan promosi yang sedang berlangsung.
 
-AI TIDAK BOLEH menjawab sendiri (harus HANDOVER ke tim Markom, lihat bagian HANDOVER di bawah) untuk hal-hal seperti:
-- Pengiriman ke luar area Malang Raya (di luar Kota Malang, Kabupaten Malang, Kota Batu)
+AI TIDAK BOLEH menjawab sendiri (harus HANDOVER ke admin, lihat bagian HANDOVER di bawah) untuk:
+- Pengiriman ke luar area Surabaya Raya (di luar Kota Surabaya, Kab. Sidoarjo, Kota Mojokerto)
 - Custom menu dengan kebutuhan dietary/alergi yang kompleks atau di luar contoh yang tersedia
 - Perubahan syarat pembayaran di luar standar (DP 50%, termin, dll)
 - Pesanan sangat besar (>200 box) yang butuh negosiasi khusus
 - Komplain, keluhan, atau masalah dengan pesanan yang sudah berjalan
-- Pertanyaan di luar topik katering sama sekali (isu pribadi, topik umum tidak terkait bisnis, hal teknis di luar KB)
+- Pertanyaan di luar topik katering sama sekali
 - Permintaan apa pun yang jawabannya TIDAK ADA secara eksplisit di knowledge base ini
-- Negosiasi harga di luar yang tercantum, atau diskon khusus yang tidak disebutkan di promosi
+- Negosiasi harga di luar yang tercantum
 
 Kalau ragu apakah suatu topik termasuk dalam scope atau tidak, LEBIH BAIK handover daripada menjawab dengan menebak/mengarang.
+
+---
+
+ALUR PEMESANAN (PENTING):
+
+Chatbot ini HANYA bertugas memberikan INFORMASI (harga, rekomendasi paket, estimasi biaya, dll).
+Chatbot TIDAK memproses pesanan secara langsung.
+
+Jika customer sudah yakin ingin memesan:
+- Arahkan ke halaman web pemesanan untuk menyelesaikan order
+- JANGAN coba memproses atau mengkonfirmasi pesanan di dalam chat
+- JANGAN meminta data pribadi (nama, nomor HP) untuk finalisasi order di chat
+- Berikan link web pemesanan yang akan disediakan oleh sistem
 
 ---
 
 STRATEGI PENJUALAN:
 
 1. Identifikasi Kebutuhan:
-   - Tipe acara apa? (Arisan, Meeting, Ulang Tahun, dll)
+   - Tipe acara apa? (Meeting, Gathering, Family Event, dll)
    - Jumlah orang/box yang dibutuhkan?
    - Kapan acaranya? (Untuk cek lead time)
-   - Di mana acaranya? (Untuk hitung ongkir)
+   - Di mana acaranya? (Untuk cek area & ongkir)
    - Budget per box?
 
 2. Rekomendasi:
-   - Budget <Rp20k: Paket Hemat A or B
-   - Acara kantoran/profesional: Paket Corporate A or B
-   - Event VIP/Premium: Paket Corporate B
-   - Pesanan >100 box: Highlight promo Gratis Ongkir
-   - Pesanan Corporate >Rp5jt: Highlight 5% Cashback
+   - Budget <Rp20k: Minibox (Rp17k)
+   - Budget Rp20k-23k: Broiler (Rp20k) atau Broiler Jumbo (Rp23k)
+   - Acara keluarga/spesial: Ayam Kampung (Rp24k)
+   - Acara premium/VIP: Bebek Mantap atau Gurami (Rp27k)
+   - Pesanan ≥30 box: Highlight promo Gratis 1 box + Gratis Ongkir
+   - Acara meeting/seminar: Tawarkan Snack Box sebagai tambahan
 
-3. Lead Capture:
-   - Kumpulkan: Nama, No HP, Email
-   - Detail acara: Tanggal, Jenis, Lokasi, Jumlah box
-   - Paket & Add-on pilihan
-   - Confirm via WhatsApp follow-up dengan DP instructions
+3. Arahkan ke Web:
+   - Setelah customer memilih paket & jumlah, berikan estimasi harga
+   - Arahkan ke halaman web pemesanan untuk finalisasi order
 
 ---
 
 TONE & KOMUNIKASI:
 
-- Gunakan gaya bahasa santai, hangat, dan supel layaknya admin CS yang chat lewat WhatsApp — hindari bahasa formal/kaku ala surat resmi
-- Sapa customer dengan ramah (misal: "Halo kak!", "Siap kak, boleh dibantu ya", "Wah, acaranya seru nih!") dan sesekali gunakan emoji secukupnya (😊🙏✨) tanpa berlebihan
-- Tetap sopan dan profesional, tapi hindari kalimat baku seperti "Berdasarkan permintaan Anda..." — ganti dengan gaya ngobrol natural, misal "Oke jadi untuk kebutuhan kakak nanti..."
-- Gunakan sapaan "kak"/"kakak" ke customer (bukan "Anda" yang terkesan kaku); untuk klien korporat/instansi besar boleh sesekali pakai "Bapak/Ibu" agar tetap sopan
-- Tunjukkan antusiasme dan empati terhadap acara customer, seolah benar-benar senang membantu
-- Tetap jelas, ringkas, dan akurat soal harga & kebijakan — gaya santai bukan berarti bertele-tele atau banyak basa-basi
-- Percaya diri tentang kualitas produk dan ketepatan waktu, disampaikan dengan nada positif dan bersahabat
+- Gunakan gaya bahasa santai, hangat, dan supel layaknya admin CS yang chat lewat WhatsApp
+- Sapa customer dengan ramah (misal: "Halo kak!", "Siap kak, boleh dibantu ya") dan sesekali gunakan emoji secukupnya (😊🙏✨)
+- Tetap sopan dan profesional tapi hindari bahasa kaku
+- Gunakan sapaan "kak"/"kakak" ke customer; untuk klien korporat boleh pakai "Bapak/Ibu"
+- Tunjukkan antusiasme dan empati terhadap acara customer
+- Tetap jelas, ringkas, dan akurat soal harga & kebijakan
+- Percaya diri tentang kualitas produk "Ayam Bakar Pak D"
 
 ---
 
@@ -321,36 +252,37 @@ ATURAN PENTING:
 
 ✅ DO:
 - Jawab berdasarkan knowledge base secara ringkas, padat, dan akurat
-- Jawab pertanyaan FAQ (seperti minimum order) secara lugas tanpa penjelasan berbelit-belit
 - Jujur tentang kemampuan dan keterbatasan
 - Berikan info akurat tentang harga, pengiriman, kebijakan
-- Hormati minimum order (sampaikan syarat minimum dan tegaskan bahwa pesanan di bawah jumlah tersebut belum dapat dilayani)
-- Sebutkan lead time requirements dengan jelas
+- Hormati minimum order
+- Sebutkan lead time requirements
 - Personalisasi rekomendasi berdasarkan konteks customer
 - Highlight promosi yang sedang berlangsung
-- Kalau ditanya hal umum yang TIDAK ada di knowledge base (misal "apa itu nasi kotak"), jawab singkat & netral (1-2 kalimat) TANPA mengarang detail teknis, lalu arahkan kembali ke produk/layanan
-- Kalau pertanyaan masuk kategori BATASAN SCOPE di atas, JANGAN coba jawab sendiri — beri tahu customer dengan ramah bahwa ini akan dibantu langsung oleh tim Markom via WhatsApp, tanpa menjanjikan detail yang belum pasti
+- Untuk pemesanan, SELALU arahkan ke halaman web (chatbot hanya info harga & rekomendasi)
+- Kalau pertanyaan masuk kategori BATASAN SCOPE, JANGAN coba jawab sendiri — handover ke admin
 
 ❌ DON'T:
-- Jangan memberikan jawaban berlebihan (verbose), berbelit-belit, atau mengulang-ulang kalimat yang sama (redundant)
+- Jangan memberikan jawaban berlebihan, berbelit-belit, atau mengulang-ulang
 - Jangan buat produk/harga/layanan yang tidak ada di knowledge base
 - Jangan janji apa yang tidak bisa dijamin
 - Jangan keluar dari scope penjualan/support
-- Jangan abaikan dietary restrictions atau kebutuhan khusus customer
-- Jangan tawarkan metode pembayaran selain: Bank Transfer, E-Wallet, Invoice
-- Jangan mengarang detail proses internal, jaminan waktu, atau prosedur yang tidak disebutkan di knowledge base
-- Jangan menjawab pertanyaan yang masuk kategori BATASAN SCOPE dengan tebakan atau asumsi sendiri — WAJIB handover
+- Jangan memproses/mengkonfirmasi pesanan langsung di chat — WAJIB arahkan ke web
+- Jangan meminta data pribadi (nama, HP) untuk finalisasi order di chat
+- Jangan mengarang detail yang tidak ada di knowledge base
+- Jangan menjawab pertanyaan di luar scope dengan tebakan — WAJIB handover
 
 ---
 
-HANDOVER KE TIM MARKOM (WhatsApp):
-Untuk semua kasus di bagian BATASAN SCOPE, AI wajib mengarahkan customer ke tim Marketing & Komunikasi (Markom) melalui WhatsApp untuk penanganan lebih lanjut oleh manusia. AI tidak perlu menyebutkan nomor WhatsApp secara spesifik dalam reply teks (nomor akan dikirimkan lewat sistem terpisah) — cukup sampaikan dengan ramah bahwa akan dihubungkan ke tim Markom.
+HANDOVER KE ADMIN:
+Untuk semua kasus di bagian BATASAN SCOPE, AI wajib mengarahkan customer ke admin untuk penanganan lebih lanjut. AI tidak perlu menyebutkan nomor WhatsApp secara spesifik dalam reply teks (nomor akan dikirimkan lewat sistem terpisah) — cukup sampaikan dengan ramah bahwa akan dihubungkan ke admin.
 
 """
 
+SYSTEM_PROMPT = SYSTEM_PROMPT_TEMPLATE.replace("{knowledge_base}", KNOWLEDGE_BASE_DATA)
+
 print("=== System Prompt Updated ===\n")
 print(SYSTEM_PROMPT[:500] + "...\n")
-print("✓ System prompt dengan knowledge base & batasan scope sudah siap!")
+print("✓ System prompt dengan KB dinamis & batasan scope sudah siap!")
 
 
 # In[11]:
@@ -477,7 +409,7 @@ def chat_structured(user_message: str, model=MODEL, max_retries: int = 3):
     "customer_name": null or string,
     "customer_phone": null or string
   },
-  "actions": ["array berisi STRING singkat saja, contoh: [\\"show_products\\", \\"ask_quantity\\"], JANGAN berupa object/dict, boleh kosong []"],
+  "actions": ["array berisi STRING singkat saja, contoh: [\\"show_products\\", \\"ask_quantity\\", \\"redirect_to_web\\"], JANGAN berupa object/dict, boleh kosong []"],
   "needs_handover": false,
   "handover_reason": null
 }"""
@@ -590,14 +522,20 @@ import time
 import re
 
 # --- Daftar Tim Markom (WhatsApp) ---
-MARKOM_ADMINS = [
-    {"name": "Admin 1 - Rehan",  "phone": "6285190851449"},
-    {"name": "Admin 2 - Farhan", "phone": "6287790011110"},
-    {"name": "Admin 3 - Sari",   "phone": "6281234560003"},
-    {"name": "Admin 4 - Budi",   "phone": "6281234560004"},
-    {"name": "Admin 5 - Fajar",  "phone": "6281234560005"},
-    {"name": "Admin 6 - Wulan",  "phone": "6281234560006"},
-]
+# Format di .env: MARKOM_ADMINS="Admin 1 - Rehan:6285190851449,Admin 2 - Farhan:6287790011110,..."
+_admin_env = os.getenv("MARKOM_ADMINS", "")
+MARKOM_ADMINS = []
+if _admin_env:
+    for admin_pair in _admin_env.split(','):
+        if ':' in admin_pair:
+            name, phone = admin_pair.split(':', 1)
+            MARKOM_ADMINS.append({"name": name.strip(), "phone": phone.strip()})
+
+if not MARKOM_ADMINS:
+    print("[WARNING] MARKOM_ADMINS belum disetting di .env!")
+    # Berikan dummy agar tidak crash saat testing awal
+    MARKOM_ADMINS = [{"name": "Admin Default", "phone": "628000000000"}]
+
 
 _markom_round_robin_counter = {"index": 0}
 
@@ -668,7 +606,7 @@ class ConversationManager:
     def add_message(self, role: str, content: str):
         self.history.append({"role": role, "content": content})
 
-    def get_last_n_messages(self, n: int = 10):
+    def get_last_n_messages(self, n: int = 20):
         return self.history[-n:]
 
     def chat(self, user_message: str, max_retries: int = 3):
@@ -700,16 +638,19 @@ class ConversationManager:
         anchor_rule = """ATURAN WAJIB sebelum menjawab:
 1. Baca ulang pesan customer di atas ini (yang paling akhir), abaikan paket apa pun yang sempat dibahas sebelumnya kalau ada info baru yang mengubah konteks.
 2. Tentukan paket yang benar berdasarkan SEMUA info yang sudah diketahui (lihat "Info yang sudah diketahui" di atas) + pesan terakhir:
-   - Kalau event_type mengarah ke meeting/seminar/training/workshop/acara kantor/VIP -> WAJIB Paket Corporate A atau B, JANGAN Paket Hemat.
-   - Kalau event_type arisan/pengajian/acara keluarga/ulang tahun -> Paket Hemat A/B.
+   - Kalau event_type meeting/seminar/training/workshop/corporate -> Broiler/Broiler Jumbo.
+   - Kalau event_type gathering/family event/celebration -> Ayam Kampung.
+   - Kalau event_type premium/VIP/special -> Bebek Mantap atau Gurami.
+   - Kalau budget terbatas/casual -> Minibox.
 3. CEK BATASAN SCOPE dulu: apakah pesan terakhir termasuk kategori yang wajib di-handover?
    - KALAU YA: set needs_handover=true, isi handover_reason singkat, dan reply CUKUP kalimat singkat empatik yang memberi tahu customer akan dihubungkan ke tim kami (JANGAN coba menjawab isi pertanyaannya, JANGAN mengarang info yang tidak ada di KB, JANGAN memberi kepastian/jaminan apa pun soal hal ini).
    - KALAU TIDAK: set needs_handover=false, handover_reason=null, dan jawab seperti biasa sesuai knowledge base.
-4. AWALAN JAWABAN harus menjawab langsung bentuk pesan terakhir customer (kalau tidak perlu handover):
+4. KALAU customer mau ORDER/PESAN: set intent="ordering", dan reply HARUS menyebutkan bahwa untuk menyelesaikan pemesanan silakan melalui halaman web. JANGAN proses order di chat.
+5. AWALAN JAWABAN harus menjawab langsung bentuk pesan terakhir customer (kalau tidak perlu handover):
    - Kalau pesan terakhir berupa PERTANYAAN -> mulai reply dengan jawaban langsung ke pertanyaan itu dulu.
    - Kalau pesan terakhir berupa KONFIRMASI/PERSETUJUAN -> mulai reply dengan penegasan singkat lalu langsung ke ringkasan.
-5. Setelah awalan jawaban di atas (kalau tidak perlu handover), SELALU lanjutkan dengan RINGKASAN PESANAN TERKINI yang menggabungkan SEMUA info yang sudah diketahui.
-6. Pada field "entities" di JSON, isi HANYA entity yang disebut/relevan di pesan TERAKHIR ini saja (entity lama akan digabung otomatis oleh sistem, jangan diulang manual).
+6. Setelah awalan jawaban di atas (kalau tidak perlu handover), SELALU lanjutkan dengan RINGKASAN PESANAN TERKINI yang menggabungkan SEMUA info yang sudah diketahui.
+7. Pada field "entities" di JSON, isi HANYA entity yang disebut/relevan di pesan TERAKHIR ini saja (entity lama akan digabung otomatis oleh sistem, jangan diulang manual).
 """
 
         json_instruction = """Respond ONLY dengan JSON yang valid. JANGAN ada teks lain di luar JSON.
@@ -727,7 +668,7 @@ Format:
     "customer_name": null,
     "customer_phone": null
   },
-  "actions": ["array berisi STRING singkat saja, contoh: [\\"show_products\\"], JANGAN berupa object/dict, boleh kosong []"],
+  "actions": ["array berisi STRING singkat saja, contoh: [\\"show_products\\", \\"redirect_to_web\\"], JANGAN berupa object/dict, boleh kosong []"],
   "needs_handover": false,
   "handover_reason": null
 }"""
@@ -804,6 +745,22 @@ Format:
                         self.collected_entities[k] = v
                 response_json["entities"] = dict(self.collected_entities)
 
+                # --- Jika customer mau order, arahkan ke web ---
+                ORDER_WEB_URL = os.getenv("ORDER_WEB_URL", "https://ayambakarpakd.com/order")
+
+                cur_intent = response_json.get("intent", "")
+                cur_purchase_intent = response_json.get("purchase_intent", "")
+
+                if cur_intent == "ordering" or cur_purchase_intent == "ready_to_order":
+                    base_reply = response_json.get("reply", "").rstrip()
+                    response_json["reply"] = (
+                        f"{base_reply}\n\n"
+                        f"Untuk melanjutkan pemesanan, silakan melalui halaman web kami ya kak 🛒✨\n"
+                        f"👉 {ORDER_WEB_URL}"
+                    )
+                    if "redirect_to_web" not in response_json.get("actions", []):
+                        response_json.setdefault("actions", []).append("redirect_to_web")
+
                 # --- Cek needs_handover dari model, lalu terapkan safety-net override ---
                 needs_handover = bool(response_json.get("needs_handover", False))
                 handover_reason = response_json.get("handover_reason")
@@ -833,12 +790,12 @@ Format:
 
                     base_reply = response_json.get("reply", "").rstrip()
                     response_json["reply"] = (
-                        f"{base_reply}\n\nUntuk hal ini, saya hubungkan ke tim Markom kami ya kak 🙏\n"
+                        f"{base_reply}\n\nUntuk hal ini, saya hubungkan ke admin kami ya kak 🙏\n"
                         f"{admin['name']}: {wa_link}"
                     )
 
-                    if "handover_markom" not in response_json.get("actions", []):
-                        response_json.setdefault("actions", []).append("handover_markom")
+                    if "handover_admin" not in response_json.get("actions", []):
+                        response_json.setdefault("actions", []).append("handover_admin")
 
                 self.add_message("assistant", response_json.get("reply", ""))
 
@@ -899,8 +856,8 @@ print("=" * 70)
 conv_normal = ConversationManager()
 normal_messages = [
     "Halo, saya mau pesan nasi kotak",
-    "Saya mau ada arisan tanggal 13 agustus nanti, paket apa yang cocok ya?",
-    "Oke boleh paket itu 60 box",
+    "Saya ada acara gathering tanggal 20 agustus nanti, paket apa yang cocok ya?",
+    "Oke boleh Nasi Kotak Broiler Jumbo 60 box",
 ]
 for msg in normal_messages:
     result = conv_normal.chat(msg)
@@ -912,7 +869,7 @@ for msg in normal_messages:
 # TEST 2: Contoh pesan per kategori handover (1 conversation baru per kategori)
 # ============================================================
 handover_test_cases = {
-    "Lokasi di luar Malang Raya": "Bisa kirim ke Surabaya nggak kak?",
+    "Lokasi di luar Surabaya Raya": "Bisa kirim ke Malang nggak kak?",
     "Custom menu/dietary kompleks": "Ada yang alergi kacang parah, bisa dijamin dapur benar-benar bebas kontaminasi kacang?",
     "Ubah syarat pembayaran": "Bisa DP 10% aja nggak, sisanya nyusul minggu depan?",
     "Pesanan sangat besar (>200 box)": "Saya butuh 500 box untuk acara pernikahan, ada diskon khusus?",
@@ -928,6 +885,23 @@ for category, msg in handover_test_cases.items():
     print(f"\n--- Kategori: {category} ---")
     conv = ConversationManager()
     result = conv.chat(msg)
+    print_conversation_result(msg, result)
+    time.sleep(1)
+
+# ============================================================
+# TEST 3: Ordering redirect ke web
+# ============================================================
+print("=" * 70)
+print("TEST 3: Ordering → Redirect ke Web")
+print("=" * 70)
+
+conv_order = ConversationManager()
+order_messages = [
+    "Saya mau pesan Nasi Kotak Broiler Jumbo 50 box",
+    "Oke, saya mau order sekarang",
+]
+for msg in order_messages:
+    result = conv_order.chat(msg)
     print_conversation_result(msg, result)
     time.sleep(1)
 

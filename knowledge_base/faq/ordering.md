@@ -11,8 +11,9 @@ active: true
 
 **Tanya:** Berapa minimum order untuk Nasi Kotak?
 **Jawab:** 
-- Paket Hemat: Minimum order 20 box.
-- Paket Corporate: Minimum order 30 box.
+- Nasi Kotak Minibox & Broiler: Minimum order 20 box.
+- Nasi Kotak Broiler Jumbo, Ayam Kampung, Bebek Mantap, Gurami: Minimum order 30 box.
+- Snack Box: Minimum order 30 box.
 Untuk pesanan di bawah jumlah tersebut, mohon maaf saat ini belum dapat kami layani.
 
 **Tanya:** Berapa hari sebelumnya saya harus memesan (Lead Time)?
