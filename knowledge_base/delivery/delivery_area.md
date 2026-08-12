@@ -7,7 +7,7 @@ active: true
 # Area Pengiriman dan Biaya
 
 **Area Layanan Kami:**
-Kami melayani pengiriman Nasi Kotak untuk seluruh wilayah **Malang Raya** (Kota Malang, Kabupaten Malang, dan Kota Batu).
+Kami melayani pengiriman Nasi Kotak untuk seluruh wilayah **Surabaya Raya** (Kota Surabaya, Kabupaten Sidoarjo, dan Kota Mojokerto).
 
 **Biaya Pengiriman (Ongkir):**
 - **Jarak 0 - 5 km:** GRATIS Ongkir.
