@@ -5,16 +5,47 @@ category: beverage
 price: 5000
 active: true
 ---
-# Pilihan Minuman Tambahan
+# 🥤 Add-ons - Minuman Tambahan
 
-Beberapa paket kami sudah termasuk Air Mineral (seperti Paket Corporate A dan B). Namun, jika Anda membutuhkan tambahan atau upgrade minuman, berikut pilihannya:
+Lengkapi pesanan nasi kotak Anda dengan minuman segar pilihan kami!
 
-**Air Mineral Botol (330ml)**
-- Tambahan Rp 3.000 / box (jika upgrade dari air gelas)
-- Beli terpisah Rp 4.000 / botol
+## Daftar Minuman Tersedia
 
-**Teh Kotak / Jus Kotak (200ml)**
-- Beli terpisah Rp 5.000 / kotak
+### Minuman Ringan (Rp 5.000)
 
-**Kopi / Teh Termos (Khusus Event Prasmanan/Meeting)**
-- Rp 150.000 / termos (Kapasitas ~30 cup, sudah termasuk gula dan gelas kertas)
+**Freshea Pouch** - Rp 5.000  
+Minuman kesehatan dengan ekstrak buah-buahan segar. Cocok untuk menu sehat.
+
+**Teh Kotak Sosro** - Rp 5.000  
+Teh premium dari Sosro dalam kemasan praktis. Pilihan klasik yang disukai banyak orang.
+
+**Es Teh** - Rp 5.000  
+Es teh segar dengan rasa manis yang pas. Sempurna untuk minuman dingin di siang hari.
+
+---
+
+### Minuman Sedang (Rp 7.000)
+
+**Es Jeruk** - Rp 7.000  
+Jeruk segar yang diperas langsung dengan es batu. Menyegarkan dan alami.
+
+**Milo** - Rp 7.000  
+Milo hangat atau dingin sesuai selera. Memberikan energi tambahan untuk aktivitas.
+
+**Lemon Tea** - Rp 7.000  
+Teh lemon yang segar dengan rasa asam yang nikmat. Kombinasi sempurna antara teh dan lemon.
+
+---
+
+### Minuman Premium (Rp 10.000)
+
+**Es Vanilla** - Rp 10.000  
+Es krim vanilla yang creamy dengan rasa vanila yang kaya. Dessert yang sempurna setelah makan.
+
+**Es Strawberry** - Rp 10.000  
+Es krim strawberry dengan rasa buah yang segar. Pilihan favorit untuk yang menyukai strawberry.
+
+**Es Chocolate** - Rp 10.000  
+Es krim chocolate yang kaya rasa coklat. Untuk para pecinta coklat sejati.
+
+---
