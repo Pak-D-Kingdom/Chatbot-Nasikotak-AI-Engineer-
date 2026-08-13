@@ -1,4 +1,5 @@
 # Byte-compiled / optimized / DLL files
+sync_notebook.py
 PRODUCT REQUIREMENT DOCUMENT (PRD).md
 implementation_plan.md
 __pycache__/
