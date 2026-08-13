@@ -1,4 +1,8 @@
 # Byte-compiled / optimized / DLL files
+rebuild_index.py
+sync_notebook.py
+PRODUCT REQUIREMENT DOCUMENT (PRD).md
+implementation_plan.md
 __pycache__/
 *.py[codz]
 *$py.class
@@ -217,3 +221,4 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+.DS_Store
