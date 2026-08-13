@@ -86,7 +86,7 @@ class ChatPipeline:
         entities = llm_response.get("entities", {})
         analysis = MessageAnalysis(
             intent=llm_response.get("intent", "other"),
-            purchase_intent=llm_response.get("purchase_intent", "LOW"),
+            purchase_intent=(llm_response.get("purchase_intent") or "LOW").upper(),
             budget=entities.get("budget_per_box"),
             quantity=entities.get("quantity"),
             event_type=entities.get("event_type"),

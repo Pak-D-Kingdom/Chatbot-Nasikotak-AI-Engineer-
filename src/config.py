@@ -5,13 +5,13 @@ load_dotenv()
 
 # === LLM Provider ===
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
-LLM_MODEL = "llama-3.1-8b-instant"
+LLM_MODEL = "openai/gpt-oss-20b"
 LLM_MAX_TOKENS = 1024
 LLM_TEMPERATURE = 0.2
 LLM_MAX_RETRIES = 3
 
 # === Rate Limiting (Groq Free Tier) ===
-GROQ_TPM_LIMIT = 6000
+GROQ_TPM_LIMIT = 8000
 GROQ_RPM_LIMIT = 30
 GROQ_TOKEN_BUDGET = 0.80
 
@@ -29,8 +29,8 @@ _admin_env = os.getenv("MARKOM_ADMINS", "")
 MARKOM_ADMINS = []
 if _admin_env:
     for pair in _admin_env.split(","):
-        if ":" in pair:
-            name, phone = pair.split(":", 1)
+        if "|" in pair:
+            name, phone = pair.split("|", 1)
             MARKOM_ADMINS.append({"name": name.strip(), "phone": phone.strip()})
 if not MARKOM_ADMINS:
     MARKOM_ADMINS = [{"name": "Admin Default", "phone": "628000000000"}]

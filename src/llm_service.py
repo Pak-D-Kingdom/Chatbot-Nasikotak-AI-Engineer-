@@ -76,6 +76,7 @@ def check_handover_override(user_message: str, collected_entities: dict) -> Opti
     text = user_message.lower()
 
     # 1. Pesanan sangat besar (>200 box)
+    # Cek quantity dari entities ATAU dari pesan terakhir saja
     qty = collected_entities.get("quantity")
     if isinstance(qty, (int, float)) and qty > 200:
         return "Pesanan sangat besar (>200 box)"
@@ -96,9 +97,12 @@ def check_handover_override(user_message: str, collected_entities: dict) -> Opti
         return "Permintaan DP di bawah standar 50%"
 
     # 4. Komplain terhadap pesanan yang sudah berjalan
-    complaint_keywords = ["komplain", "keluhan", "kecewa", "telat", "terlambat", "basi", "rusak",
-                           "kurang box", "salah kirim", "tidak sesuai pesanan"]
-    if any(k in text for k in complaint_keywords):
+    complaint_keywords = [
+        r'\bkomplain\b', r'\bkeluhan\b', r'\bkecewa\b', 
+        r'\btelat\b', r'\bterlambat\b', r'\bbasi\b', r'\brusak\b',
+        r'\bsalah kirim\b', r'\btidak sesuai pesanan\b'
+    ]
+    if any(re.search(k, text) for k in complaint_keywords):
         return "Komplain terhadap pesanan yang sudah berjalan"
 
     return None
@@ -399,6 +403,13 @@ class LLMService:
                 updated_entities = dict(collected_entities)
                 for k, v in new_entities.items():
                     if v is not None and k in updated_entities:
+                        # Untuk quantity: jangan override ke nilai lebih kecil kecuali
+                        # intent menunjukkan perubahan pesanan (bukan subset)
+                        if k == "quantity" and updated_entities.get(k) is not None:
+                            old_val = updated_entities[k]
+                            if isinstance(old_val, (int, float)) and isinstance(v, (int, float)):
+                                if v < old_val and response_json.get("intent") != "ordering":
+                                    continue  # Skip: kemungkinan subset, bukan total baru
                         updated_entities[k] = v
                 response_json["entities"] = updated_entities
 
@@ -420,7 +431,10 @@ class LLMService:
                 needs_handover = bool(response_json.get("needs_handover", False))
                 handover_reason = response_json.get("handover_reason")
 
-                override_reason = check_handover_override(user_message, updated_entities)
+                # Jangan override handover jika customer sedang ordering (bukan komplain)
+                override_reason = None
+                if cur_intent not in ("ordering",):
+                    override_reason = check_handover_override(user_message, updated_entities)
                 if override_reason and not needs_handover:
                     needs_handover = True
                     handover_reason = override_reason

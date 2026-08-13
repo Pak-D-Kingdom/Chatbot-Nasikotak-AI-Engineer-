@@ -53,12 +53,14 @@ class ConversationManager:
         # Logika sederhana: jika intent baru lebih tinggi secara ordinal, kita update.
         intent_levels = {"LOW": 0, "MEDIUM": 1, "HIGH": 2, "READY_TO_ORDER": 3}
         current_level = intent_levels.get(session.get("purchase_intent", "LOW"), 0)
-        new_level = intent_levels.get(analysis.purchase_intent, 0)
+        
+        normalized_pi = analysis.purchase_intent.upper() if analysis.purchase_intent else "LOW"
+        new_level = intent_levels.get(normalized_pi, 0)
         
         # Contoh: hanya update kalau naik, ATAU kalau turun drastis karena komplain/batal
         # Untuk sekarang kita override saja untuk demonstrasi dinamis
-        if analysis.purchase_intent in intent_levels:
-             session["purchase_intent"] = analysis.purchase_intent
+        if normalized_pi in intent_levels:
+             session["purchase_intent"] = normalized_pi
              
         return session
         
