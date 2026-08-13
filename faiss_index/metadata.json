@@ -1,6 +1,6 @@
 [
   {
-    "page_content": "# Pilihan Minuman Tambahan\n\nBeberapa paket kami sudah termasuk Air Mineral (seperti Paket Corporate A dan B). Namun, jika Anda membutuhkan tambahan atau upgrade minuman, berikut pilihannya:\n\n**Air Mineral Botol (330ml)**\n- Tambahan Rp 3.000 / box (jika upgrade dari air gelas)\n- Beli terpisah Rp 4.000 / botol\n\n**Teh Kotak / Jus Kotak (200ml)**\n- Beli terpisah Rp 5.000 / kotak\n\n**Kopi / Teh Termos (Khusus Event Prasmanan/Meeting)**\n- Rp 150.000 / termos (Kapasitas ~30 cup, sudah termasuk gula dan gelas kertas)",
+    "page_content": "# 🥤 Add-ons - Minuman Tambahan\n\nLengkapi pesanan nasi kotak Anda dengan minuman segar pilihan kami!\n\n## Daftar Minuman Tersedia\n\n### Minuman Ringan (Rp 5.000)\n\n**Freshea Pouch** - Rp 5.000  \nMinuman kesehatan dengan ekstrak buah-buahan segar. Cocok untuk menu sehat.\n\n**Teh Kotak Sosro** - Rp 5.000  \nTeh premium dari Sosro dalam kemasan praktis. Pilihan klasik yang disukai banyak orang.\n\n**Es Teh** - Rp 5.000  \nEs teh segar dengan rasa manis yang pas. Sempurna untuk minuman dingin di siang hari.\n\n---\n\n### Minuman Sedang (Rp 7.000)\n\n**Es Jeruk** - Rp 7.000  \nJeruk segar yang diperas langsung dengan es batu. Menyegarkan dan alami.",
     "metadata": {
       "document_id": "A002",
       "type": "addon",
@@ -9,6 +9,18 @@
       "active": true,
       "source": "beverages.md",
       "chunk_id": 0
+    }
+  },
+  {
+    "page_content": "langsung dengan es batu. Menyegarkan dan alami.\n\n**Milo** - Rp 7.000  \nMilo hangat atau dingin sesuai selera. Memberikan energi tambahan untuk aktivitas.\n\n**Lemon Tea** - Rp 7.000  \nTeh lemon yang segar dengan rasa asam yang nikmat. Kombinasi sempurna antara teh dan lemon.\n\n---\n\n### Minuman Premium (Rp 10.000)\n\n**Es Vanilla** - Rp 10.000  \nEs krim vanilla yang creamy dengan rasa vanila yang kaya. Dessert yang sempurna setelah makan.\n\n**Es Strawberry** - Rp 10.000  \nEs krim strawberry dengan rasa buah yang segar. Pilihan favorit untuk yang menyukai strawberry.\n\n**Es Chocolate** - Rp 10.000  \nEs krim chocolate yang kaya rasa coklat. Untuk para pecinta coklat sejati.\n\n---",
+    "metadata": {
+      "document_id": "A002",
+      "type": "addon",
+      "category": "beverage",
+      "price": 5000,
+      "active": true,
+      "source": "beverages.md",
+      "chunk_id": 1
     }
   },
   {
@@ -24,7 +36,7 @@
     }
   },
   {
-    "page_content": "# Profil Dapur Nasi Kotak Malang\n\n**Tentang Kami:**\nDapur Nasi Kotak Malang adalah penyedia layanan katering spesialis nasi kotak yang berfokus pada kualitas rasa, kebersihan, dan ketepatan waktu pengiriman. Kami telah berpengalaman melayani ribuan porsi untuk berbagai acara mulai dari arisan keluarga hingga meeting korporat berskala besar.\n\n**Alamat Dapur Produksi:**\nJl. Raya Soekarno Hatta No. 45, Lowokwaru, Kota Malang.\n\n**Jam Operasional Customer Service:**\nSenin - Minggu: 07.00 - 21.00 WIB\n(Untuk pengiriman, kami melayani mulai pukul 05.00 pagi sesuai pesanan).\n\n**Sertifikasi:**\n- 100% Halal MUI\n- Sertifikat Laik Sehat (SLS) dari Dinas Kesehatan Kota Malang.",
+    "page_content": "# Ayam Bakar Pak D\n\n## 🏪 Tentang Kami\n\n**Ayam Bakar Pak D** merupakan restoran yang memiliki sejarah panjang dalam industri kuliner Indonesia. Sebelumnya dikenal sebagai **Depot Pak D**, bisnis ini telah berdiri sejak **2008** dengan komitmen utama untuk menghadirkan cita rasa autentik ayam bakar dan ikan bakar yang lezat dan unik.\n\nDimulai dari cabang pertama di Tropodo, Sidoarjo, produk unggulan kami yaitu ayam bakar dan ikan bakar segera mendapat tempat di hati masyarakat dengan cita rasanya yang istimewa.\n\n## 🌍 Jangkauan & Ekspansi\n\nHingga saat ini, jaringan cabang outlet **Ayam Bakar Pak D** telah berkembang pesat dengan:",
     "metadata": {
       "document_id": "C001",
       "type": "company",
@@ -35,7 +47,29 @@
     }
   },
   {
-    "page_content": "# Area Pengiriman dan Biaya\n\n**Area Layanan Kami:**\nKami melayani pengiriman Nasi Kotak untuk seluruh wilayah **Malang Raya** (Kota Malang, Kabupaten Malang, dan Kota Batu).\n\n**Biaya Pengiriman (Ongkir):**\n- **Jarak 0 - 5 km:** GRATIS Ongkir.\n- **Jarak 5 - 10 km:** Rp 20.000 flat.\n- **Jarak 10 - 20 km:** Rp 40.000 flat.\n- **Lebih dari 20 km:** Akan dihitung menggunakan tarif taksi online atau kurir rekanan, diinformasikan oleh admin saat konfirmasi.",
+    "page_content": "Bakar Pak D** telah berkembang pesat dengan:\n\n- **30 cabang** tersebar di Wilayah Jawa Timur\n- **3 Kota utama:** Surabaya, Sidoarjo, Gresik\n- **2 Cabang kemitraan:** Tanggulangin (Sidoarjo) & Kotabaru (Kalimantan Selatan)\n- **Total: 32 cabang** dan terus berkembang sesuai target **Go Nasional**\n\n## 🍗 Menu Andalan\n\nProduk unggulan kami mencakup:\n- Ayam Bakar (berbagai varian: broiler reguler, broiler jumbo, ayam kampung)\n- Bebek Bakar\n- Ikan Bakar (Gurami)\n- Nasi Kotak dengan berbagai pilihan paket\n\nSetiap hidangan disiapkan dengan bumbu khas dan teknik bakar yang telah teruji sejak awal berdirinya usaha ini.\n\n## 🏢 Lokasi Central Kitchen",
+    "metadata": {
+      "document_id": "C001",
+      "type": "company",
+      "topic": "profile",
+      "active": true,
+      "source": "company_profile.md",
+      "chunk_id": 1
+    }
+  },
+  {
+    "page_content": "usaha ini.\n\n## 🏢 Lokasi Central Kitchen\n\n**Ayam Bakar Pak D - Jambangan**  \nJl. Raya Kebonsari No.25f, Kebonsari, Kec. Jambangan  \nSurabaya, Jawa Timur 60232\n\nCentral kitchen ini menjadi pusat produksi untuk supply Nasi Kotak Catering ke seluruh cabang dan mitra bisnis.\n\n## 💪 Komitmen Kami\n\n- **Kualitas bahan baku terbaik** - Kami hanya menggunakan daging berkualitas premium\n- **Rasa autentik** - Bumbu dan resep yang telah terbukti selama bertahun-tahun\n- **Pelayanan terbaik** - Tim yang berdedikasi untuk kepuasan pelanggan\n- **Ekspansi berkelanjutan** - Target Go Nasional dengan tetap menjaga kualitas\n\nTerima kasih telah menjadi bagian dari keluarga besar Ayam Bakar Pak D! 🙏",
+    "metadata": {
+      "document_id": "C001",
+      "type": "company",
+      "topic": "profile",
+      "active": true,
+      "source": "company_profile.md",
+      "chunk_id": 2
+    }
+  },
+  {
+    "page_content": "# Area Pengiriman dan Biaya\n\n**Area Layanan Kami:**\nKami melayani pengiriman Nasi Kotak untuk seluruh wilayah **Surabaya Raya** (Kota Surabaya, Kabupaten Sidoarjo, dan Kota Mojokerto).\n\n**Biaya Pengiriman (Ongkir):**\n- **Jarak 0 - 5 km:** GRATIS Ongkir.\n- **Jarak 5 - 10 km:** Rp 20.000 flat.\n- **Jarak 10 - 20 km:** Rp 40.000 flat.\n- **Lebih dari 20 km:** Akan dihitung menggunakan tarif taksi online atau kurir rekanan, diinformasikan oleh admin saat konfirmasi.",
     "metadata": {
       "document_id": "D001",
       "type": "delivery",
@@ -57,7 +91,7 @@
     }
   },
   {
-    "page_content": "# Custom Menu (Pesanan Khusus)\n\n**Ketentuan Permintaan Custom Menu:**\nKami melayani permintaan custom menu di luar paket yang tersedia, seperti menu vegetarian, penambahan lauk tertentu, atau penyesuaian rasa (misal: tidak pedas). Namun, custom menu ini hanya berlaku untuk pemesanan dengan jumlah di atas 50 box. Harga akan disesuaikan kembali berdasarkan bahan baku yang direquest.",
+    "page_content": "# Custom Menu (Pesanan Khusus)\n\n**Tanya:** Apakah saya bisa request ganti menu atau custom menu di luar paket yang ada?\n**Jawab:** Bisa. Kami melayani permintaan custom menu (contoh: minta menu vegetarian, tambah lauk tertentu, atau hapus menu pedas). Namun, custom menu hanya berlaku untuk pemesanan di atas 50 box. Harga akan disesuaikan kembali berdasarkan bahan baku menu yang direquest.\n\n**Tanya:** Bagaimana jika ada peserta yang alergi seafood atau tidak makan daging?\n**Jawab:** Anda bisa memisahkan beberapa box dengan pesanan khusus (misal: 90 box standar, 10 box vegetarian). Mohon beritahu kami rincian ini saat melakukan pemesanan agar dapur dapat mempersiapkannya secara terpisah.",
     "metadata": {
       "document_id": "F003",
       "type": "faq",
@@ -68,18 +102,7 @@
     }
   },
   {
-    "page_content": "kembali berdasarkan bahan baku yang direquest.\n\n**Penanganan Menu Khusus (Alergi / Pantangan Makanan):**\nJika ada peserta acara yang memiliki alergi (misalnya seafood) atau pantangan makanan (misalnya tidak makan daging), pesanan bisa dipisahkan dengan box khusus. Contohnya, dari total 100 box, Anda bisa membagi menjadi 90 box standar dan 10 box vegetarian. Rincian ini harus diberitahukan saat melakukan pemesanan agar dapur dapat mempersiapkannya secara terpisah.",
-    "metadata": {
-      "document_id": "F003",
-      "type": "faq",
-      "topic": "custom_menu",
-      "active": true,
-      "source": "custom_menu.md",
-      "chunk_id": 1
-    }
-  },
-  {
-    "page_content": "# Cara Pemesanan dan Minimum Order\n\n**Prosedur Pemesanan:**\nPemesanan Nasi Kotak dapat dilakukan langsung melalui chat ini. Admin kami akan menindaklanjuti dengan meminta detail pesanan seperti jumlah box, paket yang dipilih, alamat pengiriman, dan tanggal acara.\n\n**Ketentuan Minimum Order:**\nMinimum order untuk pemesanan Nasi Kotak bergantung pada paket yang dipilih:\n- Paket Hemat: Minimum order 20 box.\n- Paket Corporate: Minimum order 30 box.\nSaat ini kami belum dapat melayani pesanan di bawah jumlah minimum tersebut.",
+    "page_content": "# Cara Pemesanan dan Minimum Order\n\n**Tanya:** Bagaimana cara memesan Nasi Kotak?\n**Jawab:** Anda bisa memesan melalui chat ini dan admin kami akan menindaklanjuti pesanan Anda. Kami akan meminta detail seperti jumlah box, paket yang dipilih, alamat pengiriman, dan tanggal acara.\n\n**Tanya:** Berapa minimum order untuk Nasi Kotak?\n**Jawab:** \n- Nasi Kotak Minibox & Broiler: Minimum order 20 box.\n- Nasi Kotak Broiler Jumbo, Ayam Kampung, Bebek Mantap, Gurami: Minimum order 30 box.\n- Snack Box: Minimum order 30 box.\nUntuk pesanan di bawah jumlah tersebut, mohon maaf saat ini belum dapat kami layani.",
     "metadata": {
       "document_id": "F001",
       "type": "faq",
@@ -90,7 +113,7 @@
     }
   },
   {
-    "page_content": "pesanan di bawah jumlah minimum tersebut.\n\n**Waktu Pemesanan (Lead Time):**\nPemesanan disarankan dilakukan maksimal H-2 (2 hari sebelum acara). Untuk pesanan dalam jumlah besar (di atas 100 box), sebaiknya dilakukan maksimal H-4 agar persiapan lebih matang. Pemesanan mendadak pada H-1 hanya dapat dilayani tergantung pada ketersediaan slot di dapur kami.",
+    "page_content": "mohon maaf saat ini belum dapat kami layani.\n\n**Tanya:** Berapa hari sebelumnya saya harus memesan (Lead Time)?\n**Jawab:** Kami sarankan pemesanan dilakukan maksimal H-2 atau 2 hari sebelum acara. Untuk pemesanan dalam jumlah besar (di atas 100 box), sebaiknya maksimal H-4 agar persiapan lebih matang. Pemesanan mendadak (H-1) tergantung pada ketersediaan slot dapur kami.",
     "metadata": {
       "document_id": "F001",
       "type": "faq",
@@ -101,7 +124,7 @@
     }
   },
   {
-    "page_content": "# Pembayaran\n\n**Metode Pembayaran:**\nKami menerima pembayaran melalui Transfer Bank (BCA, Mandiri, BNI, BRI) dan e-Wallet (OVO, GoPay, Dana). Rincian nomor rekening atau panduan transfer akan diberikan oleh admin saat tahap konfirmasi pesanan.\n\n**Ketentuan Down Payment (DP) dan Pelunasan:**\nUntuk setiap pemesanan, wajib menyertakan **DP minimal 50%** dari total tagihan setelah pesanan dikonfirmasi. Sisa pembayaran atau pelunasan harus diselesaikan maksimal pada hari H (sebelum pesanan dikirimkan).",
+    "page_content": "# Pembayaran\n\n**Tanya:** Apa metode pembayaran yang tersedia?\n**Jawab:** Saat ini kami menerima pembayaran melalui Transfer Bank (BCA, Mandiri, BNI, BRI) dan e-Wallet (OVO, GoPay, Dana). Rincian nomor rekening akan diberikan oleh admin saat konfirmasi pesanan.\n\n**Tanya:** Apakah harus DP (Down Payment) atau bisa bayar lunas di akhir?\n**Jawab:** Ya, untuk semua pesanan wajib menyertakan **DP minimal 50%** dari total tagihan setelah pesanan dikonfirmasi. Sisa pembayaran (pelunasan) harus dibayarkan maksimal pada hari H (sebelum pesanan dikirim).",
     "metadata": {
       "document_id": "F002",
       "type": "faq",
@@ -112,7 +135,7 @@
     }
   },
   {
-    "page_content": "pada hari H (sebelum pesanan dikirimkan).\n\n**Sistem Termin atau Invoice (Khusus Perusahaan):**\nPembayaran menggunakan sistem termin atau invoice (Top 14 hari atau 30 hari) tersedia khusus untuk klien korporat atau instansi pemerintah. Syarat untuk menggunakan fasilitas ini adalah melampirkan dokumen Purchase Order (PO) resmi dari pihak perusahaan instansi.",
+    "page_content": "maksimal pada hari H (sebelum pesanan dikirim).\n\n**Tanya:** Apakah bisa menggunakan sistem termin (invoice belakangan) untuk perusahaan?\n**Jawab:** Bisa. Khusus untuk klien korporat atau instansi pemerintah, pembayaran dapat menggunakan sistem invoice (Top 14 hari atau 30 hari). Syaratnya adalah melampirkan Purchase Order (PO) resmi dari perusahaan.",
     "metadata": {
       "document_id": "F002",
       "type": "faq",
@@ -123,123 +146,129 @@
     }
   },
   {
-    "page_content": "# Paket Corporate A\n\n**Harga:** Rp 27.000 / box\n**Minimum Order:** 30 box\n**Cocok untuk:** Meeting, Seminar, Training, Workshop kantoran.\n\n## Menu Utama\n- Nasi Putih (Porsi Standar)\n- Ayam Geprek / Ayam Rendang\n- Tumis Sayur Campur / Oseng Kacang Panjang\n- Telur Balado Utuh\n- Sambal & Lalapan\n- Kerupuk Udang\n- Buah (Jeruk / Semangka potong)\n- Air Mineral Gelas (240ml)\n\n## Deskripsi\nPaket Corporate A dirancang khusus untuk memenuhi kebutuhan acara kantor. Dengan tambahan air mineral gelas dan telur utuh, paket ini memastikan peserta mendapatkan asupan makanan yang bergizi dan mengenyangkan selama acara berlangsung. Porsi pas dan kemasan eksklusif.",
+    "page_content": "# Nasi Kotak Ayam Kampung\n\n**Harga:** Rp 24.000 / box  \n**Minimum Order:** 30 box  \n**Cocok untuk:** Gathering, Family Event, Celebration, Special Event\n\n## Menu Utama\n- 1 potong ayam kampung\n- 1 nasi putih\n- Tahu saus\n- Kerupuk\n- Sambal & lalapan\n\n## Deskripsi\nNasi Kotak Ayam Kampung menghadirkan cita rasa autentik dengan menggunakan daging ayam kampung berkualitas. Ayam kampung memiliki tekstur lebih kenyal dan rasa yang lebih kuat dibanding ayam broiler. Dipadu dengan bumbu bakar signature Ayam Bakar Pak D menciptakan pengalaman kuliner yang tak terlupakan. Sempurna untuk acara keluarga atau perayaan spesial.",
     "metadata": {
-      "document_id": "P003",
+      "document_id": "P004",
       "type": "product",
-      "category": "corporate",
+      "category": "ayam_kampung",
+      "price": 24000,
+      "minimum_order": 30,
+      "event_types": [
+        "gathering",
+        "family_event",
+        "celebration",
+        "special_event"
+      ],
+      "active": true,
+      "source": "Paket_Ayam_Kampung.md",
+      "chunk_id": 0
+    }
+  },
+  {
+    "page_content": "# Nasi Kotak Bebek Mantap\n\n**Harga:** Rp 27.000 / box  \n**Minimum Order:** 30 box  \n**Cocok untuk:** Gathering, Corporate Event, Special Occasion, Premium Event\n\n## Menu Utama\n- 1 potong bebek mantap\n- 1 nasi putih\n- Tahu saus\n- Kerupuk\n- Sambal & lalapan\n\n## Deskripsi\nNasi Kotak Bebek Mantap adalah pilihan premium yang menghadirkan cita rasa istimewa. Daging bebek pilihan yang dibakar dengan bumbu khas Ayam Bakar Pak D menghasilkan rasa yang kaya dan lezat. Tekstur daging yang empuk dan lemak yang pas membuat setiap gigitan memuaskan. Sempurna untuk acara spesial atau client gathering yang membutuhkan menu eksklusif.",
+    "metadata": {
+      "document_id": "P005",
+      "type": "product",
+      "category": "bebek",
       "price": 27000,
       "minimum_order": 30,
       "event_types": [
-        "meeting",
-        "seminar",
-        "training",
-        "workshop"
+        "gathering",
+        "corporate_event",
+        "special_occasion",
+        "premium_event"
       ],
       "active": true,
-      "source": "paket_corporate_a.md",
+      "source": "Paket_Bebek_Mantap.md",
       "chunk_id": 0
     }
   },
   {
-    "page_content": "# Paket Corporate B (Premium)\n\n**Harga:** Rp 33.000 / box\n**Minimum Order:** 30 box\n**Cocok untuk:** Meeting Penting, Seminar Berskala Besar, Acara VIP.\n\n## Menu Utama\n- Nasi Putih / Nasi Kuning\n- Ayam Bakar Madu / Sapi Lada Hitam (Sapi +Rp5000)\n- Sayur Brokoli Bawang Putih / Capcay Seafood\n- Perkedel Kentang\n- Sambal Terasi Premium\n- Kerupuk Udang Besar\n- Buah (Pisang Cavendish / Jeruk Santang)\n- Pudding Coklat / Strawberry\n- Air Mineral Botol (330ml)",
-    "metadata": {
-      "document_id": "P004",
-      "type": "product",
-      "category": "corporate",
-      "price": 33000,
-      "minimum_order": 30,
-      "event_types": [
-        "meeting",
-        "seminar",
-        "training",
-        "workshop",
-        "VIP_event"
-      ],
-      "active": true,
-      "source": "paket_corporate_b.md",
-      "chunk_id": 0
-    }
-  },
-  {
-    "page_content": "Coklat / Strawberry\n- Air Mineral Botol (330ml)\n\n## Deskripsi\nPaket Corporate B adalah opsi paling premium untuk tamu istimewa atau acara VIP. Dilengkapi dengan dessert pudding, buah premium, dan air mineral botol. Varian menu daging sapi juga tersedia dengan tambahan harga. Kemasan box bento premium yang elegan memberikan kesan profesional.",
-    "metadata": {
-      "document_id": "P004",
-      "type": "product",
-      "category": "corporate",
-      "price": 33000,
-      "minimum_order": 30,
-      "event_types": [
-        "meeting",
-        "seminar",
-        "training",
-        "workshop",
-        "VIP_event"
-      ],
-      "active": true,
-      "source": "paket_corporate_b.md",
-      "chunk_id": 1
-    }
-  },
-  {
-    "page_content": "# Paket Hemat A\n\n**Harga:** Rp 18.000 / box\n**Minimum Order:** 20 box\n**Cocok untuk:** Arisan, Pengajian, Acara Keluarga sederhana.\n\n## Menu Utama\n- Nasi Putih\n- Ayam Goreng\n- Sayur Sop / Orak Arik Buncis\n- Sambal Terasi\n- Kerupuk Udang\n\n## Deskripsi\nPaket Hemat A adalah pilihan paling hemat untuk acara kumpul-kumpul sederhana. Dengan menu ayam goreng klasik yang disukai semua orang, paket ini memberikan solusi praktis dan lezat dengan budget yang sangat terjangkau.",
-    "metadata": {
-      "document_id": "P001",
-      "type": "product",
-      "category": "hemat",
-      "price": 18000,
-      "minimum_order": 20,
-      "event_types": [
-        "arisan",
-        "pengajian",
-        "acara_keluarga"
-      ],
-      "active": true,
-      "source": "paket_hemat_a.md",
-      "chunk_id": 0
-    }
-  },
-  {
-    "page_content": "# Paket Hemat B\n\n**Harga:** Rp 23.000 / box\n**Minimum Order:** 20 box\n**Cocok untuk:** Arisan, Pengajian, Acara Keluarga, Ulang Tahun.\n\n## Menu Utama\n- Nasi Putih\n- Ayam Bakar Kecap\n- Sayur Lodeh / Capcay\n- Telur Balado Separuh\n- Sambal Bajak\n- Kerupuk Udang\n- Buah (Jeruk / Pisang)\n\n## Deskripsi\nPaket Hemat B menawarkan hidangan yang lebih lengkap dengan tambahan telur balado dan buah segar. Pilihan menu ayam bakar kecap memberikan rasa manis gurih yang lezat, sangat cocok untuk acara keluarga atau syukuran kecil.",
+    "page_content": "# Nasi Kotak Broiler\n\n**Harga:** Rp 20.000 / box  \n**Minimum Order:** 20 box  \n**Cocok untuk:** Meeting, Seminar, Training, Office Event\n\n## Menu Utama\n- 1 potong ayam broiler reguler\n- 1 nasi putih\n- Tahu saus\n- Kerupuk\n- Sambal & lalapan\n\n## Deskripsi\nNasi Kotak Broiler menghadirkan kualitas lebih dengan porsi yang lebih lengkap. Ayam broiler pilihan yang dibakar dengan bumbu khas Ayam Bakar Pak D, disajikan dengan lauk pendamping yang melengkapi. Perfect untuk acara meeting atau seminar kantor yang membutuhkan menu berkualitas dengan harga terjangkau.",
     "metadata": {
       "document_id": "P002",
       "type": "product",
-      "category": "hemat",
-      "price": 23000,
+      "category": "broiler",
+      "price": 20000,
       "minimum_order": 20,
       "event_types": [
-        "arisan",
-        "pengajian",
-        "acara_keluarga",
-        "ulang_tahun"
+        "meeting",
+        "seminar",
+        "training",
+        "office_event"
       ],
       "active": true,
-      "source": "paket_hemat_b.md",
+      "source": "Paket_Broiler.md",
       "chunk_id": 0
     }
   },
   {
-    "page_content": "# Promo Nasi Kotak Bulan Ini\n\nSaat ini kami memiliki beberapa promo menarik yang sedang berlangsung:\n\n**1. Promo Gratis Ongkir (Free Delivery)**\nDapatkan layanan pengiriman gratis tanpa biaya antar untuk:\n- Pemesanan di atas 100 box.\n- Atau pengiriman dalam radius maksimal 5 km dari dapur produksi kami.\n- Syarat & Ketentuan: Berlaku untuk semua jenis paket (Hemat dan Corporate).",
+    "page_content": "# Nasi Kotak Broiler Jumbo\n\n**Harga:** Rp 23.000 / box  \n**Minimum Order:** 30 box  \n**Cocok untuk:** Meeting, Seminar, Workshop, Gathering, Corporate Event\n\n## Menu Utama\n- 1 potong ayam broiler jumbo\n- 1 nasi putih\n- Tahu saus\n- Kerupuk\n- Sambal & lalapan\n\n## Deskripsi\nNasi Kotak Broiler Jumbo adalah pilihan premium dengan porsi ayam yang lebih besar. Ayam broiler jumbo dibakar dengan teknik khusus menghasilkan daging yang empuk dan gurih. Ideal untuk acara corporate yang membutuhkan menu berkualitas tinggi dengan presentasi premium. Setiap kotak menjanjikan kepuasan maksimal.",
     "metadata": {
-      "document_id": "PR01",
-      "type": "promotion",
-      "name": "Promo Free Ongkir & Cashback",
-      "discount_type": "conditional",
+      "document_id": "P003",
+      "type": "product",
+      "category": "broiler_jumbo",
+      "price": 23000,
+      "minimum_order": 30,
+      "event_types": [
+        "meeting",
+        "seminar",
+        "workshop",
+        "gathering",
+        "corporate_event"
+      ],
       "active": true,
-      "source": "current_promotion.md",
+      "source": "Paket_Broiler_Jumbo.md",
       "chunk_id": 0
     }
   },
   {
-    "page_content": "untuk semua jenis paket (Hemat dan Corporate).\n\n**2. Promo Cashback 5% Corporate**\nKhusus untuk pemesanan Corporate (kantor/instansi) dengan total nilai transaksi di atas Rp 5.000.000, Anda berhak mendapatkan Cashback sebesar 5% dari total tagihan.\n- Syarat & Ketentuan: Berlaku kelipatan, tidak bisa digabung dengan diskon lain (kecuali Gratis Ongkir). Cashback diberikan dalam bentuk potongan harga langsung pada saat pelunasan.",
+    "page_content": "# Nasi Kotak Gurami\n\n**Harga:** Rp 27.000 / box  \n**Minimum Order:** 30 box  \n**Cocok untuk:** Gathering, Corporate Event, Special Occasion, Premium Event\n\n## Menu Utama\n- 1 ekor gurami kecil\n- 1 nasi putih\n- Tahu saus\n- Kerupuk\n- Sambal & lalapan\n\n## Deskripsi\nNasi Kotak Gurami menghadirkan alternatif seafood premium dari Ayam Bakar Pak D. Gurami segar yang dibakar sempurna dengan bumbu signature menciptakan cita rasa yang unik dan menggugah selera. Daging gurami yang lembut dan gurih menjadi pilihan excellent untuk yang mencari sesuatu yang berbeda. Cocok untuk acara gathering VIP atau corporate event eksklusif.",
+    "metadata": {
+      "document_id": "P006",
+      "type": "product",
+      "category": "gurami",
+      "price": 27000,
+      "minimum_order": 30,
+      "event_types": [
+        "gathering",
+        "corporate_event",
+        "special_occasion",
+        "premium_event"
+      ],
+      "active": true,
+      "source": "Paket_Gurami.md",
+      "chunk_id": 0
+    }
+  },
+  {
+    "page_content": "# Nasi Kotak Minibox\n\n**Harga:** Rp 17.000 / box  \n**Minimum Order:** 20 box  \n**Cocok untuk:** Gathering, Office Break, Casual Event\n\n## Menu Utama\n- 1 potong ayam broiler reguler\n- 1 nasi putih\n- Sambal & lalapan\n\n## Deskripsi\nNasi Kotak Minibox adalah pilihan terjangkau dari Ayam Bakar Pak D. Dengan daging ayam broiler berkualitas yang dibakar sempurna, menghadirkan cita rasa autentik Ayam Bakar Pak D dengan harga ekonomis. Cocok untuk kebutuhan sehari-hari atau acara santai.",
+    "metadata": {
+      "document_id": "P001",
+      "type": "product",
+      "category": "minibox",
+      "price": 17000,
+      "minimum_order": 20,
+      "event_types": [
+        "gathering",
+        "office_break",
+        "casual_event"
+      ],
+      "active": true,
+      "source": "Paket_Minibox.md",
+      "chunk_id": 0
+    }
+  },
+  {
+    "page_content": "# Promo Nasi Kotak Bulan Ini\n\nSaat ini kami memiliki beberapa promo menarik yang sedang berlangsung:\n\n## Penawaran Utama\n\nDapatkan penawaran terbaik untuk pembelian nasi kotak dalam jumlah besar!\n\n**Syarat Promo:**\n- Minimal pembelian **30 box** dari paket manapun\n- Gratis **1 box** dengan paket yang sama yang Anda pesan\n- Gratis **Ongkos Kirim** ke seluruh area pengiriman kami",
     "metadata": {
       "document_id": "PR01",
       "type": "promotion",
-      "name": "Promo Free Ongkir & Cashback",
+      "name": "Promo Free Ongkir",
       "discount_type": "conditional",
       "active": true,
       "source": "current_promotion.md",
-      "chunk_id": 1
+      "chunk_id": 0
     }
   }
 ]

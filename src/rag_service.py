@@ -220,9 +220,9 @@ class RAGService:
         # Generate embedding
         query_embedding = self.encoder.encode([query_text], normalize_embeddings=True)
         
-        # Karena kita mungkin butuh lebih banyak dokumen jika ada metadata filtering, 
-        # kita ambil top_k * 3 terlebih dahulu, baru difilter.
-        search_k = top_k * 3 if metadata_filters else top_k
+        # Karena metadata filtering dilakukan secara post-filtering,
+        # kita harus mengambil candidate lebih banyak dari FAISS.
+        search_k = top_k * 20 if metadata_filters else top_k
         search_k = min(search_k, self.index.ntotal)
         
         distances, indices = self.index.search(np.array(query_embedding, dtype=np.float32), search_k)

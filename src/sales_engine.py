@@ -1,9 +1,8 @@
 import os
 from typing import List, Dict, Any, Optional
 import time
-from openai import OpenAIError
 from pydantic import BaseModel, Field
-from openai import OpenAI
+from groq import Groq
 from sqlalchemy.orm import Session
 from dotenv import load_dotenv
 
@@ -50,12 +49,11 @@ class MessageAnalysis(BaseModel):
 
 class SalesEngine:
     def __init__(self):
-        api_key = os.getenv("GROK_API_KEY")
+        api_key = os.getenv("GROQ_API_KEY")
         if not api_key:
-            raise ValueError("GROK_API_KEY tidak ditemukan di .env")
-        self.client = OpenAI(
+            raise ValueError("GROQ_API_KEY tidak ditemukan di .env")
+        self.client = Groq(
             api_key=api_key,
-            base_url="https://api.groq.com/openai/v1",
         )
         self.model_name = "llama-3.1-8b-instant"
 
@@ -128,7 +126,7 @@ LOW, MEDIUM, HIGH, atau READY_TO_ORDER.
                     temperature=0.1,
                 )
                 break
-            except OpenAIError as e:
+            except Exception as e:
                 if "429" in str(e) and attempt < max_retries - 1:
                     print(
                         f"Rate limit/quota exceeded (429). Menunggu 30 detik sebelum mencoba lagi (Percobaan {attempt + 1}/{max_retries})..."
@@ -295,8 +293,8 @@ LOW, MEDIUM, HIGH, atau READY_TO_ORDER.
         self, db: Session, current_budget: float, quantity: int
     ) -> List[Product]:
         """
-        Mencari maksimal 2 produk dengan harga sedikit di atas budget (maksimal 20% lebih tinggi)
-        sebagai opsi upselling.
+        Mencari 1 produk dengan harga sedikit di atas budget (maksimal 30% lebih tinggi)
+        sebagai opsi upselling, diambil yang terdekat dengan budget saat ini.
         """
         # Cari produk di range budget -> budget * 1.3
         min_budget = current_budget * 1.01  # Sedikit lebih mahal
@@ -309,7 +307,7 @@ LOW, MEDIUM, HIGH, atau READY_TO_ORDER.
             .filter(Product.price <= max_budget)
             .filter(Product.minimum_order <= quantity)
             .order_by(Product.price.asc())
-            .limit(2)
+            .limit(1)
             .all()
         )
 
