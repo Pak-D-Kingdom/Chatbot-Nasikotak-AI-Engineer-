@@ -2,19 +2,11 @@ import os
 from typing import List, Dict, Any, Optional
 import time
 from pydantic import BaseModel, Field
-from groq import Groq
 from sqlalchemy.orm import Session
-from dotenv import load_dotenv
 
-import sys
-
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from src.database import Product, Promotion
+from src.llm_service import LLMService
 
-load_dotenv()
-
-
-# Skema Pydantic untuk Output Terstruktur LLM
 class MessageAnalysis(BaseModel):
     reasoning: Optional[str] = Field(
         description="Alasan singkat mengapa pesan ini masuk ke intent dan purchase_intent tertentu.",
@@ -46,105 +38,29 @@ class MessageAnalysis(BaseModel):
         description="Tanggal acara, jika ada.", default=None
     )
 
-
 class SalesEngine:
     def __init__(self):
-        api_key = os.getenv("GROQ_API_KEY")
-        if not api_key:
-            raise ValueError("GROQ_API_KEY tidak ditemukan di .env")
-        self.client = Groq(
-            api_key=api_key,
-        )
-        self.model_name = "llama-3.1-8b-instant"
+        self.llm = LLMService()
 
     def analyze_message(self, message: str) -> MessageAnalysis:
         """
-        Menganalisis pesan pengguna menggunakan Gemini untuk mengekstrak intent,
+        Menganalisis pesan pengguna menggunakan LLMService terpusat untuk mengekstrak intent,
         purchase intent, dan entitas terkait.
         """
-        prompt = f"""
-        Tugas Anda adalah menganalisis pesan dari pengguna untuk layanan katering nasi kotak.
+        result = self.llm.chat_structured(message)
         
-        Pesan Pengguna: "{message}"
+        # Mapping result from LLMService to MessageAnalysis schema
+        entities = result.get("entities", {})
         
-        Ekstrak informasi berikut dengan akurat dan BERIKAN OUTPUT DALAM FORMAT JSON VALID.
-        Struktur JSON yang diharapkan:
-        {{
-            "reasoning": "Tuliskan analisa singkat (1 kalimat) tentang pesan ini sebelum menentukan intent dan purchase_intent",
-            "intent": "Niat utama pengguna. Pilih salah satu: greeting, product_inquiry, product_recommendation, price_calculation, order_intent, promotion_inquiry, delivery_inquiry, complaint, human_request, other",
-            "purchase_intent": "Pilih SATU: LOW, MEDIUM, HIGH, atau READY_TO_ORDER",
-            "budget": float (angka budget per porsi atau total) atau null,
-            "quantity": int (jumlah pesanan) atau null,
-            "event_type": string (jenis acara, misalnya: "meeting", "arisan", "pernikahan", dll) atau null. Contoh: "buat meeting di kantor" berarti event_type adalah "meeting",
-            "location": string (lokasi acara/pengiriman) atau null,
-            "event_date": string (tanggal acara) atau null
-        }}
-        
-        KRITERIA PENENTUAN `purchase_intent` (WAJIB IKUTI PANDUAN INI):
-
-- "LOW": Pengguna hanya menyapa, mengeksplorasi produk, atau bertanya informasi umum tanpa menunjukkan niat membeli yang jelas. Contoh: "Halo", "Ada paket apa aja?", "Menunya apa saja?", "Lokasinya dimana?", "Ada paket untuk acara kantor?"
-
-- "MEDIUM": Pengguna mulai mempertimbangkan pembelian dengan bertanya harga berdasarkan jumlah tertentu, budget, diskon, atau membandingkan paket, tetapi belum menunjukkan keputusan untuk membeli. Contoh: "Kalau pesan 100 harganya?", "Kalau 50 box berapa?", "Budget 30 ribu dapat paket apa?", "Ada diskon kalau pesan banyak?", "Bedanya paket A dan B?"
-
-- "HIGH": Pengguna menunjukkan ketertarikan kuat, persetujuan verbal, atau mengatakan ingin membeli/memesan, tetapi belum memberikan instruksi transaksi konkret seperti alamat, waktu pengiriman, atau pembayaran. Contoh: "Wah menarik, saya mau pesan", "Oke saya ambil paket corporate", "Boleh deh yang itu", "Saya mau paket A", "Saya tertarik dengan paket ini"
-
-- "READY_TO_ORDER": Pengguna sudah memberikan instruksi konkret untuk melakukan transaksi, seperti alamat pengiriman, waktu/tanggal pengiriman, detail pesanan yang siap diproses, atau meminta informasi pembayaran. Contoh: "Kirim ke Sudirman ya besok", "Antar ke kantor saya jam 12", "Saya pesan 100 box untuk hari Jumat", "Minta nomor rekeningnya dong", "Saya mau transfer sekarang", "Kirim 100 box ke Surabaya besok"
-
-ATURAN PENTING:
-- Fokus pada maksud keseluruhan pesan, bukan hanya keyword.
-- Kata "mau", "pesan", atau jumlah box TIDAK otomatis berarti READY_TO_ORDER.
-- "Saya mau pesan 100 box" = HIGH jika belum ada instruksi transaksi konkret.
-- "Kirim 100 box ke Sudirman besok" = READY_TO_ORDER.
-- "Kalau 100 box harganya berapa?" = MEDIUM.
-- Jika pengguna hanya bertanya atau mengeksplorasi = LOW.
-- Jika pengguna sedang mempertimbangkan harga/pilihan = MEDIUM.
-- Jika pengguna sudah ingin membeli tetapi belum memberikan instruksi transaksi = HIGH.
-- Jika pengguna memberikan instruksi transaksi konkret = READY_TO_ORDER.
-
-Pilih tepat satu kategori:
-LOW, MEDIUM, HIGH, atau READY_TO_ORDER.
-        CATATAN PENTING:
-        - Buat "reasoning" terlebih dahulu sebelum field lainnya agar analisis lebih akurat.
-        - "intent" dan "purchase_intent" TIDAK BOLEH null.
-        - Jika "budget", "quantity", "event_type", "location", "event_date" tidak disebutkan secara eksplisit, berikan nilai null.
-        """
-
-        max_retries = 3
-        response = None
-        for attempt in range(max_retries):
-            try:
-                response = self.client.chat.completions.create(
-                    model=self.model_name,
-                    messages=[
-                        {
-                            "role": "system",
-                            "content": "Anda adalah asisten analisis data untuk katering nasi kotak yang selalu mengembalikan JSON valid.",
-                        },
-                        {"role": "user", "content": prompt},
-                    ],
-                    response_format={"type": "json_object"},
-                    temperature=0.1,
-                )
-                break
-            except Exception as e:
-                if "429" in str(e) and attempt < max_retries - 1:
-                    print(
-                        f"Rate limit/quota exceeded (429). Menunggu 30 detik sebelum mencoba lagi (Percobaan {attempt + 1}/{max_retries})..."
-                    )
-                    time.sleep(30)
-                else:
-                    raise e
-
-        import json
-
-        try:
-            content = response.choices[0].message.content
-            data = json.loads(content)
-            return MessageAnalysis(**data)
-        except Exception as e:
-            print(f"Error parsing Grok output: {e}")
-            # Fallback
-            return MessageAnalysis(intent="other", purchase_intent="LOW")
+        return MessageAnalysis(
+            intent=result.get("intent", "other"),
+            purchase_intent=result.get("purchase_intent", "LOW"),
+            budget=entities.get("budget_per_box"),
+            quantity=entities.get("quantity"),
+            event_type=entities.get("event_type"),
+            location=entities.get("location"),
+            event_date=entities.get("event_date")
+        )
 
     def recommend_products(
         self,

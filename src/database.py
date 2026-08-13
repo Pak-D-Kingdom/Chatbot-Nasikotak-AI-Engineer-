@@ -3,9 +3,10 @@ from datetime import datetime
 from sqlalchemy import create_engine, Column, Integer, String, Float, Boolean, DateTime, Text, JSON
 from sqlalchemy.orm import declarative_base, sessionmaker
 
+from src.config import DB_PATH, PROJECT_ROOT
+
 # Ensure data directory exists
-os.makedirs("data", exist_ok=True)
-DB_PATH = "sqlite:///data/nasikotak.db"
+os.makedirs(os.path.join(PROJECT_ROOT, "data"), exist_ok=True)
 
 engine = create_engine(DB_PATH, connect_args={"check_same_thread": False})
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

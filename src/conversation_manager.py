@@ -1,10 +1,7 @@
 import json
 from typing import Dict, Any, List, Optional
 from sqlalchemy.orm import Session
-import sys
 import os
-
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from src.database import Conversation
 from src.sales_engine import MessageAnalysis
 
