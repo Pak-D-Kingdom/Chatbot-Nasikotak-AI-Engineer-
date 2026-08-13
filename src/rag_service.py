@@ -254,14 +254,24 @@ class RAGService:
         
         return results
 
-    def construct_context(self, retrieved_docs: List[Document]) -> str:
+    def construct_context(self, retrieved_docs: List[Document], max_chars: int = 1500) -> str:
         """
         Membangun string context dari dokumen yang terambil untuk prompt LLM.
         """
         context_parts = []
+        total_chars = 0
         for i, doc in enumerate(retrieved_docs, 1):
+            if doc.metadata.get('relevance_score', 0) < 0.3:
+                continue
+                
             source = doc.metadata.get('source', 'Unknown source')
             content = doc.page_content
-            context_parts.append(f"[Document {i} | Source: {source}]\n{content}\n")
+            entry = f"[{source}]\n{content}\n"
+            
+            if total_chars + len(entry) > max_chars:
+                break
+                
+            context_parts.append(entry)
+            total_chars += len(entry)
             
         return "\n".join(context_parts)

@@ -91,58 +91,80 @@
     }
   },
   {
-    "page_content": "# Custom Menu (Pesanan Khusus)\n\n**Tanya:** Apakah saya bisa request ganti menu atau custom menu di luar paket yang ada?\n**Jawab:** Bisa. Kami melayani permintaan custom menu (contoh: minta menu vegetarian, tambah lauk tertentu, atau hapus menu pedas). Namun, custom menu hanya berlaku untuk pemesanan di atas 50 box. Harga akan disesuaikan kembali berdasarkan bahan baku menu yang direquest.\n\n**Tanya:** Bagaimana jika ada peserta yang alergi seafood atau tidak makan daging?\n**Jawab:** Anda bisa memisahkan beberapa box dengan pesanan khusus (misal: 90 box standar, 10 box vegetarian). Mohon beritahu kami rincian ini saat melakukan pemesanan agar dapur dapat mempersiapkannya secara terpisah.",
+    "page_content": "# Harga Promo & Paket Rombongan\n\n**Tanya:** Apakah ada menu pilihan hemat untuk makan bersama/keluarga?\n**Jawab:** Ada, kami menyediakan pilihan Paket Rame-Rame (isi 4-10 porsi) yang lebih ekonomis untuk dinikmati bersama keluarga atau rekan kerja.\n\n**Tanya:** Apa menu paling favorit (best seller) di Ayam Bakar Pak D?\n**Jawab:** Menu paling direkomendasikan adalah Paket Ayam Bakar Bumbu Manis Gurih dipadukan dengan Sambal Korek dan Sayur Asem.\n\n**Tanya:** Apakah ada promo atau diskon pemesanan hari ini?\n**Jawab:** Kami sering mengadakan promo diskon menu dan potongan ongkir di platform GoFood, GrabFood, dan ShopeeFood. Silakan cek bagian banner promo di aplikasi Anda.",
     "metadata": {
       "document_id": "F003",
       "type": "faq",
-      "topic": "custom_menu",
+      "topic": "harga_promo_dan_paket_rombongan",
       "active": true,
-      "source": "custom_menu.md",
+      "source": "harga_promo_dan_paket_rombongan.md",
       "chunk_id": 0
     }
   },
   {
-    "page_content": "# Cara Pemesanan dan Minimum Order\n\n**Tanya:** Bagaimana cara memesan Nasi Kotak?\n**Jawab:** Anda bisa memesan melalui chat ini dan admin kami akan menindaklanjuti pesanan Anda. Kami akan meminta detail seperti jumlah box, paket yang dipilih, alamat pengiriman, dan tanggal acara.\n\n**Tanya:** Berapa minimum order untuk Nasi Kotak?\n**Jawab:** \n- Nasi Kotak Minibox & Broiler: Minimum order 20 box.\n- Nasi Kotak Broiler Jumbo, Ayam Kampung, Bebek Mantap, Gurami: Minimum order 30 box.\n- Snack Box: Minimum order 30 box.\nUntuk pesanan di bawah jumlah tersebut, mohon maaf saat ini belum dapat kami layani.",
+    "page_content": "# Kelengkapan Paket & Sambal\n\n**Tanya:** Jika memesan Paket Ayam Bakar apa saja isi di dalamnya?\n**Jawab:** Setiap pemesanan Paket Hemat Ayam Bakar sudah lengkap berisi: Ayam Bakar, Nasi Putih hangat, Sambal Khas Pak D, dan Lalapan segar.\n\n**Tanya:** Sambal jenis apa yang didapatkan dan apakah dipisah?\n**Jawab:** Kami menyediakan Sambal Terasi/Korek khas Pak D dengan tingkat kepedasan yang sedang hingga pedas mantap. Untuk menjaga kualitas dan kebersihan, sambal selalu dikemas dalam wadah/plastik terpisah.",
     "metadata": {
-      "document_id": "F001",
+      "document_id": "F002",
       "type": "faq",
-      "topic": "ordering",
+      "topic": "kelengkapan_paket_dan_sambal",
       "active": true,
-      "source": "ordering.md",
+      "source": "kelengkapan_paket_dan_sambal.md",
       "chunk_id": 0
     }
   },
   {
-    "page_content": "mohon maaf saat ini belum dapat kami layani.\n\n**Tanya:** Berapa hari sebelumnya saya harus memesan (Lead Time)?\n**Jawab:** Kami sarankan pemesanan dilakukan maksimal H-2 atau 2 hari sebelum acara. Untuk pemesanan dalam jumlah besar (di atas 100 box), sebaiknya maksimal H-4 agar persiapan lebih matang. Pemesanan mendadak (H-1) tergantung pada ketersediaan slot dapur kami.",
+    "page_content": "selalu dikemas dalam wadah/plastik terpisah.\n\n**Tanya:** Bisakah saya menambah ekstra sambal atau nasi?\n**Jawab:** Sangat bisa. Anda dapat menambahkan menu 'Ekstra Nasi Putih' atau 'Ekstra Sambal' pada kategori Add-On di aplikasi online.",
     "metadata": {
-      "document_id": "F001",
+      "document_id": "F002",
       "type": "faq",
-      "topic": "ordering",
+      "topic": "kelengkapan_paket_dan_sambal",
       "active": true,
-      "source": "ordering.md",
+      "source": "kelengkapan_paket_dan_sambal.md",
       "chunk_id": 1
     }
   },
   {
-    "page_content": "# Pembayaran\n\n**Tanya:** Apa metode pembayaran yang tersedia?\n**Jawab:** Saat ini kami menerima pembayaran melalui Transfer Bank (BCA, Mandiri, BNI, BRI) dan e-Wallet (OVO, GoPay, Dana). Rincian nomor rekening akan diberikan oleh admin saat konfirmasi pesanan.\n\n**Tanya:** Apakah harus DP (Down Payment) atau bisa bayar lunas di akhir?\n**Jawab:** Ya, untuk semua pesanan wajib menyertakan **DP minimal 50%** dari total tagihan setelah pesanan dikonfirmasi. Sisa pembayaran (pelunasan) harus dibayarkan maksimal pada hari H (sebelum pesanan dikirim).",
+    "page_content": "# Menu & Pilihan Produk\n\n**Tanya:** Tipe bumbu Ayam Bakar Pak D seperti apa?\n**Jawab:** Ayam Bakar Pak D disajikan dengan bumbu kecap manis gurih khas yang meresap hingga ke dalam daging, dibakar hingga menghasilkan aroma karamelisasi yang harum dan lezat.\n\n**Tanya:** Apakah saya bisa memilih bagian potong ayam?\n**Jawab:** Ya, Anda dapat memilih varian bagian ayam seperti Paha Atas, Paha Bawah, Dada, atau Sayap sesuai ketersediaan di aplikasi pemesanan online kami.\n\n**Tanya:** Seberapa besar porsi ayamnya?\n**Jawab:** Porsi potong ayam kami dirancang pas dan mengenyangkan untuk kebutuhan porsi makan satu orang dewasa.",
     "metadata": {
-      "document_id": "F002",
+      "document_id": "F001",
       "type": "faq",
-      "topic": "payment",
+      "topic": "menu_dan_pilihan_produk",
       "active": true,
-      "source": "payment.md",
+      "source": "menu_dan_pilihan_produk.md",
       "chunk_id": 0
     }
   },
   {
-    "page_content": "maksimal pada hari H (sebelum pesanan dikirim).\n\n**Tanya:** Apakah bisa menggunakan sistem termin (invoice belakangan) untuk perusahaan?\n**Jawab:** Bisa. Khusus untuk klien korporat atau instansi pemerintah, pembayaran dapat menggunakan sistem invoice (Top 14 hari atau 30 hari). Syaratnya adalah melampirkan Purchase Order (PO) resmi dari perusahaan.",
+    "page_content": "untuk kebutuhan porsi makan satu orang dewasa.\n\n**Tanya:** Selain ayam bakar apakah ada pilihan menu lainnya?\n**Jawab:** Ada! Kami juga menyediakan menu Ayam Goreng Krispi/Kuning, Bebek Goreng/Bakar, Ati Ampela, Tahu, Tempe, Sayur Asem, serta berbagai pilihan minuman segar.",
     "metadata": {
-      "document_id": "F002",
+      "document_id": "F001",
       "type": "faq",
-      "topic": "payment",
+      "topic": "menu_dan_pilihan_produk",
       "active": true,
-      "source": "payment.md",
+      "source": "menu_dan_pilihan_produk.md",
       "chunk_id": 1
+    }
+  },
+  {
+    "page_content": "# Pemesanan Jumlah Banyak (Nasi Kotak)\n\n**Tanya:** Bagaimana cara pesan Nasi Kotak untuk acara khusus dalam jumlah banyak?\n**Jawab:** Untuk pemesanan acara/catering dalam jumlah besar, disarankan untuk melakukan pemesanan H-1 sampai H-2 melalui Direct Message Instagram atau nomor WhatsApp Admin Resmi outlet terdekat kami.",
+    "metadata": {
+      "document_id": "F005",
+      "type": "faq",
+      "topic": "pemesanan_jumlah_banyak",
+      "active": true,
+      "source": "pemesanan_jumlah_banyak.md",
+      "chunk_id": 0
+    }
+  },
+  {
+    "page_content": "# Pengemasan & Kualitas Delivery\n\n**Tanya:** Bagaimana pengemasan makanan untuk pemesanan online?\n**Jawab:** Makanan dikemas menggunakan kotak/thinwall food-grade yang rapat, tahan panas, dan higienis sehingga aman dari tumpah selama perjalanan oleh kurir.\n\n**Tanya:** Apakah Ayam Bakar Pak D dipastikan Halal?\n**Jawab:** Ya, 100% Halal. Seluruh bahan baku dan proses pengolahannya memenuhi standar kehalalan.",
+    "metadata": {
+      "document_id": "F004",
+      "type": "faq",
+      "topic": "pengemasan_dan_kualitas_delivery",
+      "active": true,
+      "source": "pengemasan_dan_kualitas_delivery.md",
+      "chunk_id": 0
     }
   },
   {

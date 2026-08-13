@@ -83,9 +83,21 @@ class ConversationManager:
         db.add(db_message)
         db.commit()
         
-    def get_history(self, session_id: str, limit: int = 5) -> List[Dict[str, str]]:
+    def get_history(self, session_id: str, limit: int = 5, max_chars: int = 2000) -> List[Dict[str, str]]:
         """
-        Mengambil sejumlah history terakhir untuk konteks LLM.
+        Mengambil sejumlah history terakhir untuk konteks LLM, dibatasi oleh jumlah pesan dan max_chars.
         """
         session = self.get_session(session_id)
-        return session["messages"][-limit:]
+        recent = session["messages"][-limit:]
+        
+        # Trim dari pesan terlama jika total chars melebihi max
+        trimmed = []
+        total = 0
+        for msg in reversed(recent):
+            msg_len = len(msg.get("text", ""))
+            if total + msg_len > max_chars:
+                break
+            trimmed.append(msg)
+            total += msg_len
+        
+        return list(reversed(trimmed))

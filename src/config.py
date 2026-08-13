@@ -6,9 +6,14 @@ load_dotenv()
 # === LLM Provider ===
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 LLM_MODEL = "llama-3.1-8b-instant"
-LLM_MAX_TOKENS = 1500
+LLM_MAX_TOKENS = 1024
 LLM_TEMPERATURE = 0.2
 LLM_MAX_RETRIES = 3
+
+# === Rate Limiting (Groq Free Tier) ===
+GROQ_TPM_LIMIT = 6000
+GROQ_RPM_LIMIT = 30
+GROQ_TOKEN_BUDGET = 0.80
 
 # === Paths ===
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -32,7 +37,8 @@ if not MARKOM_ADMINS:
 
 # === RAG ===
 EMBEDDING_MODEL = "intfloat/multilingual-e5-small"
-RAG_TOP_K = 5
+RAG_TOP_K = 3
+RAG_MAX_CONTEXT_TOKENS = 600
 
 # === Conversation ===
-MAX_CONVERSATION_HISTORY = 20
+MAX_CONVERSATION_HISTORY = 10

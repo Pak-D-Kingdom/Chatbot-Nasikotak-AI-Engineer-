@@ -1,4 +1,5 @@
 # Byte-compiled / optimized / DLL files
+rebuild_index.py
 sync_notebook.py
 PRODUCT REQUIREMENT DOCUMENT (PRD).md
 implementation_plan.md
