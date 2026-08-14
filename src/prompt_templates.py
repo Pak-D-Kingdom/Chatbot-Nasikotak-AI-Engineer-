@@ -39,7 +39,7 @@ def build_system_prompt():
 
 ANCHOR_RULES = """ATURAN:
 1. Jawab HANYA pesan terakhir. Jangan ulang jawaban lama.
-2. Tentukan paket UTAMA dulu (meeting=Broiler, gathering=Ayam Kampung). Jangan tawar Snack Box di awal.
+2. Tentukan paket UTAMA dulu yang sesuai dengan jenis acara (secara luas, misal meeting bisa cocok dengan corporate_event). Rekomendasikan produk yang harganya di bawah budget namun paling mendekati budget per box. Jangan tawar Snack Box di awal.
 3. Tawar ADD-ON hanya jika paket utama disepakati.
 4. JIKA OUT-OF-SCOPE: needs_handover=true, isi handover_reason, reply akan dihubungi admin.
 5. JIKA MAU ORDER: intent="ordering", arahkan ke web. Jangan proses order.
@@ -52,15 +52,28 @@ ANCHOR_RULES = """ATURAN:
    - ready_to_order: "mau pesan/order/ambil"
 """
 
-JSON_FORMAT_INSTRUCTION = """Format HANYA JSON:
+JSON_FORMAT_INSTRUCTION = """Format HANYA JSON. Gunakan struktur ini:
 {
   "reply": "string (indo)",
   "intent": "greeting|product_inquiry|price_inquiry|recommendation|ordering|other",
-  "purchase_intent": "low|medium|high|ready_to_order (WAJIB naikkan jika customer minat/order)",
-  "entities": {"quantity": null (isi HANYA jika disebut di pesan TERAKHIR, jangan tebak), "budget_per_box": null, "event_type": null, "location": null, "event_date": null, "customer_name": null, "customer_phone": null},
+  "purchase_intent": "low|medium|high|ready_to_order",
+  "entities": {
+    "quantity": null,
+    "budget_per_box": null,
+    "event_type": null,
+    "location": null,
+    "event_date": null,
+    "customer_name": null,
+    "customer_phone": null
+  },
   "actions": ["string"],
   "needs_handover": false,
   "handover_reason": null
-}"""
+}
+
+CATATAN ENTITIES:
+- quantity: isi HANYA jika disebut di pesan TERAKHIR, jangan tebak (gunakan null jika tidak ada).
+- purchase_intent: WAJIB naikkan jika customer minat/order.
+"""
 
 VALID_INTENTS = {"greeting", "product_inquiry", "price_inquiry", "recommendation", "ordering", "other"}
