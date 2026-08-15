@@ -69,6 +69,15 @@ class Conversation(Base):
     purchase_intent = Column(String, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
 
+class UserForm(Base):
+    __tablename__ = "user_forms"
+    
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    session_id = Column(String, index=True, nullable=False)
+    name = Column(String, nullable=False)
+    phone = Column(String, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
 def init_db():
     Base.metadata.create_all(bind=engine)
     print("Database initialized successfully.")

@@ -203,23 +203,30 @@ class LLMService:
     def chat_structured(self, user_message: str) -> dict:
         """Chat dengan structured JSON output, divalidasi Pydantic."""
         
-        json_format_broad = """{
+        json_format_broad = """Format HANYA JSON. Gunakan struktur ini:
+{
   "reply": "response in Indonesian",
-  "intent": "pilih TEPAT SATU nilai saja dari: product_inquiry, price_inquiry, recommendation, ordering, other (JANGAN gabungkan dengan tanda | atau koma)",
-  "purchase_intent": "pilih TEPAT SATU nilai saja dari: low, medium, high, ready_to_order",
+  "intent": "product_inquiry",
+  "purchase_intent": "low",
   "entities": {
-    "quantity": null or number,
-    "budget_per_box": null or number,
-    "event_type": null or string,
-    "location": null or string,
-    "event_date": null or string,
-    "customer_name": null or string,
-    "customer_phone": null or string
+    "quantity": null,
+    "budget_per_box": null,
+    "event_type": null,
+    "location": null,
+    "event_date": null,
+    "customer_name": null,
+    "customer_phone": null
   },
-  "actions": ["array berisi STRING singkat saja, contoh: [\\"show_products\\", \\"ask_quantity\\", \\"redirect_to_web\\"], JANGAN berupa object/dict, boleh kosong []"],
+  "actions": ["show_products"],
   "needs_handover": false,
   "handover_reason": null
-}"""
+}
+
+CATATAN:
+- intent: pilih TEPAT SATU dari (greeting, product_inquiry, price_inquiry, recommendation, ordering, other)
+- purchase_intent: pilih TEPAT SATU dari (low, medium, high, ready_to_order)
+- entities: isi dengan value yang sesuai (bisa berupa angka untuk quantity/budget_per_box, string untuk lainnya) atau null.
+"""
 
         messages = [
             {"role": "system", "content": self.system_prompt},

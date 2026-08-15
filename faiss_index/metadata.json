@@ -168,26 +168,14 @@
     }
   },
   {
-    "page_content": "# Nasi Kotak Ayam Kampung\n\n**Harga:** Rp 24.000 / box  \n**Minimum Order:** 30 box  \n**Cocok untuk:** Gathering, Family Event, Celebration, Special Event\n\n## Menu Utama\n- 1 potong ayam kampung\n- 1 nasi putih\n- Tahu saus\n- Kerupuk\n- Sambal & lalapan\n\n## Deskripsi\nNasi Kotak Ayam Kampung menghadirkan cita rasa autentik dengan menggunakan daging ayam kampung berkualitas. Ayam kampung memiliki tekstur lebih kenyal dan rasa yang lebih kuat dibanding ayam broiler. Dipadu dengan bumbu bakar signature Ayam Bakar Pak D menciptakan pengalaman kuliner yang tak terlupakan. Sempurna untuk acara keluarga atau perayaan spesial.",
+    "page_content": "",
     "metadata": {
-      "document_id": "P004",
-      "type": "product",
-      "category": "ayam_kampung",
-      "price": 24000,
-      "minimum_order": 30,
-      "event_types": [
-        "gathering",
-        "family_event",
-        "celebration",
-        "special_event"
-      ],
-      "active": true,
       "source": "Paket_Ayam_Kampung.md",
       "chunk_id": 0
     }
   },
   {
-    "page_content": "# Nasi Kotak Bebek Mantap\n\n**Harga:** Rp 27.000 / box  \n**Minimum Order:** 30 box  \n**Cocok untuk:** Gathering, Corporate Event, Special Occasion, Premium Event\n\n## Menu Utama\n- 1 potong bebek mantap\n- 1 nasi putih\n- Tahu saus\n- Kerupuk\n- Sambal & lalapan\n\n## Deskripsi\nNasi Kotak Bebek Mantap adalah pilihan premium yang menghadirkan cita rasa istimewa. Daging bebek pilihan yang dibakar dengan bumbu khas Ayam Bakar Pak D menghasilkan rasa yang kaya dan lezat. Tekstur daging yang empuk dan lemak yang pas membuat setiap gigitan memuaskan. Sempurna untuk acara spesial atau client gathering yang membutuhkan menu eksklusif.",
+    "page_content": "# Nasi Kotak Bebek Mantap\n\n![Paket Bebek Mantap](/image/bebek.png)\n\n**Harga:** Rp 27.000 / box  \n**Minimum Order:** 30 box  \n**Cocok untuk:** Gathering, Corporate Event, Special Occasion, Premium Event\n\n## Menu Utama\n- 1 potong bebek mantap\n- 1 nasi putih\n- Tahu saus\n- Kerupuk\n- Sambal & lalapan\n\n## Deskripsi\nNasi Kotak Bebek Mantap adalah pilihan premium yang menghadirkan cita rasa istimewa. Daging bebek pilihan yang dibakar dengan bumbu khas Ayam Bakar Pak D menghasilkan rasa yang kaya dan lezat. Tekstur daging yang empuk dan lemak yang pas membuat setiap gigitan memuaskan. Sempurna untuk acara spesial atau client gathering yang membutuhkan menu eksklusif.",
     "metadata": {
       "document_id": "P005",
       "type": "product",
@@ -206,7 +194,7 @@
     }
   },
   {
-    "page_content": "# Nasi Kotak Broiler\n\n**Harga:** Rp 20.000 / box  \n**Minimum Order:** 20 box  \n**Cocok untuk:** Meeting, Seminar, Training, Office Event\n\n## Menu Utama\n- 1 potong ayam broiler reguler\n- 1 nasi putih\n- Tahu saus\n- Kerupuk\n- Sambal & lalapan\n\n## Deskripsi\nNasi Kotak Broiler menghadirkan kualitas lebih dengan porsi yang lebih lengkap. Ayam broiler pilihan yang dibakar dengan bumbu khas Ayam Bakar Pak D, disajikan dengan lauk pendamping yang melengkapi. Perfect untuk acara meeting atau seminar kantor yang membutuhkan menu berkualitas dengan harga terjangkau.",
+    "page_content": "# Nasi Kotak Broiler\n\n![Paket Broiler](/image/ayam%20broiler.png)\n\n**Harga:** Rp 20.000 / box  \n**Minimum Order:** 20 box  \n**Cocok untuk:** Meeting, Seminar, Training, Office Event\n\n## Menu Utama\n- 1 potong ayam broiler reguler\n- 1 nasi putih\n- Tahu saus\n- Kerupuk\n- Sambal & lalapan\n\n## Deskripsi\nNasi Kotak Broiler menghadirkan kualitas lebih dengan porsi yang lebih lengkap. Ayam broiler pilihan yang dibakar dengan bumbu khas Ayam Bakar Pak D, disajikan dengan lauk pendamping yang melengkapi. Perfect untuk acara meeting atau seminar kantor yang membutuhkan menu berkualitas dengan harga terjangkau.",
     "metadata": {
       "document_id": "P002",
       "type": "product",
@@ -225,7 +213,7 @@
     }
   },
   {
-    "page_content": "# Nasi Kotak Broiler Jumbo\n\n**Harga:** Rp 23.000 / box  \n**Minimum Order:** 30 box  \n**Cocok untuk:** Meeting, Seminar, Workshop, Gathering, Corporate Event\n\n## Menu Utama\n- 1 potong ayam broiler jumbo\n- 1 nasi putih\n- Tahu saus\n- Kerupuk\n- Sambal & lalapan\n\n## Deskripsi\nNasi Kotak Broiler Jumbo adalah pilihan premium dengan porsi ayam yang lebih besar. Ayam broiler jumbo dibakar dengan teknik khusus menghasilkan daging yang empuk dan gurih. Ideal untuk acara corporate yang membutuhkan menu berkualitas tinggi dengan presentasi premium. Setiap kotak menjanjikan kepuasan maksimal.",
+    "page_content": "# Nasi Kotak Broiler Jumbo\n\n![Paket Broiler Jumbo](/image/ayam%20broiler%20jumbo.png)\n\n**Harga:** Rp 23.000 / box  \n**Minimum Order:** 30 box  \n**Cocok untuk:** Meeting, Seminar, Workshop, Gathering, Corporate Event\n\n## Menu Utama\n- 1 potong ayam broiler jumbo\n- 1 nasi putih\n- Tahu saus\n- Kerupuk\n- Sambal & lalapan\n\n## Deskripsi\nNasi Kotak Broiler Jumbo adalah pilihan premium dengan porsi ayam yang lebih besar. Ayam broiler jumbo dibakar dengan teknik khusus menghasilkan daging yang empuk dan gurih. Ideal untuk acara corporate yang membutuhkan menu berkualitas tinggi dengan presentasi premium. Setiap kotak menjanjikan kepuasan maksimal.",
     "metadata": {
       "document_id": "P003",
       "type": "product",
@@ -245,7 +233,7 @@
     }
   },
   {
-    "page_content": "# Nasi Kotak Gurami\n\n**Harga:** Rp 27.000 / box  \n**Minimum Order:** 30 box  \n**Cocok untuk:** Gathering, Corporate Event, Special Occasion, Premium Event\n\n## Menu Utama\n- 1 ekor gurami kecil\n- 1 nasi putih\n- Tahu saus\n- Kerupuk\n- Sambal & lalapan\n\n## Deskripsi\nNasi Kotak Gurami menghadirkan alternatif seafood premium dari Ayam Bakar Pak D. Gurami segar yang dibakar sempurna dengan bumbu signature menciptakan cita rasa yang unik dan menggugah selera. Daging gurami yang lembut dan gurih menjadi pilihan excellent untuk yang mencari sesuatu yang berbeda. Cocok untuk acara gathering VIP atau corporate event eksklusif.",
+    "page_content": "# Nasi Kotak Gurami\n\n![Paket Gurami](/image/gurami.png)\n\n**Harga:** Rp 27.000 / box  \n**Minimum Order:** 30 box  \n**Cocok untuk:** Gathering, Corporate Event, Special Occasion, Premium Event\n\n## Menu Utama\n- 1 ekor gurami kecil\n- 1 nasi putih\n- Tahu saus\n- Kerupuk\n- Sambal & lalapan\n\n## Deskripsi\nNasi Kotak Gurami menghadirkan alternatif seafood premium dari Ayam Bakar Pak D. Gurami segar yang dibakar sempurna dengan bumbu signature menciptakan cita rasa yang unik dan menggugah selera. Daging gurami yang lembut dan gurih menjadi pilihan excellent untuk yang mencari sesuatu yang berbeda. Cocok untuk acara gathering VIP atau corporate event eksklusif.",
     "metadata": {
       "document_id": "P006",
       "type": "product",
@@ -264,7 +252,7 @@
     }
   },
   {
-    "page_content": "# Nasi Kotak Minibox\n\n**Harga:** Rp 17.000 / box  \n**Minimum Order:** 20 box  \n**Cocok untuk:** Gathering, Office Break, Casual Event\n\n## Menu Utama\n- 1 potong ayam broiler reguler\n- 1 nasi putih\n- Sambal & lalapan\n\n## Deskripsi\nNasi Kotak Minibox adalah pilihan terjangkau dari Ayam Bakar Pak D. Dengan daging ayam broiler berkualitas yang dibakar sempurna, menghadirkan cita rasa autentik Ayam Bakar Pak D dengan harga ekonomis. Cocok untuk kebutuhan sehari-hari atau acara santai.",
+    "page_content": "# Nasi Kotak Minibox\n\n![Paket Minibox](/image/minibox.png)\n\n**Harga:** Rp 17.000 / box  \n**Minimum Order:** 20 box  \n**Cocok untuk:** Gathering, Office Break, Casual Event\n\n## Menu Utama\n- 1 potong ayam broiler reguler\n- 1 nasi putih\n- Sambal & lalapan\n\n## Deskripsi\nNasi Kotak Minibox adalah pilihan terjangkau dari Ayam Bakar Pak D. Dengan daging ayam broiler berkualitas yang dibakar sempurna, menghadirkan cita rasa autentik Ayam Bakar Pak D dengan harga ekonomis. Cocok untuk kebutuhan sehari-hari atau acara santai.",
     "metadata": {
       "document_id": "P001",
       "type": "product",
@@ -282,7 +270,7 @@
     }
   },
   {
-    "page_content": "# Promo Nasi Kotak Bulan Ini\n\nSaat ini kami memiliki beberapa promo menarik yang sedang berlangsung:\n\n## Penawaran Utama\n\nDapatkan penawaran terbaik untuk pembelian nasi kotak dalam jumlah besar!\n\n**Syarat Promo:**\n- Minimal pembelian **30 box** dari paket manapun\n- Gratis **1 box** dengan paket yang sama yang Anda pesan\n- Gratis **Ongkos Kirim** ke seluruh area pengiriman kami",
+    "page_content": "# Promo Nasi Kotak Bulan Ini\n\nSaat ini kami memiliki beberapa promo menarik yang sedang berlangsung:\n\n## Penawaran Utama\n\nDapatkan penawaran terbaik untuk pembelian nasi kotak dalam jumlah besar!\n\n**Syarat Promo:**\n\n- Minimal pembelian **10 box** dari paket manapun\n- Gratis **1 box** dengan paket yang sama yang Anda pesan\n- Gratis **Ongkos Kirim** ke seluruh area pengiriman kami",
     "metadata": {
       "document_id": "PR01",
       "type": "promotion",

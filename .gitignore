@@ -1,7 +1,11 @@
 # Byte-compiled / optimized / DLL files
+static/
+prompt.md
+scratch/
 rebuild_index.py
 sync_notebook.py
 PRODUCT REQUIREMENT DOCUMENT (PRD).md
+implementation_plan_app.md
 implementation_plan.md
 __pycache__/
 *.py[codz]

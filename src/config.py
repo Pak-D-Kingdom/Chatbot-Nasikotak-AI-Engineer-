@@ -37,8 +37,8 @@ if not MARKOM_ADMINS:
 
 # === RAG ===
 EMBEDDING_MODEL = "intfloat/multilingual-e5-small"
-RAG_TOP_K = 3
-RAG_MAX_CONTEXT_TOKENS = 600
+RAG_TOP_K = 6
+RAG_MAX_CONTEXT_TOKENS = 2000
 
 # === Conversation ===
 MAX_CONVERSATION_HISTORY = 10
