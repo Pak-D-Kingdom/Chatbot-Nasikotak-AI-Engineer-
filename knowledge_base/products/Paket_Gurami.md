@@ -10,6 +10,8 @@ active: true
 
 # Nasi Kotak Gurami
 
+![Paket Gurami](/image/gurami.png)
+
 **Harga:** Rp 27.000 / box  
 **Minimum Order:** 30 box  
 **Cocok untuk:** Gathering, Corporate Event, Special Occasion, Premium Event

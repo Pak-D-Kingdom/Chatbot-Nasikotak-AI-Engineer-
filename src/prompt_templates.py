@@ -50,6 +50,7 @@ ANCHOR_RULES = """ATURAN:
    - medium: sebut budget/qty/event
    - high: pilih paket/minta rekomendasi
    - ready_to_order: "mau pesan/order/ambil"
+9. JIKA Anda menyebutkan produk dan di dalam KONTEKS terdapat URL gambarnya (format ![Nama](/image/...)), WAJIB sertakan markdown gambar tersebut di dalam `reply` Anda!
 """
 
 JSON_FORMAT_INSTRUCTION = """Format HANYA JSON. Gunakan struktur ini:

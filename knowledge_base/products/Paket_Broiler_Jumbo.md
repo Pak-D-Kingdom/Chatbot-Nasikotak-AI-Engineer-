@@ -10,6 +10,8 @@ active: true
 
 # Nasi Kotak Broiler Jumbo
 
+![Paket Broiler Jumbo](/image/ayam%20broiler%20jumbo.png)
+
 **Harga:** Rp 23.000 / box  
 **Minimum Order:** 30 box  
 **Cocok untuk:** Meeting, Seminar, Workshop, Gathering, Corporate Event
