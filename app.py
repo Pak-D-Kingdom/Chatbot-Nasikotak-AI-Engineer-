@@ -1,6 +1,6 @@
 import uuid
 import uvicorn
-from fastapi import FastAPI, HTTPException, Request, Response, Cookie, Depends
+from fastapi import FastAPI, HTTPException, Request, Response, Cookie, Depends, Header
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, JSONResponse
 from pydantic import BaseModel
@@ -61,7 +61,8 @@ async def root():
     return FileResponse("static/index.html")
 
 @app.get("/api/session")
-async def get_session(nasikotak_session: Optional[str] = Cookie(None)):
+async def get_session(x_session_id: Optional[str] = Header(None, alias="X-Session-ID")):
+    nasikotak_session = x_session_id
     if not nasikotak_session:
         return {"authenticated": False}
         
@@ -108,15 +109,7 @@ async def new_session(request: SessionCreateRequest, response: Response):
             db.add(new_form)
             db.commit()
             
-        # Set HTTP-only cookie
-        response.set_cookie(
-            key="nasikotak_session",
-            value=session_id,
-            httponly=True,
-            max_age=86400 * 30, # 30 days
-            samesite="lax",
-            secure=False # False for localhost dev
-        )
+        # Removed cookie setting, session_id will be stored in sessionStorage by frontend
         
         return {"status": "success", "session_id": session_id}
     except Exception as e:
@@ -132,7 +125,8 @@ async def logout(response: Response):
     return {"authenticated": False}
 
 @app.post("/api/chat", response_model=ChatResponse)
-async def chat_endpoint(request: ChatRequest, nasikotak_session: Optional[str] = Cookie(None)):
+async def chat_endpoint(request: ChatRequest, x_session_id: Optional[str] = Header(None, alias="X-Session-ID")):
+    nasikotak_session = x_session_id
     if not nasikotak_session:
         raise HTTPException(status_code=401, detail="Unauthorized. Please submit the form first.")
         
