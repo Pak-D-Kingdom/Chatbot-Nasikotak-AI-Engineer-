@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ayam Bakar Pak D - AI Sales Chatbot</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <!-- Background Design -->
+    <div class="bg-shape shape1"></div>
+    <div class="bg-shape shape2"></div>
+    
+    <div class="main-content">
+        <h1>Nasi Kotak Ayam Bakar Pak D</h1>
+        <p>Silakan coba interaksi dengan AI Sales Chatbot kami di pojok kanan bawah!</p>
+    </div>
+
+    <!-- Chat Widget Button -->
+    <button id="chat-toggle-btn" class="chat-toggle-btn">
+        <i class="fas fa-comment-dots"></i>
+    </button>
+
+    <!-- Chat Widget Container -->
+    <div id="chat-container" class="chat-container hidden">
+        <!-- Chat Header -->
+        <div class="chat-header">
+            <div class="header-info">
+                <div class="avatar">
+                    <img src="https://ui-avatars.com/api/?name=AI&background=FF8A00&color=fff" alt="AI Avatar">
+                    <div class="online-indicator"></div>
+                </div>
+                <div class="header-text">
+                    <h3>AI Sales Assistant</h3>
+                    <p>Ayam Bakar Pak D</p>
+                </div>
+            </div>
+            <button id="chat-close-btn" class="chat-close-btn">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <!-- Pre-Chat Form -->
+        <div id="pre-chat-form" class="pre-chat-form">
+            <div class="pre-chat-greeting">
+                <h4>Selamat Datang!</h4>
+                <p>Silakan isi data diri Anda untuk memulai.</p>
+            </div>
+            <div class="form-group">
+                <input type="text" id="user-name" placeholder="Nama Anda" required autocomplete="off">
+            </div>
+            <div class="form-group">
+                <input type="tel" id="user-phone" placeholder="No. Telepon / WA" required autocomplete="off">
+            </div>
+            <button id="start-chat-btn" class="start-chat-btn">Mulai Chat</button>
+        </div>
+
+        <!-- Chat Body -->
+        <div id="chat-body" class="chat-body hidden">
+            <!-- Messages will be injected here -->
+        </div>
+
+        <!-- Quick Replies -->
+        <div id="quick-replies" class="quick-replies hidden">
+            <button class="quick-reply-btn" data-text="Ada paket nasi kotak apa saja?">Lihat Paket</button>
+            <button class="quick-reply-btn" data-text="Apakah ada promo saat ini?">Promo</button>
+            <button class="quick-reply-btn" data-text="Saya punya budget 25rb per box">Budget 25rb</button>
+        </div>
+
+        <!-- Chat Footer (Input) -->
+        <div id="chat-footer" class="chat-footer hidden">
+            <div class="input-container">
+                <input type="text" id="chat-input" placeholder="Tulis pesan..." autocomplete="off">
+                <button id="chat-send-btn" class="chat-send-btn">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+            <div class="footer-branding">
+                <span>AI Chatbot Ayam Bakar Pak D</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Marked.js for Markdown parsing -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="/static/script.js"></script>
+</body>
+</html>
