@@ -2,24 +2,26 @@
 document_id: P004
 type: product
 category: ayam_kampung
-price: 24000
+price: 27000
 minimum_order: 30
-event_types: [gathering, family_event, celebration, special_event]
+event_types: [gathering,corporate_event,family_event,birthday]
 active: true
 ---
 
 # Nasi Kotak Ayam Kampung
 
-**Harga:** Rp 24.000 / box  
+![Paket Ayam Kampung](/image/ayam%20kampung.png)
+
+**Harga:** Rp 27.000 / box  
 **Minimum Order:** 30 box  
-**Cocok untuk:** Gathering, Family Event, Celebration, Special Event
+**Cocok untuk:** Gathering, Corporate Event, Family Event, Birthday
 
 ## Menu Utama
 - 1 potong ayam kampung
 - 1 nasi putih
-- Tahu saus
+- Tahu susu
 - Kerupuk
 - Sambal & lalapan
 
 ## Deskripsi
-Nasi Kotak Ayam Kampung menghadirkan cita rasa autentik dengan menggunakan daging ayam kampung berkualitas. Ayam kampung memiliki tekstur lebih kenyal dan rasa yang lebih kuat dibanding ayam broiler. Dipadu dengan bumbu bakar signature Ayam Bakar Pak D menciptakan pengalaman kuliner yang tak terlupakan. Sempurna untuk acara keluarga atau perayaan spesial.
+Nasi Kotak Ayam Kampung adalah pilihan premium yang menghadirkan cita rasa istimewa. Daging ayam kampung pilihan yang dibakar dengan bumbu khas Ayam Bakar Pak D menghasilkan rasa yang kaya dan lezat. Tekstur daging yang empuk dan lemak yang pas membuat setiap gigitan memuaskan. Sempurna untuk acara spesial atau client gathering yang membutuhkan menu eksklusif.
