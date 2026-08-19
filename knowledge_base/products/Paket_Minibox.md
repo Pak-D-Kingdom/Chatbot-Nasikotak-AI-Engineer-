@@ -10,6 +10,8 @@ active: true
 
 # Nasi Kotak Minibox
 
+![Paket Minibox](/image/minibox.png)
+
 **Harga:** Rp 17.000 / box  
 **Minimum Order:** 20 box  
 **Cocok untuk:** Gathering, Office Break, Casual Event

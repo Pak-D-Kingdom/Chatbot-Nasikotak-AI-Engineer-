@@ -10,6 +10,8 @@ active: true
 
 # Nasi Kotak Broiler
 
+![Paket Broiler](/image/ayam%20broiler.png)
+
 **Harga:** Rp 20.000 / box  
 **Minimum Order:** 20 box  
 **Cocok untuk:** Meeting, Seminar, Training, Office Event

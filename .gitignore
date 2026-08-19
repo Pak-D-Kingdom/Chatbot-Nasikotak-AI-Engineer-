@@ -1,4 +1,9 @@
 # Byte-compiled / optimized / DLL files
+prompt.md
+scratch/
+PRODUCT REQUIREMENT DOCUMENT (PRD).md
+implementation_plan_app.md
+implementation_plan.md
 __pycache__/
 *.py[codz]
 *$py.class

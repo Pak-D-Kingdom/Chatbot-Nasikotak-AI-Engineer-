@@ -10,6 +10,8 @@ active: true
 
 # Nasi Kotak Bebek Mantap
 
+![Paket Bebek Mantap](/image/bebek.png)
+
 **Harga:** Rp 27.000 / box  
 **Minimum Order:** 30 box  
 **Cocok untuk:** Gathering, Corporate Event, Special Occasion, Premium Event
