@@ -2,7 +2,7 @@
 document_id: P004
 type: product
 category: ayam_kampung
-price: 27000
+price: 24000
 minimum_order: 30
 event_types: [gathering,corporate_event,family_event,birthday]
 active: true
@@ -12,7 +12,7 @@ active: true
 
 ![Paket Ayam Kampung](/image/ayam%20kampung.png)
 
-**Harga:** Rp 27.000 / box  
+**Harga:** Rp 24.000 / box  
 **Minimum Order:** 30 box  
 **Cocok untuk:** Gathering, Corporate Event, Family Event, Birthday
 
