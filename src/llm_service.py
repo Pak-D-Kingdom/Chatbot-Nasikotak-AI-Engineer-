@@ -3,19 +3,17 @@ import re
 import time
 from typing import Optional, List, Dict, Any
 from pydantic import BaseModel
-from groq import Groq
+from openai import OpenAI
 
 from src.config import (
-    GROQ_API_KEY, 
+    LLM_API_KEY, 
     LLM_MODEL, 
+    LLM_BASE_URL,
     LLM_MAX_TOKENS, 
     LLM_TEMPERATURE, 
     LLM_MAX_RETRIES,
     ORDER_WEB_URL,
-    MARKOM_ADMINS,
-    GROQ_TPM_LIMIT,
-    GROQ_RPM_LIMIT,
-    GROQ_TOKEN_BUDGET
+    MARKOM_ADMINS
 )
 from src.prompt_templates import (
     build_system_prompt, 
@@ -108,67 +106,13 @@ def check_handover_override(user_message: str, collected_entities: dict) -> Opti
 
     return None
 
-class TokenBucketRateLimiter:
-    """Proactive rate limiter untuk Groq free tier."""
-    
-    def __init__(self, tpm_limit: int, rpm_limit: int, budget_ratio: float = 0.8):
-        self.tpm_limit = int(tpm_limit * budget_ratio)
-        self.rpm_limit = int(rpm_limit * budget_ratio)
-        self._request_timestamps = []  # timestamps
-        self._token_log = []           # list of (timestamp, token_count)
-    
-    def wait_if_needed(self, estimated_tokens: int):
-        """Block sampai ada cukup budget untuk request ini."""
-        now = time.time()
-        cutoff = now - 60
-        
-        # Bersihkan entries > 60 detik
-        self._request_timestamps = [t for t in self._request_timestamps if t > cutoff]
-        self._token_log = [(t, n) for t, n in self._token_log if t > cutoff]
-        
-        # Cek RPM
-        if len(self._request_timestamps) >= self.rpm_limit:
-            wait = self._request_timestamps[0] - cutoff
-            print(f"[INFO] RPM limit tercapai. Menunggu {wait:.1f}s...")
-            time.sleep(max(0, wait) + 0.5)
-            return self.wait_if_needed(estimated_tokens) # Cek ulang setelah sleep
-        
-        # Cek TPM
-        used_tokens = sum(n for _, n in self._token_log)
-        if used_tokens + estimated_tokens > self.tpm_limit:
-            if self._token_log:
-                wait = self._token_log[0][0] - cutoff
-                print(f"[INFO] TPM limit tercapai. Menunggu {wait:.1f}s...")
-                time.sleep(max(0, wait) + 0.5)
-                return self.wait_if_needed(estimated_tokens)
-    
-    def record(self, tokens_used: int):
-        now = time.time()
-        self._request_timestamps.append(now)
-        self._token_log.append((now, tokens_used))
-
-
 class LLMService:
-    """Centralized LLM client menggunakan Groq SDK."""
+    """Centralized LLM client menggunakan OpenAI SDK."""
     
     def __init__(self):
-        if not GROQ_API_KEY:
-            raise ValueError("GROQ_API_KEY tidak ditemukan di config")
-        self.client = Groq(api_key=GROQ_API_KEY)
+        self.client = OpenAI(api_key=LLM_API_KEY, base_url=LLM_BASE_URL)
         self.system_prompt = build_system_prompt()
         self._markom_round_robin_counter = {"index": 0}
-        self.rate_limiter = TokenBucketRateLimiter(
-            tpm_limit=GROQ_TPM_LIMIT,
-            rpm_limit=GROQ_RPM_LIMIT,
-            budget_ratio=GROQ_TOKEN_BUDGET
-        )
-
-    def _estimate_tokens(self, messages: List[Dict[str, str]]) -> int:
-        """Estimasi token kasar: 1 token = 4 karakter.
-        Abaikan system prompt karena ter-cache oleh Groq dan tidak mengurangi rate limit.
-        """
-        total_chars = sum(len(msg.get("content", "")) for msg in messages if msg.get("role") != "system")
-        return total_chars // 4 + 200 # buffer 200 tokens untuk completion
 
     def _get_next_markom_admin(self):
         """Pilih admin Markom berikutnya secara round-robin"""
@@ -183,20 +127,12 @@ class LLMService:
             {"role": "system", "content": self.system_prompt},
             {"role": "user", "content": user_message}
         ]
-        estimated_tokens = self._estimate_tokens(messages)
-        self.rate_limiter.wait_if_needed(estimated_tokens)
 
         response = self.client.chat.completions.create(
             model=LLM_MODEL,
             messages=messages,
             max_tokens=300
         )
-        if response.usage:
-            billed_tokens = response.usage.total_tokens
-            prompt_details = getattr(response.usage, "prompt_tokens_details", None)
-            if prompt_details:
-                billed_tokens -= getattr(prompt_details, "cached_tokens", 0)
-            self.rate_limiter.record(billed_tokens)
             
         response_text = response.choices[0].message.content.strip()
         return clean_markdown(response_text)
@@ -238,23 +174,12 @@ CATATAN:
         try:
             for attempt in range(LLM_MAX_RETRIES):
                 try:
-                    estimated_tokens = self._estimate_tokens(messages)
-                    self.rate_limiter.wait_if_needed(estimated_tokens)
-
                     response = self.client.chat.completions.create(
                         model=LLM_MODEL,
                         messages=messages,
                         max_tokens=LLM_MAX_TOKENS,
-                        temperature=LLM_TEMPERATURE,
-                        reasoning_effort="low"
+                        temperature=LLM_TEMPERATURE
                     )
-                    
-                    if response.usage:
-                        billed_tokens = response.usage.total_tokens
-                        prompt_details = getattr(response.usage, "prompt_tokens_details", None)
-                        if prompt_details:
-                            billed_tokens -= getattr(prompt_details, "cached_tokens", 0)
-                        self.rate_limiter.record(billed_tokens)
                     break
                 except Exception as e:
                     err_str = str(e).lower()
@@ -365,25 +290,14 @@ CATATAN:
         try:
             for attempt in range(LLM_MAX_RETRIES):
                 try:
-                    estimated_tokens = self._estimate_tokens(messages)
-                    self.rate_limiter.wait_if_needed(estimated_tokens)
-
                     response = self.client.chat.completions.create(
                         model=LLM_MODEL,
                         messages=messages,
                         max_tokens=LLM_MAX_TOKENS,
                         temperature=0.2,
                         top_p=0.9,
-                        reasoning_effort="low",
                         response_format={"type": "json_object"}
                     )
-                    
-                    if response.usage:
-                        billed_tokens = response.usage.total_tokens
-                        prompt_details = getattr(response.usage, "prompt_tokens_details", None)
-                        if prompt_details:
-                            billed_tokens -= getattr(prompt_details, "cached_tokens", 0)
-                        self.rate_limiter.record(billed_tokens)
                     break
                 except Exception as e:
                     err_str = str(e).lower()
