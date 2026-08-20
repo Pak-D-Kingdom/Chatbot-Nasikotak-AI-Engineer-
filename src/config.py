@@ -3,17 +3,13 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# === LLM Provider ===
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
-LLM_MODEL = "openai/gpt-oss-20b"
-LLM_MAX_TOKENS = 1024
-LLM_TEMPERATURE = 0.2
+# === LLM Provider (9router) ===
+NINEROUTER_API_KEY = os.getenv("NINEROUTER_API_KEY")
+NINEROUTER_BASE_URL = os.getenv("NINEROUTER_BASE_URL", "http://localhost:20128/v1")
+LLM_MODEL = "nasikotak"
+LLM_MAX_TOKENS = 512
+LLM_TEMPERATURE = 0.1
 LLM_MAX_RETRIES = 3
-
-# === Rate Limiting (Groq Free Tier) ===
-GROQ_TPM_LIMIT = 8000
-GROQ_RPM_LIMIT = 30
-GROQ_TOKEN_BUDGET = 0.80
 
 # === Paths ===
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
