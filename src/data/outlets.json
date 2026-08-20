@@ -1,0 +1,32 @@
+[
+  {
+    "id": "outlet-01",
+    "name": "Pak D - Rungkut",
+    "address": "Jl. Rungkut Industri III No. 12, Surabaya",
+    "lat": -7.3244,
+    "lng": 112.7708,
+    "phone": "031-8700001",
+    "operational_hours": "08:00 - 20:00",
+    "active": true
+  },
+  {
+    "id": "outlet-02",
+    "name": "Pak D - Wiyung",
+    "address": "Jl. Raya Menganti No. 45, Surabaya",
+    "lat": -7.3168,
+    "lng": 112.6879,
+    "phone": "031-8700002",
+    "operational_hours": "08:00 - 20:00",
+    "active": true
+  },
+  {
+    "id": "outlet-03",
+    "name": "Pak D - Sidoarjo",
+    "address": "Jl. Ahmad Yani No. 88, Sidoarjo",
+    "lat": -7.4478,
+    "lng": 112.7183,
+    "phone": "031-8700003",
+    "operational_hours": "08:00 - 21:00",
+    "active": true
+  }
+]
