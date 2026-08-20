@@ -161,10 +161,14 @@ class ChatPipeline:
                     final_price = product.price # harga satuan
                     
                     ongkir = 0
-                    if delivery_method == "pickup" and 'nearest' in locals() and nearest:
-                        ongkir = nearest[0].get("pickup_cost", 0)
-                        outlet_name = nearest[0].get("name", "Outlet")
-                        deliv_str = f"Pickup di {outlet_name}"
+                    if delivery_method == "pickup":
+                        if 'nearest' in locals() and nearest:
+                            ongkir = nearest[0].get("pickup_cost", 0)
+                            outlet_name = nearest[0].get("name", "Outlet")
+                            deliv_str = f"Pickup di {outlet_name}"
+                        else:
+                            ongkir = 0
+                            deliv_str = f"Pickup di outlet terdekat (Menunggu konfirmasi)"
                     else:
                         deliv_str = f"Delivery ke {updated_session.get('location', '-')}"
                     

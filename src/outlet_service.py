@@ -50,6 +50,27 @@ class OutletService:
                 lat = float(data[0]["lat"])
                 lng = float(data[0]["lon"])
                 return lat, lng
+            
+            # Fallback 1: Split by comma and take the last part (often City/Regency)
+            fallback_address = None
+            if "," in address:
+                fallback_address = address.split(",")[-1].strip()
+            # Fallback 2: Split by space and take the last word (often City/Regency)
+            else:
+                words = address.split()
+                if len(words) > 1:
+                    fallback_address = words[-1].strip()
+            
+            if fallback_address and fallback_address.lower() != address.lower():
+                params["q"] = fallback_address
+                response = requests.get(url, params=params, headers=headers, timeout=5)
+                if response.status_code == 200:
+                    data = response.json()
+                    if data and len(data) > 0:
+                        lat = float(data[0]["lat"])
+                        lng = float(data[0]["lon"])
+                        return lat, lng
+
             return None
         except Exception as e:
             print(f"[ERROR] Geocoding failed for '{address}': {e}")
