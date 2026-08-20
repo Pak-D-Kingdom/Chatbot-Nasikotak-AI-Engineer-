@@ -1,32 +1,222 @@
 [
   {
     "id": "outlet-01",
-    "name": "Pak D - Rungkut",
-    "address": "Jl. Rungkut Industri III No. 12, Surabaya",
-    "lat": -7.3244,
-    "lng": 112.7708,
-    "phone": "031-8700001",
-    "operational_hours": "08:00 - 20:00",
+    "name": "Pak D - Mojosari (Mojokerto)",
+    "address": "Jl. Hasanuddin No.55, Candirejo, Awang Awang, Kec. Mojosari, Kabupaten Mojokerto, Jawa Timur 61382",
+    "lat": -7.5277751,
+    "lng": 112.5558405,
+    "phone": "08881111158",
+    "operational_hours": "10:00 - 22:00",
     "active": true
   },
   {
     "id": "outlet-02",
-    "name": "Pak D - Wiyung",
-    "address": "Jl. Raya Menganti No. 45, Surabaya",
-    "lat": -7.3168,
-    "lng": 112.6879,
-    "phone": "031-8700002",
-    "operational_hours": "08:00 - 20:00",
+    "name": "Pak D - Mulyosari",
+    "address": "Jl. Raya Mulyosari No.173, Kalisari, Kec. Mulyorejo, Surabaya, Jawa Timur 60113",
+    "lat": -7.2705053,
+    "lng": 112.7969207,
+    "phone": "088989274267",
+    "operational_hours": "10:00 - 22:00",
     "active": true
   },
   {
     "id": "outlet-03",
-    "name": "Pak D - Sidoarjo",
-    "address": "Jl. Ahmad Yani No. 88, Sidoarjo",
-    "lat": -7.4478,
-    "lng": 112.7183,
-    "phone": "031-8700003",
-    "operational_hours": "08:00 - 21:00",
+    "name": "Pak D - Panglima Sudirman (Gresik)",
+    "address": "Jl. Panglima Sudirman No.64, Kramatandap, Gapurosukolilo, Kec. Gresik, Kabupaten Gresik, Jawa Timur 61111",
+    "lat": -7.1658742,
+    "lng": 112.6543918,
+    "phone": "085784730516",
+    "operational_hours": "10:00 - 22:00",
+    "active": true
+  },
+  {
+    "id": "outlet-04",
+    "name": "Pak D - Platuk",
+    "address": "Jl. Platuk No.111, Sidotopo Wetan, Kec. Kenjeran, Surabaya, Jawa Timur 60128",
+    "lat": -7.232351,
+    "lng": 112.76381,
+    "phone": "085604941726",
+    "operational_hours": "10:00 - 22:00",
+    "active": true
+  },
+  {
+    "id": "outlet-05",
+    "name": "Pak D - Rungkut 2",
+    "address": "Jl. Rungkut Madya No.113, Rungkut Kidul, Kec. Rungkut, Surabaya, Jawa Timur 60293",
+    "lat": -7.3313794,
+    "lng": 112.7796711,
+    "phone": "085785610871",
+    "operational_hours": "10:00 - 22:00",
+    "active": true
+  },
+  {
+    "id": "outlet-06",
+    "name": "Pak D - Sarirogo (Sidoarjo)",
+    "address": "Jl. Raya Luwung Sarirogo No.39, Sari Rogo, Kec. Sidoarjo, Kabupaten Sidoarjo, Jawa Timur 61234",
+    "lat": -7.4222667,
+    "lng": 112.6763515,
+    "phone": "085707028365",
+    "operational_hours": "10:00 - 22:00",
+    "active": true
+  },
+  {
+    "id": "outlet-07",
+    "name": "Pak D - Sepande (Sidoarjo)",
+    "address": "Jl. Raya Sepande, RT.01/RW.01, Krajan, Sepande, Kec. Candi, Kabupaten Sidoarjo, Jawa Timur 61271",
+    "lat": -7.4612857,
+    "lng": 112.6894592,
+    "phone": "085731983210",
+    "operational_hours": "10:00 - 22:00",
+    "active": true
+  },
+  {
+    "id": "outlet-08",
+    "name": "Pak D - Sepanjang (Sidoarjo)",
+    "address": "Jl. Raya Kalijaten No.38, Kalijaten Timur, Kalijaten, Kec. Taman, Kabupaten Sidoarjo, Jawa Timur 61257",
+    "lat": -7.3521988,
+    "lng": 112.6912908,
+    "phone": "085608175013",
+    "operational_hours": "10:00 - 22:00",
+    "active": true
+  },
+  {
+    "id": "outlet-09",
+    "name": "Pak D - Sidotopo",
+    "address": "Jl. Sidotopo Wetan No.98-136, Sidotopo Wetan, Kec. Kenjeran, Surabaya, Jawa Timur 60153",
+    "lat": -7.2349435,
+    "lng": 112.7576956,
+    "phone": "085784730494",
+    "operational_hours": "10:00 - 22:00",
+    "active": true
+  },
+  {
+    "id": "outlet-10",
+    "name": "Pak D - Suko (Sidoarjo)",
+    "address": "Jl. Raya Suko No.20, Dusun Suko, Suko, Kec. Sukodono, Kabupaten Sidoarjo, Jawa Timur 61258",
+    "lat": -7.3786403,
+    "lng": 112.6990656,
+    "phone": "085736921241",
+    "operational_hours": "10:00 - 22:00",
+    "active": true
+  },
+  {
+    "id": "outlet-11",
+    "name": "Pak D - Tropodo (Sidoarjo)",
+    "address": "Jl. Letjen Suprapto No.26, Kepuh, Kepuhkiriman, Kec. Waru, Kabupaten Sidoarjo, Jawa Timur 61256",
+    "lat": -7.3560446,
+    "lng": 112.7654729,
+    "phone": "085648601179",
+    "operational_hours": "10:00 - 22:00",
+    "active": true
+  },
+  {
+    "id": "outlet-12",
+    "name": "Lidah Mertua - Wonokromo (varian outlet Pak D)",
+    "address": "Jl. Jetis Baru No.5, Wonokromo, Surabaya, Jawa Timur 60243",
+    "lat": -7.308041,
+    "lng": 112.6976688,
+    "phone": "085731125574",
+    "operational_hours": "10:00 - 22:00",
+    "active": true
+  },
+  {
+    "id": "outlet-13",
+    "name": "Pak D - Bendul Merisi",
+    "address": "Jl. Gembili Raya No.2, Bendul Merisi, Kec. Wonocolo, Surabaya, Jawa Timur 60244",
+    "lat": -7.3060863,
+    "lng": 112.7414606,
+    "phone": "085731945661",
+    "operational_hours": "10:00 - 22:00",
+    "active": true
+  },
+  {
+    "id": "outlet-14",
+    "name": "Pak D - Betro (Sidoarjo)",
+    "address": "Jl. Raya Sedati Agung No.21, Manyar, Sedati Agung, Kec. Sedati, Kabupaten Sidoarjo, Jawa Timur 61253",
+    "lat": -7.3816501,
+    "lng": 112.7621151,
+    "phone": "083833246017",
+    "operational_hours": "10:00 - 22:00",
+    "active": true
+  },
+  {
+    "id": "outlet-15",
+    "name": "Pak D - Cemengkalang (Sidoarjo)",
+    "address": "Jl. Raya Cemeng Kalang No.11, Cemengkalang, Cemeng Kalang, Kec. Sidoarjo, Kabupaten Sidoarjo, Jawa Timur 61234",
+    "lat": -7.4418403,
+    "lng": 112.6849117,
+    "phone": "0318968477",
+    "operational_hours": "10:00 - 22:00",
+    "active": true
+  },
+  {
+    "id": "outlet-16",
+    "name": "Pak D - Perempatan Hulaan (Gresik)",
+    "address": "Jl. Raya Prapatan Hulaan, Palem Dodol, Pelemwatu, Kec. Menganti, Kabupaten Gresik, Jawa Timur 61174",
+    "lat": -7.2785367,
+    "lng": 112.5839968,
+    "phone": "085853183067",
+    "operational_hours": "10:00 - 22:00",
+    "active": true
+  },
+  {
+    "id": "outlet-17",
+    "name": "Pak D - Kartini (Sidoarjo)",
+    "address": "Jl. Untung Surapati No.39, Sidoklumpuk, Sidokumpul, Kec. Sidoarjo, Kabupaten Sidoarjo, Jawa Timur 61218",
+    "lat": -7.4475721,
+    "lng": 112.7220121,
+    "phone": "0318950957",
+    "operational_hours": "10:00 - 22:00",
+    "active": true
+  },
+  {
+    "id": "outlet-18",
+    "name": "Pak D - Kenjeran",
+    "address": "Jl. Kenjeran No.352, Gading, Kec. Tambaksari, Surabaya, Jawa Timur 60134",
+    "lat": -7.2469618,
+    "lng": 112.7738397,
+    "phone": "0895426150868",
+    "operational_hours": "10:00 - 22:00",
+    "active": true
+  },
+  {
+    "id": "outlet-19",
+    "name": "Pak D - Keputih 2",
+    "address": "Jl. Arief Rahman Hakim No.92, Keputih, Kec. Sukolilo, Surabaya, Jawa Timur 60111",
+    "lat": -7.2901741,
+    "lng": 112.7988861,
+    "phone": "085746600072",
+    "operational_hours": "10:00 - 22:00",
+    "active": true
+  },
+  {
+    "id": "outlet-20",
+    "name": "Pak D - Ketintang 1",
+    "address": "Jl. Ketintang No.16, Wonokromo, Kec. Gayungan, Surabaya, Jawa Timur 60231",
+    "lat": -7.3080435,
+    "lng": 112.7249186,
+    "phone": "082131268063",
+    "operational_hours": "10:00 - 22:00",
+    "active": true
+  },
+  {
+    "id": "outlet-21",
+    "name": "Pak D - Lontar",
+    "address": "Jl. Lontar Baru No.01, Lontar, Kec. Sambikerep, Surabaya, Jawa Timur 60216",
+    "lat": -7.2775621,
+    "lng": 112.6590761,
+    "phone": "085731945478",
+    "operational_hours": "10:00 - 22:00",
+    "active": true
+  },
+  {
+    "id": "outlet-22",
+    "name": "Pak D - Manukan 1",
+    "address": "Jl. Manukan Tengah No.9, Manukan Kulon, Kec. Tandes, Surabaya, Jawa Timur 60185",
+    "lat": -7.2647782,
+    "lng": 112.6627705,
+    "phone": "085859658951",
+    "operational_hours": "10:00 - 22:00",
     "active": true
   }
 ]
