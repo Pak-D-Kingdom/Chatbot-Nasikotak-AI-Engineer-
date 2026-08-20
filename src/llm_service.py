@@ -6,9 +6,9 @@ from pydantic import BaseModel
 from openai import OpenAI
 
 from src.config import (
-    NINEROUTER_API_KEY,
-    NINEROUTER_BASE_URL,
+    LLM_API_KEY, 
     LLM_MODEL, 
+    LLM_BASE_URL,
     LLM_MAX_TOKENS, 
     LLM_TEMPERATURE, 
     LLM_MAX_RETRIES,
@@ -31,6 +31,7 @@ class Entity(BaseModel):
     event_date: Optional[str] = None
     customer_name: Optional[str] = None
     customer_phone: Optional[str] = None
+    package_name: Optional[str] = None
 
 class GeminiStructuredResponse(BaseModel):
     """Structured response schema untuk LLM (awalnya Gemini, sekarang Groq)"""
@@ -105,28 +106,13 @@ def check_handover_override(user_message: str, collected_entities: dict) -> Opti
 
     return None
 
-
-
-
 class LLMService:
-    """Centralized LLM client menggunakan OpenAI SDK terhubung ke 9router."""
+    """Centralized LLM client menggunakan OpenAI SDK."""
     
     def __init__(self):
-        if not NINEROUTER_API_KEY:
-            raise ValueError("NINEROUTER_API_KEY tidak ditemukan di environment/config")
-        self.client = OpenAI(
-            base_url=NINEROUTER_BASE_URL,
-            api_key=NINEROUTER_API_KEY
-        )
+        self.client = OpenAI(api_key=LLM_API_KEY, base_url=LLM_BASE_URL)
         self.system_prompt = build_system_prompt()
         self._markom_round_robin_counter = {"index": 0}
-
-    def _estimate_tokens(self, messages: List[Dict[str, str]]) -> int:
-        """Estimasi token kasar: 1 token = 4 karakter.
-        Abaikan system prompt karena ter-cache oleh Groq dan tidak mengurangi rate limit.
-        """
-        total_chars = sum(len(msg.get("content", "")) for msg in messages if msg.get("role") != "system")
-        return total_chars // 4 + 200 # buffer 200 tokens untuk completion
 
     def _get_next_markom_admin(self):
         """Pilih admin Markom berikutnya secara round-robin"""
@@ -145,8 +131,7 @@ class LLMService:
         response = self.client.chat.completions.create(
             model=LLM_MODEL,
             messages=messages,
-            max_tokens=300,
-            temperature=LLM_TEMPERATURE
+            max_tokens=300
         )
             
         response_text = response.choices[0].message.content.strip()
@@ -167,7 +152,8 @@ class LLMService:
     "location": null,
     "event_date": null,
     "customer_name": null,
-    "customer_phone": null
+    "customer_phone": null,
+    "package_name": null
   },
   "actions": ["show_products"],
   "needs_handover": false,
@@ -192,15 +178,28 @@ CATATAN:
                         model=LLM_MODEL,
                         messages=messages,
                         max_tokens=LLM_MAX_TOKENS,
-                        temperature=LLM_TEMPERATURE,
-                        response_format={"type": "json_object"}
+                        temperature=LLM_TEMPERATURE
                     )
                     break
                 except Exception as e:
                     err_str = str(e).lower()
-                    if "rate_limit" in err_str or "429" in err_str or "timeout" in err_str:
-                        wait_time = 2 * (attempt + 1)
-                        print(f"[INFO] Rate limit/Timeout tercapai, menunggu {wait_time:.1f}s sebelum coba lagi... (percobaan {attempt+1}/{LLM_MAX_RETRIES})")
+                    is_rate_limit = "rate_limit" in err_str or "429" in err_str
+                    # gpt-oss kadang gagal validasi JSON karena reasoning token
+                    # menghabiskan budget max_tokens sebelum sampai ke completion
+                    # akhir. Ini seringnya transient, jadi layak di-retry juga.
+                    is_json_validate_fail = "json_validate_failed" in err_str
+
+                    if is_rate_limit or is_json_validate_fail:
+                        if is_rate_limit:
+                            wait_time = 5 * (attempt + 1)  # Default 5, 10, 15 detik
+                            match = re.search(r'try again in (\d+\.?\d*)s', err_str)
+                            if match:
+                                wait_time = float(match.group(1)) + 1.0 # Tambah 1 detik buffer
+                            print(f"[INFO] Rate limit tercapai, menunggu {wait_time:.1f}s sebelum coba lagi... (percobaan {attempt+1}/{LLM_MAX_RETRIES})")
+                        else:
+                            wait_time = 1.0
+                            print(f"[INFO] JSON validation gagal (kemungkinan reasoning token gpt-oss kehabisan budget), coba lagi... (percobaan {attempt+1}/{LLM_MAX_RETRIES})")
+
                         time.sleep(wait_time)
                         if attempt == LLM_MAX_RETRIES - 1:
                             print(f"[ERROR] Max retries reached for chat_structured: {str(e)}")
@@ -252,10 +251,17 @@ CATATAN:
         except Exception as e:
             return {"error": f"{type(e).__name__}: {str(e)}"}
 
-    def chat_with_history(self, user_message: str, history: List[Dict[str, str]], collected_entities: dict) -> dict:
+    def chat_with_history(self, user_message: str, history: List[Dict[str, str]], collected_entities: dict, raw_user_message: Optional[str] = None) -> dict:
         """
         Chat dengan conversation history + entity accumulation
         + handover detection + order redirect logic.
+
+        user_message: pesan yang dikirim ke LLM, boleh sudah di-augment dengan
+            konteks RAG (mis. diawali "[KONTEKS DARI KNOWLEDGE BASE]...").
+        raw_user_message: pesan ASLI dari customer TANPA konteks RAG, dipakai
+            untuk safety-net keyword check (check_handover_override) supaya
+            fungsi itu tidak ikut men-scan isi knowledge base sebagai kalau
+            itu perkataan customer. Jika tidak diisi, fallback ke user_message.
         """
         messages = [
             {"role": "system", "content": self.system_prompt}
@@ -294,9 +300,24 @@ CATATAN:
                     break
                 except Exception as e:
                     err_str = str(e).lower()
-                    if "rate_limit" in err_str or "429" in err_str or "timeout" in err_str:
-                        wait_time = 2 * (attempt + 1)
-                        print(f"[INFO] Rate limit/Timeout tercapai, menunggu {wait_time:.1f}s... (percobaan {attempt+1}/{LLM_MAX_RETRIES})")
+                    is_rate_limit = "rate_limit" in err_str or "429" in err_str
+                    # gpt-oss kadang gagal validasi JSON karena reasoning token
+                    # menghabiskan budget max_tokens sebelum sampai ke completion
+                    # akhir (failed_generation kosong). Ini seringnya transient,
+                    # jadi layak di-retry juga, bukan langsung dianggap fatal.
+                    is_json_validate_fail = "json_validate_failed" in err_str
+
+                    if is_rate_limit or is_json_validate_fail:
+                        if is_rate_limit:
+                            wait_time = 5 * (attempt + 1)
+                            match = re.search(r'try again in (\d+\.?\d*)s', err_str)
+                            if match:
+                                wait_time = float(match.group(1)) + 1.0
+                            print(f"[INFO] Rate limit tercapai, menunggu {wait_time:.1f}s... (percobaan {attempt+1}/{LLM_MAX_RETRIES})")
+                        else:
+                            wait_time = 1.0
+                            print(f"[INFO] JSON validation gagal (kemungkinan reasoning token gpt-oss kehabisan budget), coba lagi... (percobaan {attempt+1}/{LLM_MAX_RETRIES})")
+
                         time.sleep(wait_time)
                         if attempt == LLM_MAX_RETRIES - 1:
                             print(f"[ERROR] Max retries reached for chat_with_history: {str(e)}")
@@ -364,7 +385,7 @@ CATATAN:
                 # Jangan override handover jika customer sedang ordering (bukan komplain)
                 override_reason = None
                 if cur_intent not in ("ordering",):
-                    override_reason = check_handover_override(user_message, updated_entities)
+                    override_reason = check_handover_override(raw_user_message or user_message, updated_entities)
                 if override_reason and not needs_handover:
                     needs_handover = True
                     handover_reason = override_reason

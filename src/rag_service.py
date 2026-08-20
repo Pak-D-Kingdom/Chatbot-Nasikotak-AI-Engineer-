@@ -26,7 +26,7 @@ class RAGService:
         self.index_dir = index_dir
         self.model_name = model_name
         self.encoder = SentenceTransformer(model_name)
-        self.dimension = self.encoder.get_embedding_dimension()
+        self.dimension = self.encoder.get_sentence_embedding_dimension()
         
         
         self.index = faiss.IndexFlatIP(self.dimension)
@@ -69,10 +69,19 @@ class RAGService:
             docs.append(doc)
         return docs
 
-    def chunk_documents(self, documents: List[Document], chunk_size: int = 700, overlap: int = 50) -> List[Document]:
+    def chunk_documents(self, documents: List[Document], chunk_size: int = 1200, overlap: int = 100) -> List[Document]:
         """
         Chunking dokumen dengan menggabungkan paragraf/section selama 
         ukurannya belum melebihi chunk_size, dan mendukung overlap.
+
+        chunk_size dinaikkan dari 700 -> 1200 karakter supaya dokumen produk
+        (judul + gambar + harga + menu + deskripsi, biasanya ~800-900 karakter)
+        TIDAK terpecah jadi beberapa chunk. Jika sebuah dokumen terpecah,
+        RAG top-K retrieval bisa saja hanya mengambil sebagian chunk-nya
+        (misal cuma bagian deskripsi tanpa baris gambar/harga), sehingga
+        informasi yang sampai ke LLM jadi tidak lengkap padahal dokumennya
+        "ketemu". Dengan chunk_size lebih besar, sebagian besar dokumen
+        tunggal (produk, FAQ) tetap utuh dalam satu chunk.
         """
         chunked_docs = []
         for doc in documents:

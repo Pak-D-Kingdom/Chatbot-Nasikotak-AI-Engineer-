@@ -37,6 +37,10 @@ class MessageAnalysis(BaseModel):
     event_date: Optional[str] = Field(
         description="Tanggal acara, jika ada.", default=None
     )
+    package_name: Optional[str] = Field(
+        description="Nama paket/produk yang direkomendasikan atau dipilih customer, jika ada.",
+        default=None,
+    )
 
 class SalesEngine:
     def __init__(self):
@@ -59,7 +63,8 @@ class SalesEngine:
             quantity=entities.get("quantity"),
             event_type=entities.get("event_type"),
             location=entities.get("location"),
-            event_date=entities.get("event_date")
+            event_date=entities.get("event_date"),
+            package_name=entities.get("package_name")
         )
 
     def recommend_products(
