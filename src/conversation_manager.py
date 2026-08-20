@@ -48,6 +48,12 @@ class ConversationManager:
             session["location"] = analysis.location
         if analysis.event_date is not None:
             session["event_date"] = analysis.event_date
+        # NOTE: field ini butuh `package_name` tersedia di MessageAnalysis (sales_engine.py).
+        # Kalau atribut di sana namanya berbeda (mis. `product` atau `selected_product`),
+        # sesuaikan nama atribut di baris getattr() di bawah ini.
+        package_name = getattr(analysis, "package_name", None)
+        if package_name is not None:
+            session["selected_product"] = package_name
             
         # Update intent (Bisa naik atau turun, tapi biasanya purchase_intent kita jaga agar tidak mudah turun drastis)
         # Logika sederhana: jika intent baru lebih tinggi secara ordinal, kita update.

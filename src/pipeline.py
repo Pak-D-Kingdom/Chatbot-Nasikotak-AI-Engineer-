@@ -64,6 +64,7 @@ class ChatPipeline:
             "event_date": session.get("event_date"),
             "customer_name": session.get("customer_name"),
             "customer_phone": session.get("customer_phone"),
+            "package_name": session.get("selected_product"),
         }
 
         # Prepend RAG context to user message for grounding
@@ -78,8 +79,27 @@ class ChatPipeline:
         llm_response = self.llm.chat_with_history(
             user_message=augmented_message,
             history=formatted_history,
-            collected_entities=collected_entities
+            collected_entities=collected_entities,
+            raw_user_message=user_message
         )
+
+        # Jika LLMService gagal total (lihat chat_with_history's except block),
+        # ia return {"error": "..."} tanpa key "reply". Tanpa penanganan ini,
+        # customer akan menerima bubble kosong tanpa penjelasan apa pun.
+        if "error" in llm_response and "reply" not in llm_response:
+            print(f"[ERROR] chat_with_history gagal untuk session {session_id}: {llm_response['error']}")
+            llm_response = {
+                "reply": (
+                    "Maaf kak, sistem kami sedang sedikit gangguan 🙏 "
+                    "Boleh coba kirim ulang pesannya sebentar lagi?"
+                ),
+                "intent": "other",
+                "purchase_intent": "low",
+                "entities": {},
+                "actions": [],
+                "needs_handover": False,
+                "handover_reason": None,
+            }
 
         # --- 5. Sales Engine: enrich response ---
         # Parse entities from LLM response to update session
@@ -92,6 +112,7 @@ class ChatPipeline:
             event_type=entities.get("event_type"),
             location=entities.get("location"),
             event_date=entities.get("event_date"),
+            package_name=entities.get("package_name"),
         )
 
         # --- 6. Update session context ---

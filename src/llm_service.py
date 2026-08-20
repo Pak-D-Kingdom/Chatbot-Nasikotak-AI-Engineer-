@@ -3,19 +3,17 @@ import re
 import time
 from typing import Optional, List, Dict, Any
 from pydantic import BaseModel
-from groq import Groq
+from openai import OpenAI
 
 from src.config import (
-    GROQ_API_KEY, 
+    LLM_API_KEY, 
     LLM_MODEL, 
+    LLM_BASE_URL,
     LLM_MAX_TOKENS, 
     LLM_TEMPERATURE, 
     LLM_MAX_RETRIES,
     ORDER_WEB_URL,
-    MARKOM_ADMINS,
-    GROQ_TPM_LIMIT,
-    GROQ_RPM_LIMIT,
-    GROQ_TOKEN_BUDGET
+    MARKOM_ADMINS
 )
 from src.prompt_templates import (
     build_system_prompt, 
@@ -33,6 +31,7 @@ class Entity(BaseModel):
     event_date: Optional[str] = None
     customer_name: Optional[str] = None
     customer_phone: Optional[str] = None
+    package_name: Optional[str] = None
 
 class GeminiStructuredResponse(BaseModel):
     """Structured response schema untuk LLM (awalnya Gemini, sekarang Groq)"""
@@ -107,67 +106,13 @@ def check_handover_override(user_message: str, collected_entities: dict) -> Opti
 
     return None
 
-class TokenBucketRateLimiter:
-    """Proactive rate limiter untuk Groq free tier."""
-    
-    def __init__(self, tpm_limit: int, rpm_limit: int, budget_ratio: float = 0.8):
-        self.tpm_limit = int(tpm_limit * budget_ratio)
-        self.rpm_limit = int(rpm_limit * budget_ratio)
-        self._request_timestamps = []  # timestamps
-        self._token_log = []           # list of (timestamp, token_count)
-    
-    def wait_if_needed(self, estimated_tokens: int):
-        """Block sampai ada cukup budget untuk request ini."""
-        now = time.time()
-        cutoff = now - 60
-        
-        # Bersihkan entries > 60 detik
-        self._request_timestamps = [t for t in self._request_timestamps if t > cutoff]
-        self._token_log = [(t, n) for t, n in self._token_log if t > cutoff]
-        
-        # Cek RPM
-        if len(self._request_timestamps) >= self.rpm_limit:
-            wait = self._request_timestamps[0] - cutoff
-            print(f"[INFO] RPM limit tercapai. Menunggu {wait:.1f}s...")
-            time.sleep(max(0, wait) + 0.5)
-            return self.wait_if_needed(estimated_tokens) # Cek ulang setelah sleep
-        
-        # Cek TPM
-        used_tokens = sum(n for _, n in self._token_log)
-        if used_tokens + estimated_tokens > self.tpm_limit:
-            if self._token_log:
-                wait = self._token_log[0][0] - cutoff
-                print(f"[INFO] TPM limit tercapai. Menunggu {wait:.1f}s...")
-                time.sleep(max(0, wait) + 0.5)
-                return self.wait_if_needed(estimated_tokens)
-    
-    def record(self, tokens_used: int):
-        now = time.time()
-        self._request_timestamps.append(now)
-        self._token_log.append((now, tokens_used))
-
-
 class LLMService:
-    """Centralized LLM client menggunakan Groq SDK."""
+    """Centralized LLM client menggunakan OpenAI SDK."""
     
     def __init__(self):
-        if not GROQ_API_KEY:
-            raise ValueError("GROQ_API_KEY tidak ditemukan di config")
-        self.client = Groq(api_key=GROQ_API_KEY)
+        self.client = OpenAI(api_key=LLM_API_KEY, base_url=LLM_BASE_URL)
         self.system_prompt = build_system_prompt()
         self._markom_round_robin_counter = {"index": 0}
-        self.rate_limiter = TokenBucketRateLimiter(
-            tpm_limit=GROQ_TPM_LIMIT,
-            rpm_limit=GROQ_RPM_LIMIT,
-            budget_ratio=GROQ_TOKEN_BUDGET
-        )
-
-    def _estimate_tokens(self, messages: List[Dict[str, str]]) -> int:
-        """Estimasi token kasar: 1 token = 4 karakter.
-        Abaikan system prompt karena ter-cache oleh Groq dan tidak mengurangi rate limit.
-        """
-        total_chars = sum(len(msg.get("content", "")) for msg in messages if msg.get("role") != "system")
-        return total_chars // 4 + 200 # buffer 200 tokens untuk completion
 
     def _get_next_markom_admin(self):
         """Pilih admin Markom berikutnya secara round-robin"""
@@ -182,20 +127,12 @@ class LLMService:
             {"role": "system", "content": self.system_prompt},
             {"role": "user", "content": user_message}
         ]
-        estimated_tokens = self._estimate_tokens(messages)
-        self.rate_limiter.wait_if_needed(estimated_tokens)
 
         response = self.client.chat.completions.create(
             model=LLM_MODEL,
             messages=messages,
             max_tokens=300
         )
-        if response.usage:
-            billed_tokens = response.usage.total_tokens
-            prompt_details = getattr(response.usage, "prompt_tokens_details", None)
-            if prompt_details:
-                billed_tokens -= getattr(prompt_details, "cached_tokens", 0)
-            self.rate_limiter.record(billed_tokens)
             
         response_text = response.choices[0].message.content.strip()
         return clean_markdown(response_text)
@@ -215,7 +152,8 @@ class LLMService:
     "location": null,
     "event_date": null,
     "customer_name": null,
-    "customer_phone": null
+    "customer_phone": null,
+    "package_name": null
   },
   "actions": ["show_products"],
   "needs_handover": false,
@@ -236,33 +174,32 @@ CATATAN:
         try:
             for attempt in range(LLM_MAX_RETRIES):
                 try:
-                    estimated_tokens = self._estimate_tokens(messages)
-                    self.rate_limiter.wait_if_needed(estimated_tokens)
-
                     response = self.client.chat.completions.create(
                         model=LLM_MODEL,
                         messages=messages,
                         max_tokens=LLM_MAX_TOKENS,
                         temperature=LLM_TEMPERATURE
                     )
-                    
-                    if response.usage:
-                        billed_tokens = response.usage.total_tokens
-                        prompt_details = getattr(response.usage, "prompt_tokens_details", None)
-                        if prompt_details:
-                            billed_tokens -= getattr(prompt_details, "cached_tokens", 0)
-                        self.rate_limiter.record(billed_tokens)
                     break
                 except Exception as e:
                     err_str = str(e).lower()
-                    if "rate_limit" in err_str or "429" in err_str:
-                        # Coba parse waktu tunggu dari error Groq (misal: "Please try again in 5.3s")
-                        wait_time = 5 * (attempt + 1)  # Default 5, 10, 15 detik
-                        match = re.search(r'try again in (\d+\.?\d*)s', err_str)
-                        if match:
-                            wait_time = float(match.group(1)) + 1.0 # Tambah 1 detik buffer
-                        
-                        print(f"[INFO] Rate limit tercapai, menunggu {wait_time:.1f}s sebelum coba lagi... (percobaan {attempt+1}/{LLM_MAX_RETRIES})")
+                    is_rate_limit = "rate_limit" in err_str or "429" in err_str
+                    # gpt-oss kadang gagal validasi JSON karena reasoning token
+                    # menghabiskan budget max_tokens sebelum sampai ke completion
+                    # akhir. Ini seringnya transient, jadi layak di-retry juga.
+                    is_json_validate_fail = "json_validate_failed" in err_str
+
+                    if is_rate_limit or is_json_validate_fail:
+                        if is_rate_limit:
+                            wait_time = 5 * (attempt + 1)  # Default 5, 10, 15 detik
+                            match = re.search(r'try again in (\d+\.?\d*)s', err_str)
+                            if match:
+                                wait_time = float(match.group(1)) + 1.0 # Tambah 1 detik buffer
+                            print(f"[INFO] Rate limit tercapai, menunggu {wait_time:.1f}s sebelum coba lagi... (percobaan {attempt+1}/{LLM_MAX_RETRIES})")
+                        else:
+                            wait_time = 1.0
+                            print(f"[INFO] JSON validation gagal (kemungkinan reasoning token gpt-oss kehabisan budget), coba lagi... (percobaan {attempt+1}/{LLM_MAX_RETRIES})")
+
                         time.sleep(wait_time)
                         if attempt == LLM_MAX_RETRIES - 1:
                             print(f"[ERROR] Max retries reached for chat_structured: {str(e)}")
@@ -314,10 +251,17 @@ CATATAN:
         except Exception as e:
             return {"error": f"{type(e).__name__}: {str(e)}"}
 
-    def chat_with_history(self, user_message: str, history: List[Dict[str, str]], collected_entities: dict) -> dict:
+    def chat_with_history(self, user_message: str, history: List[Dict[str, str]], collected_entities: dict, raw_user_message: Optional[str] = None) -> dict:
         """
         Chat dengan conversation history + entity accumulation
         + handover detection + order redirect logic.
+
+        user_message: pesan yang dikirim ke LLM, boleh sudah di-augment dengan
+            konteks RAG (mis. diawali "[KONTEKS DARI KNOWLEDGE BASE]...").
+        raw_user_message: pesan ASLI dari customer TANPA konteks RAG, dipakai
+            untuk safety-net keyword check (check_handover_override) supaya
+            fungsi itu tidak ikut men-scan isi knowledge base sebagai kalau
+            itu perkataan customer. Jika tidak diisi, fallback ke user_message.
         """
         messages = [
             {"role": "system", "content": self.system_prompt}
@@ -346,9 +290,6 @@ CATATAN:
         try:
             for attempt in range(LLM_MAX_RETRIES):
                 try:
-                    estimated_tokens = self._estimate_tokens(messages)
-                    self.rate_limiter.wait_if_needed(estimated_tokens)
-
                     response = self.client.chat.completions.create(
                         model=LLM_MODEL,
                         messages=messages,
@@ -357,23 +298,27 @@ CATATAN:
                         top_p=0.9,
                         response_format={"type": "json_object"}
                     )
-                    
-                    if response.usage:
-                        billed_tokens = response.usage.total_tokens
-                        prompt_details = getattr(response.usage, "prompt_tokens_details", None)
-                        if prompt_details:
-                            billed_tokens -= getattr(prompt_details, "cached_tokens", 0)
-                        self.rate_limiter.record(billed_tokens)
                     break
                 except Exception as e:
                     err_str = str(e).lower()
-                    if "rate_limit" in err_str or "429" in err_str:
-                        wait_time = 5 * (attempt + 1)
-                        match = re.search(r'try again in (\d+\.?\d*)s', err_str)
-                        if match:
-                            wait_time = float(match.group(1)) + 1.0
-                            
-                        print(f"[INFO] Rate limit tercapai, menunggu {wait_time:.1f}s... (percobaan {attempt+1}/{LLM_MAX_RETRIES})")
+                    is_rate_limit = "rate_limit" in err_str or "429" in err_str
+                    # gpt-oss kadang gagal validasi JSON karena reasoning token
+                    # menghabiskan budget max_tokens sebelum sampai ke completion
+                    # akhir (failed_generation kosong). Ini seringnya transient,
+                    # jadi layak di-retry juga, bukan langsung dianggap fatal.
+                    is_json_validate_fail = "json_validate_failed" in err_str
+
+                    if is_rate_limit or is_json_validate_fail:
+                        if is_rate_limit:
+                            wait_time = 5 * (attempt + 1)
+                            match = re.search(r'try again in (\d+\.?\d*)s', err_str)
+                            if match:
+                                wait_time = float(match.group(1)) + 1.0
+                            print(f"[INFO] Rate limit tercapai, menunggu {wait_time:.1f}s... (percobaan {attempt+1}/{LLM_MAX_RETRIES})")
+                        else:
+                            wait_time = 1.0
+                            print(f"[INFO] JSON validation gagal (kemungkinan reasoning token gpt-oss kehabisan budget), coba lagi... (percobaan {attempt+1}/{LLM_MAX_RETRIES})")
+
                         time.sleep(wait_time)
                         if attempt == LLM_MAX_RETRIES - 1:
                             print(f"[ERROR] Max retries reached for chat_with_history: {str(e)}")
@@ -441,7 +386,7 @@ CATATAN:
                 # Jangan override handover jika customer sedang ordering (bukan komplain)
                 override_reason = None
                 if cur_intent not in ("ordering",):
-                    override_reason = check_handover_override(user_message, updated_entities)
+                    override_reason = check_handover_override(raw_user_message or user_message, updated_entities)
                 if override_reason and not needs_handover:
                     needs_handover = True
                     handover_reason = override_reason
