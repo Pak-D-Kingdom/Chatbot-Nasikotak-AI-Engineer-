@@ -145,5 +145,18 @@ async def chat_endpoint(request: ChatRequest, x_session_id: Optional[str] = Head
     finally:
         db.close()
 
+@app.get("/api/outlets")
+async def get_outlets():
+    """Return daftar semua outlet aktif."""
+    return pipeline.outlet_service.get_active_outlets()
+
+@app.get("/api/outlets/nearest")
+async def get_nearest_outlets(address: str, limit: int = 3):
+    """Cari outlet terdekat dari alamat."""
+    result = pipeline.outlet_service.find_nearest_by_address(address, limit)
+    if result is None:
+        raise HTTPException(status_code=400, detail="Gagal geocode alamat")
+    return result
+
 if __name__ == "__main__":
     uvicorn.run("app:app", host="0.0.0.0", port=8000, reload=True)

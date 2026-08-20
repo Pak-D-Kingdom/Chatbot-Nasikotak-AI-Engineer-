@@ -69,20 +69,35 @@ class LeadManager:
 
         budget_str = f"Rp{budget:,.0f}/box" if budget else "-"
         product_str = product_name or session_context.get("selected_product", "-")
+        delivery_method_str = session_context.get("delivery_method", "-")
 
-        message = (
-            f"Halo Admin, saya ingin memesan nasi kotak:\n"
-            f"Paket: {product_str}\n"
-            f"Jumlah: {qty} box\n"
-            f"Acara: {event}\n"
-            f"Tanggal: {date}\n"
-            f"Lokasi: {location}\n"
-            f"Budget: {budget_str}\n"
-        )
-        if name:
-            message += f"Nama: {name}\n"
+        if "invoice_text" in session_context:
+            message = "Halo Admin, saya ingin konfirmasi pesanan berikut:\n\n" + session_context["invoice_text"].replace("**", "*")
+            # Remove the last line about clicking the button
+            message = message.split("\n\nPesanan kakak sudah siap!")[0]
+            if name:
+                message += f"\n\nNama Pemesan: {name}"
+        else:
+            message = (
+                f"Halo Admin, saya ingin memesan nasi kotak:\n"
+                f"Paket: {product_str}\n"
+                f"Jumlah: {qty} box\n"
+                f"Metode: {delivery_method_str}\n"
+                f"Acara: {event}\n"
+                f"Tanggal: {date}\n"
+                f"Lokasi: {location}\n"
+                f"Budget: {budget_str}\n"
+            )
+            if name:
+                message += f"Nama: {name}\n"
 
-        return f"https://wa.me/{admin_phone}?text={quote(message)}"
+        # Normalize admin_phone (replace leading 0 with 62)
+        if admin_phone.startswith("0"):
+            admin_phone = "62" + admin_phone[1:]
+        elif admin_phone.startswith("+"):
+            admin_phone = admin_phone[1:]
+
+        return f"https://api.whatsapp.com/send?phone={admin_phone}&text={quote(message)}"
 
     def generate_order_web_link(self, session_context: dict) -> str:
         """Generate link ke halaman web pemesanan."""

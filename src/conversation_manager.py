@@ -25,6 +25,8 @@ class ConversationManager:
                 "selected_product": None,
                 "customer_name": None,
                 "customer_phone": None,
+                "delivery_method": None,
+                "pickup_outlet": None,
                 "purchase_intent": "LOW",
                 "messages": []
             }
@@ -54,6 +56,10 @@ class ConversationManager:
         package_name = getattr(analysis, "package_name", None)
         if package_name is not None:
             session["selected_product"] = package_name
+            
+        delivery_method = getattr(analysis, "delivery_method", None)
+        if delivery_method is not None:
+            session["delivery_method"] = delivery_method
             
         # Update intent (Bisa naik atau turun, tapi biasanya purchase_intent kita jaga agar tidak mudah turun drastis)
         # Logika sederhana: jika intent baru lebih tinggi secara ordinal, kita update.

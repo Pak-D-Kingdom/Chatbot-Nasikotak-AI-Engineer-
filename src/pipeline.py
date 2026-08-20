@@ -9,6 +9,7 @@ from src.sales_engine import SalesEngine, MessageAnalysis
 from src.conversation_manager import ConversationManager
 from src.lead_manager import LeadManager
 from src.database import get_db, init_db
+from src.outlet_service import OutletService
 
 class ChatPipeline:
     """
@@ -23,6 +24,7 @@ class ChatPipeline:
         self.sales = SalesEngine()
         self.conv_manager = ConversationManager()
         self.lead_manager = LeadManager()
+        self.outlet_service = OutletService()
     
     def chat(self, user_message: str, session_id: str = None, 
              db: Session = None) -> Dict[str, Any]:
@@ -65,6 +67,7 @@ class ChatPipeline:
             "customer_name": session.get("customer_name"),
             "customer_phone": session.get("customer_phone"),
             "package_name": session.get("selected_product"),
+            "delivery_method": session.get("delivery_method"),
         }
 
         # Prepend RAG context to user message for grounding
@@ -113,10 +116,78 @@ class ChatPipeline:
             location=entities.get("location"),
             event_date=entities.get("event_date"),
             package_name=entities.get("package_name"),
+            delivery_method=entities.get("delivery_method"),
         )
+        
+        # --- 5.5. Pickup Business Logic ---
+        delivery_method = entities.get("delivery_method") or session.get("delivery_method")
+        location = entities.get("location") or session.get("location")
+        quantity = entities.get("quantity") or session.get("quantity")
+
+        # Auto-set pickup jika qty < 25
+        if quantity and quantity < 25 and delivery_method != "pickup":
+            delivery_method = "pickup"
+            analysis.delivery_method = "pickup"
+
+        # Jika pickup + ada lokasi -> cari outlet terdekat
+        if delivery_method == "pickup" and location:
+            nearest = self.outlet_service.find_nearest_by_address(location, limit=3)
+            if nearest:
+                outlet_info = self.outlet_service.format_outlet_info(nearest)
+                base_reply = llm_response.get("reply", "").rstrip()
+                llm_response["reply"] = (
+                    f"{base_reply}\n\n"
+                    f"📍 **Outlet Terdekat dari lokasi kakak:**\n{outlet_info}"
+                )
 
         # --- 6. Update session context ---
         updated_session = self.conv_manager.update_session(session_id, analysis)
+
+        # --- 6.5 Invoice Generation ---
+        if "generate_invoice" in llm_response.get("actions", []):
+            pkg_name = updated_session.get("selected_product")
+            qty = updated_session.get("quantity")
+            if pkg_name and qty:
+                products = self.sales.get_all_products(db)
+                product = next((p for p in products if pkg_name.lower() in p.name.lower()), None)
+                if product:
+                    try:
+                        price_info = self.sales.calculate_price(db, product, qty)
+                        total_price = price_info.get("final_total", 0)
+                    except ValueError:
+                        # Fallback if quantity < minimum_order (should not happen if LLM did its job, but just in case)
+                        total_price = product.price * qty
+                        
+                    final_price = product.price # harga satuan
+                    
+                    ongkir = 0
+                    if delivery_method == "pickup" and 'nearest' in locals() and nearest:
+                        ongkir = nearest[0].get("pickup_cost", 0)
+                        outlet_name = nearest[0].get("name", "Outlet")
+                        deliv_str = f"Pickup di {outlet_name}"
+                    else:
+                        deliv_str = f"Delivery ke {updated_session.get('location', '-')}"
+                    
+                    grand_total = total_price + ongkir
+                    ongkir_str = f"Rp{ongkir:,.0f}" if ongkir > 0 else "Konfirmasi Admin" if delivery_method != "pickup" else "GRATIS"
+                    
+                    invoice_text = (
+                        f"📝 **Ringkasan Pesanan**\n"
+                        f"• Paket: {product.name}\n"
+                        f"• Harga Satuan: Rp{final_price:,.0f}\n"
+                        f"• Jumlah: {qty} box\n"
+                        f"• Subtotal: Rp{total_price:,.0f}\n"
+                        f"• Metode: {deliv_str}\n"
+                        f"• Ongkir: {ongkir_str}\n"
+                        f"• **TOTAL ESTIMASI: Rp{grand_total:,.0f}**\n\n"
+                        f"Pesanan kakak sudah siap! Silakan klik tombol di bawah ini untuk mengirim pesanan ke Admin kami melalui WhatsApp ya kak 👇"
+                    )
+                    
+                    updated_session["invoice_text"] = invoice_text
+                    updated_session["purchase_intent"] = "READY_TO_ORDER"
+                    
+                    base_reply = llm_response.get("reply", "").rstrip()
+                    llm_response["reply"] = f"{base_reply}\n\n{invoice_text}"
 
         # Save messages to memory (and optionally DB)
         if db:

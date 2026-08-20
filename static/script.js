@@ -145,7 +145,13 @@ document.addEventListener('DOMContentLoaded', () => {
             waBtn.href = whatsappLink;
             waBtn.target = '_blank';
             waBtn.className = 'action-btn';
-            waBtn.innerHTML = '<i class="fab fa-whatsapp"></i> Hubungi Admin';
+            
+            if (content.includes("Ringkasan Pesanan")) {
+                waBtn.innerHTML = '<i class="fab fa-whatsapp"></i> Kirim Pesanan (WhatsApp)';
+            } else {
+                waBtn.innerHTML = '<i class="fab fa-whatsapp"></i> Hubungi Admin';
+            }
+            
             btnContainer.appendChild(waBtn);
             bubbleDiv.appendChild(btnContainer);
         }

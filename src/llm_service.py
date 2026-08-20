@@ -32,6 +32,7 @@ class Entity(BaseModel):
     customer_name: Optional[str] = None
     customer_phone: Optional[str] = None
     package_name: Optional[str] = None
+    delivery_method: Optional[str] = None
 
 class GeminiStructuredResponse(BaseModel):
     """Structured response schema untuk LLM (awalnya Gemini, sekarang Groq)"""
@@ -153,7 +154,8 @@ class LLMService:
     "event_date": null,
     "customer_name": null,
     "customer_phone": null,
-    "package_name": null
+    "package_name": null,
+    "delivery_method": null
   },
   "actions": ["show_products"],
   "needs_handover": false,
@@ -294,8 +296,7 @@ CATATAN:
                         model=LLM_MODEL,
                         messages=messages,
                         max_tokens=LLM_MAX_TOKENS,
-                        temperature=0.2,
-                        top_p=0.9,
+                        temperature=LLM_TEMPERATURE,
                         response_format={"type": "json_object"}
                     )
                     break
@@ -365,19 +366,13 @@ CATATAN:
                         updated_entities[k] = v
                 response_json["entities"] = updated_entities
 
-                # --- Jika customer mau order, arahkan ke web ---
-                cur_intent = response_json.get("intent", "")
-                cur_purchase_intent = response_json.get("purchase_intent", "")
-
+                # --- Jika customer mau order, jangan redirect ke web lagi ---
+                # Logika invoice digenerate di pipeline.py
+                cur_intent = response_json.get("intent", "").lower()
+                cur_purchase_intent = response_json.get("purchase_intent", "").lower()
                 if cur_intent == "ordering" or cur_purchase_intent == "ready_to_order":
-                    base_reply = response_json.get("reply", "").rstrip()
-                    response_json["reply"] = (
-                        f"{base_reply}\n\n"
-                        f"Untuk melanjutkan pemesanan, silakan melalui halaman web kami ya kak 🛒✨\n"
-                        f"👉 {ORDER_WEB_URL}"
-                    )
-                    if "redirect_to_web" not in response_json.get("actions", []):
-                        response_json.setdefault("actions", []).append("redirect_to_web")
+                    if "generate_invoice" not in response_json.get("actions", []):
+                        response_json.setdefault("actions", []).append("generate_invoice")
 
                 # --- Cek needs_handover dari model, lalu terapkan safety-net override ---
                 needs_handover = bool(response_json.get("needs_handover", False))

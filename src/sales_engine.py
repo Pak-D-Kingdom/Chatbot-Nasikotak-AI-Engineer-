@@ -41,6 +41,10 @@ class MessageAnalysis(BaseModel):
         description="Nama paket/produk yang direkomendasikan atau dipilih customer, jika ada.",
         default=None,
     )
+    delivery_method: Optional[str] = Field(
+        description="Metode pengiriman: 'delivery' (antar) atau 'pickup' (ambil di outlet). Null jika belum disebutkan.",
+        default=None,
+    )
 
 class SalesEngine:
     def __init__(self):
@@ -64,7 +68,8 @@ class SalesEngine:
             event_type=entities.get("event_type"),
             location=entities.get("location"),
             event_date=entities.get("event_date"),
-            package_name=entities.get("package_name")
+            package_name=entities.get("package_name"),
+            delivery_method=entities.get("delivery_method")
         )
 
     def recommend_products(
@@ -171,6 +176,11 @@ class SalesEngine:
 
         # Ambil top N
         return [p for score, p in scored_products[:limit]]
+
+    def get_all_products(self, db: Session = None) -> List[Product]:
+        """Ambil semua produk (dari knowledge base)."""
+        # Gunakan recommend_products dengan limit besar untuk mengambil semua
+        return self.recommend_products(db, limit=100)
 
     def calculate_price(
         self, db: Session, product: Product, quantity: int
