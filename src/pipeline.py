@@ -65,6 +65,8 @@ class ChatPipeline:
             "customer_name": session.get("customer_name"),
             "customer_phone": session.get("customer_phone"),
             "package_name": session.get("selected_product"),
+            "delivery_time": session.get("delivery_time"),
+            "fulfillment_method": session.get("fulfillment_method"),
         }
 
         # Prepend RAG context to user message for grounding
@@ -113,6 +115,8 @@ class ChatPipeline:
             location=entities.get("location"),
             event_date=entities.get("event_date"),
             package_name=entities.get("package_name"),
+            delivery_time=entities.get("delivery_time"),
+            fulfillment_method=entities.get("fulfillment_method"),
         )
 
         # --- 6. Update session context ---

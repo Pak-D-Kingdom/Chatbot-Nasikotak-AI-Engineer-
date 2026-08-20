@@ -41,6 +41,14 @@ class MessageAnalysis(BaseModel):
         description="Nama paket/produk yang direkomendasikan atau dipilih customer, jika ada.",
         default=None,
     )
+    delivery_time: Optional[str] = Field(
+        description="Jam pengiriman/pengambilan yang disebut customer, jika ada.",
+        default=None,
+    )
+    fulfillment_method: Optional[str] = Field(
+        description="'delivery' atau 'pickup', jika bisa disimpulkan dari qty atau pernyataan eksplisit customer.",
+        default=None,
+    )
 
 class SalesEngine:
     def __init__(self):
@@ -64,7 +72,9 @@ class SalesEngine:
             event_type=entities.get("event_type"),
             location=entities.get("location"),
             event_date=entities.get("event_date"),
-            package_name=entities.get("package_name")
+            package_name=entities.get("package_name"),
+            delivery_time=entities.get("delivery_time"),
+            fulfillment_method=entities.get("fulfillment_method"),
         )
 
     def recommend_products(

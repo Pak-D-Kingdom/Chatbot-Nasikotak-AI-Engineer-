@@ -16,11 +16,55 @@ document.addEventListener('DOMContentLoaded', () => {
     // State
     let isWaiting = false;
 
-    // Initialize Markdown options
-    marked.setOptions({
-        breaks: true,
-        gfm: true
-    });
+    // NOTE: marked.js DIHAPUS dari alur render pesan bot.
+    // Alasan: marked.parse() menginterpretasikan SELURUH markdown (bold **,
+    // italic _, heading #, dst), jadi kalau LLM kelupaan/kebablasan nulis
+    // satu karakter markdown saja, seluruh baris ikut ke-bold otomatis lewat
+    // <strong>. Karena kebutuhan kita cuma "tampilkan gambar produk + baris
+    // baru", kita render sendiri secara eksplisit dan SELALU escape teks biasa
+    // sebagai plain text, supaya bold TIDAK MUNGKIN muncul dari isi pesan.
+
+    // Escape karakter HTML supaya teks selalu dirender sebagai plain text
+    // (bukan HTML/markdown), mencegah XSS sekaligus mencegah karakter seperti
+    // *, _, ~, ` ditafsirkan sebagai formatting oleh browser.
+    function escapeHtml(str) {
+        return str
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
+    // Render terbatas: HANYA mendukung markdown gambar ![alt](url) dan
+    // newline -> <br>. Semua karakter markdown lain (*, _, ~, `, #, dst)
+    // akan di-escape dan tampil apa adanya sebagai teks biasa, TIDAK PERNAH
+    // di-render sebagai bold/italic/heading/dll.
+    function renderBotContent(content) {
+        const imageRegex = /!\[([^\]]*)\]\(([^)\s]+)\)/g;
+        let lastIndex = 0;
+        let html = '';
+        let match;
+
+        while ((match = imageRegex.exec(content)) !== null) {
+            // Teks sebelum gambar: escape lalu ubah newline jadi <br>
+            const textBefore = content.slice(lastIndex, match.index);
+            html += escapeHtml(textBefore).replace(/\n/g, '<br>');
+
+            const alt = escapeHtml(match[1]);
+            const url = escapeHtml(match[2]);
+            html += `<img src="${url}" alt="${alt}" loading="lazy">`;
+
+            lastIndex = imageRegex.lastIndex;
+        }
+
+        // Sisa teks setelah gambar terakhir (atau seluruh teks jika tidak
+        // ada gambar sama sekali)
+        const textAfter = content.slice(lastIndex);
+        html += escapeHtml(textAfter).replace(/\n/g, '<br>');
+
+        return html;
+    }
 
     // Start Chat after form submit
     startChatBtn.addEventListener('click', async () => {
@@ -127,12 +171,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const bubbleDiv = document.createElement('div');
         bubbleDiv.className = 'message-bubble';
-        
-        if (isMarkdown && sender === 'bot') {
-            bubbleDiv.innerHTML = marked.parse(content);
+
+        if (sender === 'bot') {
+            // Semua pesan bot dirender lewat renderBotContent: hanya
+            // gambar produk yang jadi <img>, sisanya SELALU plain text
+            // (di-escape), jadi tidak mungkin muncul bold/italic dsb,
+            // terlepas dari isMarkdown atau isi konten dari backend.
+            bubbleDiv.innerHTML = renderBotContent(content);
         } else {
-            // For simple text, replace newlines with <br>
-            bubbleDiv.innerHTML = content.replace(/\n/g, '<br>');
+            // Pesan user: escape juga supaya konsisten & aman dari XSS
+            bubbleDiv.innerHTML = escapeHtml(content).replace(/\n/g, '<br>');
         }
 
         msgDiv.appendChild(bubbleDiv);
