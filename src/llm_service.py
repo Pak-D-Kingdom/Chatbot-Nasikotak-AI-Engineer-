@@ -12,6 +12,7 @@ from src.config import (
     LLM_MAX_TOKENS, 
     LLM_TEMPERATURE, 
     LLM_MAX_RETRIES,
+    ORDER_WEB_URL,
     MARKOM_ADMINS
 )
 from src.prompt_templates import (
@@ -31,8 +32,7 @@ class Entity(BaseModel):
     customer_name: Optional[str] = None
     customer_phone: Optional[str] = None
     package_name: Optional[str] = None
-    delivery_time: Optional[str] = None
-    fulfillment_method: Optional[str] = None
+    delivery_method: Optional[str] = None
 
 class GeminiStructuredResponse(BaseModel):
     """Structured response schema untuk LLM (awalnya Gemini, sekarang Groq)"""
@@ -155,8 +155,7 @@ class LLMService:
     "customer_name": null,
     "customer_phone": null,
     "package_name": null,
-    "delivery_time": null,
-    "fulfillment_method": null
+    "delivery_method": null
   },
   "actions": ["show_products"],
   "needs_handover": false,
@@ -167,7 +166,6 @@ CATATAN:
 - intent: pilih TEPAT SATU dari (greeting, product_inquiry, price_inquiry, recommendation, ordering, other)
 - purchase_intent: pilih TEPAT SATU dari (low, medium, high, ready_to_order)
 - entities: isi dengan value yang sesuai (bisa berupa angka untuk quantity/budget_per_box, string untuk lainnya) atau null.
-- fulfillment_method: isi "delivery" atau "pickup" jika bisa disimpulkan, atau null.
 """
 
         messages = [
@@ -257,7 +255,8 @@ CATATAN:
 
     def chat_with_history(self, user_message: str, history: List[Dict[str, str]], collected_entities: dict, raw_user_message: Optional[str] = None) -> dict:
         """
-        Chat dengan conversation history + entity accumulation + handover detection.
+        Chat dengan conversation history + entity accumulation
+        + handover detection + order redirect logic.
 
         user_message: pesan yang dikirim ke LLM, boleh sudah di-augment dengan
             konteks RAG (mis. diawali "[KONTEKS DARI KNOWLEDGE BASE]...").
@@ -265,13 +264,6 @@ CATATAN:
             untuk safety-net keyword check (check_handover_override) supaya
             fungsi itu tidak ikut men-scan isi knowledge base sebagai kalau
             itu perkataan customer. Jika tidak diisi, fallback ke user_message.
-
-        Untuk order reguler (intent="ordering" / purchase_intent="ready_to_order"),
-        bot TIDAK mengarahkan ke halaman web atau membuat link WA otomatis untuk
-        customer. Bot hanya menulis ringkasan invoice di dalam "reply" (sudah
-        diinstruksikan lewat system prompt + ANCHOR_RULES), dan customer sendiri
-        yang menyalin invoice tsb untuk dikirim ke WA Admin. Link WA otomatis
-        (wa.me/...) hanya dibuat untuk kasus needs_handover=True di bawah.
         """
         messages = [
             {"role": "system", "content": self.system_prompt}
@@ -304,8 +296,7 @@ CATATAN:
                         model=LLM_MODEL,
                         messages=messages,
                         max_tokens=LLM_MAX_TOKENS,
-                        temperature=0.2,
-                        top_p=0.9,
+                        temperature=LLM_TEMPERATURE,
                         response_format={"type": "json_object"}
                     )
                     break
@@ -375,14 +366,13 @@ CATATAN:
                         updated_entities[k] = v
                 response_json["entities"] = updated_entities
 
-                cur_intent = response_json.get("intent", "")
-                cur_purchase_intent = response_json.get("purchase_intent", "")
-
-                # CATATAN: Sengaja TIDAK ADA blok redirect ke web/link otomatis di sini
-                # untuk order reguler. Invoice sudah ditulis LLM langsung di "reply"
-                # (lihat FORMAT INVOICE di system prompt), dan customer diminta
-                # menyalinnya sendiri ke WA Admin. Ini berlaku untuk semua purchase
-                # intent (termasuk high/ready_to_order) selama BUKAN kasus handover.
+                # --- Jika customer mau order, jangan redirect ke web lagi ---
+                # Logika invoice digenerate di pipeline.py
+                cur_intent = response_json.get("intent", "").lower()
+                cur_purchase_intent = response_json.get("purchase_intent", "").lower()
+                if cur_intent == "ordering" or cur_purchase_intent == "ready_to_order":
+                    if "generate_invoice" not in response_json.get("actions", []):
+                        response_json.setdefault("actions", []).append("generate_invoice")
 
                 # --- Cek needs_handover dari model, lalu terapkan safety-net override ---
                 needs_handover = bool(response_json.get("needs_handover", False))

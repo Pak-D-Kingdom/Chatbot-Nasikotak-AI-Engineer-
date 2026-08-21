@@ -25,8 +25,8 @@ class ConversationManager:
                 "selected_product": None,
                 "customer_name": None,
                 "customer_phone": None,
-                "delivery_time": None,
-                "fulfillment_method": None,
+                "delivery_method": None,
+                "pickup_outlet": None,
                 "purchase_intent": "LOW",
                 "messages": []
             }
@@ -56,18 +56,10 @@ class ConversationManager:
         package_name = getattr(analysis, "package_name", None)
         if package_name is not None:
             session["selected_product"] = package_name
-
-        # delivery_time & fulfillment_method: dibutuhkan untuk cek kelengkapan
-        # data invoice di ALUR PEMESANAN (lihat prompt_templates.py). Tanpa ini,
-        # bot akan terus menganggap data belum lengkap walau customer sudah
-        # menjawabnya, karena tidak pernah diakumulasi ke session.
-        delivery_time = getattr(analysis, "delivery_time", None)
-        if delivery_time is not None:
-            session["delivery_time"] = delivery_time
-
-        fulfillment_method = getattr(analysis, "fulfillment_method", None)
-        if fulfillment_method is not None:
-            session["fulfillment_method"] = fulfillment_method
+            
+        delivery_method = getattr(analysis, "delivery_method", None)
+        if delivery_method is not None:
+            session["delivery_method"] = delivery_method
             
         # Update intent (Bisa naik atau turun, tapi biasanya purchase_intent kita jaga agar tidak mudah turun drastis)
         # Logika sederhana: jika intent baru lebih tinggi secara ordinal, kita update.

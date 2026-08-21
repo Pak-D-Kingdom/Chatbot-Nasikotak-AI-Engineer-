@@ -18,4 +18,3 @@ Dapatkan penawaran terbaik untuk pembelian nasi kotak dalam jumlah besar!
 
 - Minimal pembelian **10 box** dari paket manapun
 - Gratis **1 box** dengan paket yang sama yang Anda pesan
-- Gratis **Ongkos Kirim** ke seluruh area pengiriman kami
