@@ -110,16 +110,6 @@
     "active": true
   },
   {
-    "id": "outlet-12",
-    "name": "Lidah Mertua - Wonokromo (varian outlet Pak D)",
-    "address": "Jl. Jetis Baru No.5, Wonokromo, Surabaya, Jawa Timur 60243",
-    "lat": -7.3080410,
-    "lng": 112.6976688,
-    "phone": "085731125574",
-    "operational_hours": null,
-    "active": true
-  },
-  {
     "id": "outlet-13",
     "name": "Pak D - Bendul Merisi",
     "address": "Jl. Gembili Raya No.2, Bendul Merisi, Kec. Wonocolo, Surabaya, Jawa Timur 60244",
