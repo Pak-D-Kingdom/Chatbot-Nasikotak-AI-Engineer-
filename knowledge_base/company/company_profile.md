@@ -27,7 +27,7 @@ Produk unggulan kami mencakup:
 - Ayam Bakar (berbagai varian: broiler reguler, broiler jumbo, ayam kampung)
 - Bebek Bakar
 - Ikan Bakar (Gurami)
-- Nasi Kotak dengan berbagai pilihan paket
+- Catering dengan berbagai pilihan paket
 
 Setiap hidangan disiapkan dengan bumbu khas dan teknik bakar yang telah teruji sejak awal berdirinya usaha ini.
 
@@ -37,7 +37,7 @@ Setiap hidangan disiapkan dengan bumbu khas dan teknik bakar yang telah teruji s
 Jl. Raya Kebonsari No.25f, Kebonsari, Kec. Jambangan  
 Surabaya, Jawa Timur 60232
 
-Central kitchen ini menjadi pusat produksi untuk supply Nasi Kotak Catering ke seluruh cabang dan mitra bisnis.
+Central kitchen ini menjadi pusat produksi untuk supply Catering Catering ke seluruh cabang dan mitra bisnis.
 
 ## 💪 Komitmen Kami
 

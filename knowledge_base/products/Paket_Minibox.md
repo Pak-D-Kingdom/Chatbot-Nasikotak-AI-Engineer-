@@ -3,17 +3,17 @@ document_id: P001
 type: product
 category: minibox
 price: 17000
-minimum_order: 20
+minimum_order: 25
 event_types: [gathering, office_break, casual_event]
 active: true
 ---
 
-# Nasi Kotak Minibox
+# Catering Minibox
 
 ![Paket Minibox](/image/minibox.png)
 
 **Harga:** Rp 17.000 / box  
-**Minimum Order:** 20 box  
+**Minimum Order:** 25 box  
 **Cocok untuk:** Gathering, Office Break, Casual Event
 
 ## Menu Utama
@@ -22,4 +22,4 @@ active: true
 - Sambal & lalapan
 
 ## Deskripsi
-Nasi Kotak Minibox adalah pilihan terjangkau dari Ayam Bakar Pak D. Dengan daging ayam broiler berkualitas yang dibakar sempurna, menghadirkan cita rasa autentik Ayam Bakar Pak D dengan harga ekonomis. Cocok untuk kebutuhan sehari-hari atau acara santai.
+Catering Minibox adalah pilihan terjangkau dari Ayam Bakar Pak D. Dengan daging ayam broiler berkualitas yang dibakar sempurna, menghadirkan cita rasa autentik Ayam Bakar Pak D dengan harga ekonomis. Cocok untuk kebutuhan sehari-hari atau acara santai.

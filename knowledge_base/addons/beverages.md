@@ -7,7 +7,7 @@ active: true
 ---
 # 🥤 Add-ons - Minuman Tambahan
 
-Lengkapi pesanan nasi kotak Anda dengan minuman segar pilihan kami!
+Lengkapi pesanan catering Anda dengan minuman segar pilihan kami!
 
 ## Daftar Minuman Tersedia
 
