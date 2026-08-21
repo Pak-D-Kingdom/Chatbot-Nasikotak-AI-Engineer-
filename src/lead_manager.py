@@ -79,7 +79,7 @@ class LeadManager:
                 message += f"\n\nNama Pemesan: {name}"
         else:
             message = (
-                f"Halo Admin, saya ingin memesan nasi kotak:\n"
+                f"Halo Admin, saya ingin memesan catering:\n"
                 f"Paket: {product_str}\n"
                 f"Jumlah: {qty} box\n"
                 f"Metode: {delivery_method_str}\n"

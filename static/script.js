@@ -36,11 +36,24 @@ document.addEventListener('DOMContentLoaded', () => {
             .replace(/'/g, '&#39;');
     }
 
+    // Hilangkan penanda bold markdown (**teks**) dan sisakan isinya saja,
+    // supaya customer tidak melihat tanda ** mentah di chat bubble.
+    // Ini TIDAK mengubah desain "tidak pernah render sebagai <strong>" di
+    // atas — teks tetap plain text biasa, cuma tanda bintangnya dibuang
+    // sebelum di-escape/ditampilkan.
+    function stripMarkdownBold(str) {
+        return str.replace(/\*\*(.*?)\*\*/g, '$1');
+    }
+
     // Render terbatas: HANYA mendukung markdown gambar ![alt](url) dan
     // newline -> <br>. Semua karakter markdown lain (*, _, ~, `, #, dst)
     // akan di-escape dan tampil apa adanya sebagai teks biasa, TIDAK PERNAH
-    // di-render sebagai bold/italic/heading/dll.
+    // di-render sebagai bold/italic/heading/dll. Pengecualian: tanda **
+    // (bold marker) dibuang duluan lewat stripMarkdownBold, jadi tidak
+    // muncul sama sekali di layar.
     function renderBotContent(content) {
+        content = stripMarkdownBold(content);
+
         const imageRegex = /!\[([^\]]*)\]\(([^)\s]+)\)/g;
         let lastIndex = 0;
         let html = '';
@@ -111,7 +124,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => {
             if (chatBody.children.length === 0) {
                 const greetingName = customerName ? customerName : 'Kak';
-                addMessage(`Halo kak ${greetingName}! 👋 Saya Asisten AI Ayam Bakar Pak D. Ada yang bisa dibantu soal pesanan nasi kotak untuk acara kakak?`, 'bot');
+                addMessage(`Halo kak ${greetingName}! 👋 Saya Asisten AI Ayam Bakar Pak D. Ada yang bisa dibantu soal pesanan catering untuk acara kakak?`, 'bot');
             }
         }, 500);
     }

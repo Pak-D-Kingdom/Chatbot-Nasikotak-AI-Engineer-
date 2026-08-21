@@ -7,7 +7,7 @@ active: true
 ---
 # Snack Box Tambahan
 
-Selain hidangan utama nasi kotak, kami juga menyediakan opsi **Snack Box** yang cocok dihidangkan sebelum makan siang atau saat coffee break (co-break) acara Anda.
+Selain hidangan utama catering, kami juga menyediakan opsi **Snack Box** yang cocok dihidangkan sebelum makan siang atau saat coffee break (co-break) acara Anda.
 
 **Snack Box Standar - Rp 10.000 / box**
 Isi:
