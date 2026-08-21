@@ -6,7 +6,7 @@
     "lat": -7.5277751,
     "lng": 112.5558405,
     "phone": "08881111158",
-    "operational_hours": "10:00 - 22:00",
+    "operational_hours": null,
     "active": true
   },
   {
@@ -16,7 +16,7 @@
     "lat": -7.2705053,
     "lng": 112.7969207,
     "phone": "088989274267",
-    "operational_hours": "10:00 - 22:00",
+    "operational_hours": null,
     "active": true
   },
   {
@@ -26,17 +26,17 @@
     "lat": -7.1658742,
     "lng": 112.6543918,
     "phone": "085784730516",
-    "operational_hours": "10:00 - 22:00",
+    "operational_hours": null,
     "active": true
   },
   {
     "id": "outlet-04",
     "name": "Pak D - Platuk",
     "address": "Jl. Platuk No.111, Sidotopo Wetan, Kec. Kenjeran, Surabaya, Jawa Timur 60128",
-    "lat": -7.232351,
-    "lng": 112.76381,
+    "lat": -7.2323510,
+    "lng": 112.7638100,
     "phone": "085604941726",
-    "operational_hours": "10:00 - 22:00",
+    "operational_hours": null,
     "active": true
   },
   {
@@ -46,7 +46,7 @@
     "lat": -7.3313794,
     "lng": 112.7796711,
     "phone": "085785610871",
-    "operational_hours": "10:00 - 22:00",
+    "operational_hours": null,
     "active": true
   },
   {
@@ -56,7 +56,7 @@
     "lat": -7.4222667,
     "lng": 112.6763515,
     "phone": "085707028365",
-    "operational_hours": "10:00 - 22:00",
+    "operational_hours": null,
     "active": true
   },
   {
@@ -66,7 +66,7 @@
     "lat": -7.4612857,
     "lng": 112.6894592,
     "phone": "085731983210",
-    "operational_hours": "10:00 - 22:00",
+    "operational_hours": null,
     "active": true
   },
   {
@@ -76,7 +76,7 @@
     "lat": -7.3521988,
     "lng": 112.6912908,
     "phone": "085608175013",
-    "operational_hours": "10:00 - 22:00",
+    "operational_hours": null,
     "active": true
   },
   {
@@ -96,7 +96,7 @@
     "lat": -7.3786403,
     "lng": 112.6990656,
     "phone": "085736921241",
-    "operational_hours": "10:00 - 22:00",
+    "operational_hours": null,
     "active": true
   },
   {
@@ -106,17 +106,17 @@
     "lat": -7.3560446,
     "lng": 112.7654729,
     "phone": "085648601179",
-    "operational_hours": "10:00 - 22:00",
+    "operational_hours": null,
     "active": true
   },
   {
     "id": "outlet-12",
     "name": "Lidah Mertua - Wonokromo (varian outlet Pak D)",
     "address": "Jl. Jetis Baru No.5, Wonokromo, Surabaya, Jawa Timur 60243",
-    "lat": -7.308041,
+    "lat": -7.3080410,
     "lng": 112.6976688,
     "phone": "085731125574",
-    "operational_hours": "10:00 - 22:00",
+    "operational_hours": null,
     "active": true
   },
   {
@@ -126,7 +126,7 @@
     "lat": -7.3060863,
     "lng": 112.7414606,
     "phone": "085731945661",
-    "operational_hours": "10:00 - 22:00",
+    "operational_hours": null,
     "active": true
   },
   {
@@ -136,7 +136,7 @@
     "lat": -7.3816501,
     "lng": 112.7621151,
     "phone": "083833246017",
-    "operational_hours": "10:00 - 22:00",
+    "operational_hours": null,
     "active": true
   },
   {
@@ -146,7 +146,7 @@
     "lat": -7.4418403,
     "lng": 112.6849117,
     "phone": "0318968477",
-    "operational_hours": "10:00 - 22:00",
+    "operational_hours": null,
     "active": true
   },
   {
@@ -156,7 +156,7 @@
     "lat": -7.2785367,
     "lng": 112.5839968,
     "phone": "085853183067",
-    "operational_hours": "10:00 - 22:00",
+    "operational_hours": null,
     "active": true
   },
   {
@@ -166,7 +166,7 @@
     "lat": -7.4475721,
     "lng": 112.7220121,
     "phone": "0318950957",
-    "operational_hours": "10:00 - 22:00",
+    "operational_hours": null,
     "active": true
   },
   {
@@ -176,7 +176,7 @@
     "lat": -7.2469618,
     "lng": 112.7738397,
     "phone": "0895426150868",
-    "operational_hours": "10:00 - 22:00",
+    "operational_hours": "10:00 - 21:45",
     "active": true
   },
   {
@@ -186,7 +186,7 @@
     "lat": -7.2901741,
     "lng": 112.7988861,
     "phone": "085746600072",
-    "operational_hours": "10:00 - 22:00",
+    "operational_hours": null,
     "active": true
   },
   {
@@ -196,7 +196,7 @@
     "lat": -7.3080435,
     "lng": 112.7249186,
     "phone": "082131268063",
-    "operational_hours": "10:00 - 22:00",
+    "operational_hours": null,
     "active": true
   },
   {
@@ -206,7 +206,7 @@
     "lat": -7.2775621,
     "lng": 112.6590761,
     "phone": "085731945478",
-    "operational_hours": "10:00 - 22:00",
+    "operational_hours": null,
     "active": true
   },
   {
@@ -216,7 +216,7 @@
     "lat": -7.2647782,
     "lng": 112.6627705,
     "phone": "085859658951",
-    "operational_hours": "10:00 - 22:00",
+    "operational_hours": null,
     "active": true
   }
 ]
