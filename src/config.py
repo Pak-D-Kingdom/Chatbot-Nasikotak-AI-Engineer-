@@ -16,7 +16,7 @@ load_dotenv(dotenv_path=DOTENV_PATH)
 # === LLM Provider ===
 LLM_API_KEY = os.getenv("NINEROUTER_API_KEY", "dummy-key-for-9router")
 LLM_MODEL = "nasikotak"
-LLM_BASE_URL = os.getenv("LLM_BASE_URL", "http://localhost:20128/v1")
+LLM_BASE_URL = os.getenv("LLM_BASE_URL", "http://host.docker.internal:20128/v1")
 LLM_MAX_TOKENS = 2048
 LLM_TEMPERATURE = 0.2
 LLM_MAX_RETRIES = 3

@@ -1,0 +1,28 @@
+# ============================================================
+# requirements-production.txt (FINAL, berdasarkan grep import
+# asli dari app.py + src/ pada 2026-08-21)
+#
+# Hanya 11 package top-level ini yang benar-benar di-import
+# langsung oleh kode production (app.py + src/). Dependency lain
+# yang muncul di requirements.txt lama (torch, transformers,
+# tokenizers, scikit-learn, scipy, dll) TIDAK perlu ditulis manual
+# --- itu semua otomatis ter-install sebagai dependency bawaan
+# sentence-transformers & faiss-cpu. pip yang akan resolve sendiri.
+#
+# Catatan: semua provider LLM (Cerebras/Mistral/Groq/NineRouter di
+# .env) sepertinya diakses lewat 1 client `openai` dengan base_url
+# custom per provider (pola "OpenAI-compatible API"), makanya cuma
+# `openai` yang perlu di-install, bukan groq/google-genai/dst.
+# ============================================================
+
+fastapi==0.141.1
+uvicorn==0.52.3
+pydantic==2.13.4
+python-dotenv==1.2.2
+PyYAML==6.0.3
+requests==2.34.2
+numpy==1.26.4
+faiss-cpu==1.12.0
+sentence-transformers==4.1.0
+SQLAlchemy==2.0.51
+openai==3.3.1

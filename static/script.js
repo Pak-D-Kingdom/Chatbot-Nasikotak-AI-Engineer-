@@ -45,9 +45,32 @@ document.addEventListener('DOMContentLoaded', () => {
         return str.replace(/\*\*(.*?)\*\*/g, '$1');
     }
 
-    // Render terbatas: HANYA mendukung markdown gambar ![alt](url) dan
-    // newline -> <br>. Semua karakter markdown lain (*, _, ~, `, #, dst)
-    // akan di-escape dan tampil apa adanya sebagai teks biasa, TIDAK PERNAH
+    // Ubah URL polos (http:// atau https://) jadi <a> yang bisa diklik.
+    // Dipanggil SETELAH escapeHtml, jadi jalan di teks yang sudah di-escape
+    // (URL wajar aman dari karakter escapeHtml seperti < > " '). Ini TIDAK
+    // melanggar prinsip "tidak pernah render markdown formatting" di atas —
+    // linkify cuma mengenali pola URL literal (https://...), bukan sintaks
+    // markdown apa pun, jadi tetap tidak ada bold/italic/heading yang bisa
+    // muncul dari isi pesan.
+    function linkify(escapedText) {
+        const urlRegex = /(https?:\/\/[^\s<]+)/g;
+        return escapedText.replace(urlRegex, (url) => {
+            // Buang tanda baca penutup kalimat yang mungkin ikut ke-capture
+            // di akhir URL, misal titik atau tanda kurung tutup
+            let trailing = '';
+            const trailingMatch = url.match(/[.,)\]]+$/);
+            if (trailingMatch) {
+                trailing = trailingMatch[0];
+                url = url.slice(0, -trailing.length);
+            }
+            return `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>${trailing}`;
+        });
+    }
+
+    // Render terbatas: HANYA mendukung markdown gambar ![alt](url), URL
+    // polos (https://...) yang diubah jadi link bisa-klik, dan newline ->
+    // <br>. Semua karakter markdown lain (*, _, ~, `, #, dst) akan
+    // di-escape dan tampil apa adanya sebagai teks biasa, TIDAK PERNAH
     // di-render sebagai bold/italic/heading/dll. Pengecualian: tanda **
     // (bold marker) dibuang duluan lewat stripMarkdownBold, jadi tidak
     // muncul sama sekali di layar.
@@ -60,9 +83,9 @@ document.addEventListener('DOMContentLoaded', () => {
         let match;
 
         while ((match = imageRegex.exec(content)) !== null) {
-            // Teks sebelum gambar: escape lalu ubah newline jadi <br>
+            // Teks sebelum gambar: escape, linkify URL, lalu ubah newline jadi <br>
             const textBefore = content.slice(lastIndex, match.index);
-            html += escapeHtml(textBefore).replace(/\n/g, '<br>');
+            html += linkify(escapeHtml(textBefore)).replace(/\n/g, '<br>');
 
             const alt = escapeHtml(match[1]);
             const url = escapeHtml(match[2]);
@@ -74,7 +97,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Sisa teks setelah gambar terakhir (atau seluruh teks jika tidak
         // ada gambar sama sekali)
         const textAfter = content.slice(lastIndex);
-        html += escapeHtml(textAfter).replace(/\n/g, '<br>');
+        html += linkify(escapeHtml(textAfter)).replace(/\n/g, '<br>');
 
         return html;
     }
@@ -187,9 +210,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (sender === 'bot') {
             // Semua pesan bot dirender lewat renderBotContent: hanya
-            // gambar produk yang jadi <img>, sisanya SELALU plain text
-            // (di-escape), jadi tidak mungkin muncul bold/italic dsb,
-            // terlepas dari isMarkdown atau isi konten dari backend.
+            // gambar produk yang jadi <img>, URL polos jadi <a> bisa-klik,
+            // sisanya SELALU plain text (di-escape), jadi tidak mungkin
+            // muncul bold/italic dsb, terlepas dari isMarkdown atau isi
+            // konten dari backend.
             bubbleDiv.innerHTML = renderBotContent(content);
         } else {
             // Pesan user: escape juga supaya konsisten & aman dari XSS
