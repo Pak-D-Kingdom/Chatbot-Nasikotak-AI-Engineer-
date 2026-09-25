@@ -21,9 +21,9 @@ allowed_origins = [
     "https://ayambakarpakde.com",
     "https://www.ayambakarpakde.com",
     "https://nasikotak.com",
-    "http://localhost:8000",
+    "http://localhost:8001",
     "http://localhost:3000",
-    "http://127.0.0.1:8000",
+    "http://127.0.0.1:8001",
 ]
 if cors_origins_env:
     for origin in cors_origins_env.split(","):
@@ -184,4 +184,4 @@ async def get_nearest_outlets(address: str, limit: int = 5):
     return result
 
 if __name__ == "__main__":
-    uvicorn.run("app:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("app:app", host="0.0.0.0", port=8001, reload=True)

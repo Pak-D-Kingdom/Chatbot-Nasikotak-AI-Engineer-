@@ -23,8 +23,8 @@ RUN useradd -m -u 1000 appuser && chown -R appuser /app
 # Pindah ke user non-root
 USER appuser
 
-# Expose port 8000 untuk FastAPI
-EXPOSE 8000
+# Expose port 8001 untuk FastAPI
+EXPOSE 8001
 
 # Perintah untuk menjalankan aplikasi
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8001"]
