@@ -136,6 +136,309 @@
     }
   },
   {
+    "page_content": "# Ayam Broiler Jumbo\n\n![Paling Best Seller]\n\n**Harga:** Rp 23.000\n**Tipe:** Makan di tempat (Dine-in)\n**Label:** Paling Best Seller\n\n## Menu Utama\n- 1 potong ayam broiler jumbo\n- 1 nasi putih\n- Sambal & lalapan\n\n## Pilihan Rasa\n- Bakar Manis\n- Bakar Rempah Pedas\n- Bakar Taliwang\n\n## Deskripsi\nAyam Broiler Jumbo adalah menu satuan dine-in dengan porsi jumbo yang lebih besar. Menjadi salah satu menu paling best seller berkat porsi ayam yang memuaskan dan cita rasa bakar khas Pak D yang konsisten. Pilihan tepat bagi yang menginginkan porsi lebih kenyang.",
+    "metadata": {
+      "document_id": "P009",
+      "type": "menu",
+      "category": "satuan",
+      "price": 23000,
+      "service_type": "dine_in",
+      "best_seller": true,
+      "active": true,
+      "source": "Ayam_Broiler_Jumbo.md",
+      "chunk_id": 0
+    }
+  },
+  {
+    "page_content": "# Ayam Broiler Reguler\n\n**Harga:** Rp 18.000\n**Tipe:** Makan di tempat (Dine-in)\n\n## Menu Utama\n- 1 potong ayam broiler reguler\n- 1 nasi putih\n- Sambal & lalapan\n\n## Pilihan Rasa\n- Bakar Manis\n- Bakar Rempah Pedas\n- Bakar Taliwang\n\n## Deskripsi\nAyam Broiler Reguler adalah menu satuan dine-in dengan porsi standar. Ayam broiler pilihan dibakar dengan bumbu khas Pak D, disajikan dengan nasi putih hangat, sambal, dan lalapan segar. Tersedia dalam tiga pilihan rasa bakar yang bisa disesuaikan dengan selera.",
+    "metadata": {
+      "document_id": "P008",
+      "type": "menu",
+      "category": "satuan",
+      "price": 18000,
+      "service_type": "dine_in",
+      "active": true,
+      "source": "Ayam_Broiler_Reguler.md",
+      "chunk_id": 0
+    }
+  },
+  {
+    "page_content": "# Ayam Kampung\n\n![Paling Best Seller]\n\n**Harga:** Rp 24.000\n**Tipe:** Makan di tempat (Dine-in)\n**Label:** Paling Best Seller\n\n## Menu Utama\n- 1 potong ayam kampung\n- 1 nasi putih\n- Sambal & lalapan\n\n## Pilihan Rasa\n- Bakar Manis\n- Bakar Rempah Pedas\n- Bakar Taliwang\n\n## Deskripsi\nAyam Kampung dine-in menghadirkan cita rasa premium dengan daging ayam kampung asli yang dibakar sempurna. Daging yang lebih padat dan gurih dibanding broiler menjadikan menu ini favorit pelanggan. Tersedia tiga pilihan rasa bakar sesuai selera.",
+    "metadata": {
+      "document_id": "P010",
+      "type": "menu",
+      "category": "satuan",
+      "price": 24000,
+      "service_type": "dine_in",
+      "best_seller": true,
+      "active": true,
+      "source": "Ayam_Kampung.md",
+      "chunk_id": 0
+    }
+  },
+  {
+    "page_content": "# Bebek Mantap\n\n**Harga:** Rp 27.000\n**Tipe:** Makan di tempat (Dine-in)\n\n## Menu Utama\n- 1 potong bebek mantap\n- 1 nasi putih\n- Sambal & lalapan\n\n## Pilihan Rasa\n- Bakar Manis\n- Bakar Rempah Pedas\n- Bakar Taliwang\n\n## Deskripsi\nBebek Mantap menyajikan daging bebek pilihan yang dibakar dengan bumbu khas Pak D. Daging bebek yang empuk dengan lapisan kulit yang renyah memberikan sensasi makan yang berbeda. Menu premium untuk pecinta bebek bakar autentik.",
+    "metadata": {
+      "document_id": "P011",
+      "type": "menu",
+      "category": "satuan",
+      "price": 27000,
+      "service_type": "dine_in",
+      "active": true,
+      "source": "Bebek_Mantap.md",
+      "chunk_id": 0
+    }
+  },
+  {
+    "page_content": "# Gurami Kecil Pak D\n\n**Harga:** Rp 27.000\n**Tipe:** Makan di tempat (Dine-in)\n\n## Menu Utama\n- 1 ekor gurami kecil Pak D\n- 1 nasi putih\n- Sambal & lalapan\n\n## Pilihan Rasa\n- Bakar Manis\n- Bakar Rempah Pedas\n- Bakar Taliwang\n\n## Deskripsi\nGurami Kecil Pak D menghadirkan ikan gurami segar utuh yang dibakar dengan bumbu signature. Daging gurami yang lembut dan gurih menjadi alternatif seafood dari Ayam Bakar Pak D. Disajikan lengkap dengan nasi putih, sambal, dan lalapan segar.",
+    "metadata": {
+      "document_id": "P012",
+      "type": "menu",
+      "category": "satuan",
+      "price": 27000,
+      "service_type": "dine_in",
+      "active": true,
+      "source": "Gurami_Kecil_Pak_D.md",
+      "chunk_id": 0
+    }
+  },
+  {
+    "page_content": "# Paket Berdua — Ayam Kampung 1 Ekor\n\n![Paling Best Seller]\n\n**Harga:** Rp 86.000\n**Tipe:** Makan di tempat (Dine-in)\n**Label:** Paling Best Seller\n**Bonus:** Gratis 1 porsi cahkangkung\n\n## Menu Utama\n- 1 ekor ayam kampung\n- 2 nasi putih\n- 2 es teh\n- 1 cahkangkung (GRATIS)\n- Sambal & lalapan\n\n## Pilihan Rasa\n- Bakar Manis\n- Bakar Rempah Pedas\n- Bakar Taliwang\n\n## Deskripsi\nPaket Berdua Ayam Kampung adalah paket berdua paling premium dengan 1 ekor ayam kampung utuh. Daging ayam kampung yang lebih padat dan berkarakter, dibakar dengan bumbu khas Pak D. Sudah termasuk 2 nasi putih, 2 es teh, dan bonus cahkangkung gratis.",
+    "metadata": {
+      "document_id": "P020",
+      "type": "menu",
+      "category": "paket_berdua",
+      "price": 86000,
+      "service_type": "dine_in",
+      "best_seller": true,
+      "active": true,
+      "source": "Paket_Berdua_Ayam_Kampung.md",
+      "chunk_id": 0
+    }
+  },
+  {
+    "page_content": "# Paket Berdua — Ayam Broiler 1 Ekor\n\n**Harga:** Rp 66.000\n**Tipe:** Makan di tempat (Dine-in)\n**Bonus:** Gratis 1 porsi cahkangkung\n\n## Menu Utama\n- 1 ekor ayam broiler\n- 2 nasi putih\n- 1 cahkangkung (GRATIS)\n- Sambal & lalapan\n\n## Pilihan Rasa\n- Bakar Manis\n- Bakar Bumbu Rujak\n- Bakar Taliwang\n\n## Deskripsi\nPaket Berdua Ayam Broiler menyajikan 1 ekor ayam broiler utuh porsi standar. Upgrade dari versi hemat dengan potongan ayam yang lebih besar dan lebih banyak daging. Cocok untuk makan berdua yang ingin porsi lebih puas.",
+    "metadata": {
+      "document_id": "P018",
+      "type": "menu",
+      "category": "paket_berdua",
+      "price": 66000,
+      "service_type": "dine_in",
+      "active": true,
+      "source": "Paket_Berdua_Broiler.md",
+      "chunk_id": 0
+    }
+  },
+  {
+    "page_content": "# Paket Berdua — Ayam Broiler Hemat 1 Ekor\n\n![Promo Special]\n\n**Harga:** Rp 50.000\n**Tipe:** Makan di tempat (Dine-in)\n**Label:** Promo Special\n**Bonus:** Gratis 1 porsi cahkangkung\n\n## Menu Utama\n- 1 ekor ayam broiler hemat\n- 2 nasi putih\n- 1 cahkangkung (GRATIS)\n- Sambal & lalapan\n\n## Pilihan Rasa\n- Bakar Manis\n- Bakar Bumbu Rujak\n- Bakar Taliwang\n\n## Deskripsi\nPaket Berdua Ayam Broiler Hemat menyajikan 1 ekor ayam broiler utuh dengan harga promo spesial. Cocok untuk makan berdua dengan porsi yang mengenyangkan. Sudah termasuk 2 nasi putih dan bonus gratis cahkangkung.",
+    "metadata": {
+      "document_id": "P017",
+      "type": "menu",
+      "category": "paket_berdua",
+      "price": 50000,
+      "service_type": "dine_in",
+      "promo": true,
+      "active": true,
+      "source": "Paket_Berdua_Broiler_Hemat.md",
+      "chunk_id": 0
+    }
+  },
+  {
+    "page_content": "# Paket Berdua — Gurami Besar 1 Ekor\n\n![Paling Best Seller]\n\n**Harga:** Rp 76.000\n**Tipe:** Makan di tempat (Dine-in)\n**Label:** Paling Best Seller\n**Bonus:** Gratis 1 porsi cahkangkung\n\n## Menu Utama\n- 1 ekor gurami besar\n- 2 nasi putih\n- 2 es teh\n- 1 cahkangkung (GRATIS)\n- Sambal & lalapan\n\n## Pilihan Rasa\n- Bakar Manis\n- Bakar Rempah Pedas\n- Bakar Taliwang\n\n## Deskripsi\nPaket Berdua Gurami Besar menyajikan 1 ekor gurami besar utuh yang dibakar sempurna. Menu best seller ini sudah termasuk 2 nasi putih, 2 es teh, dan bonus cahkangkung gratis. Pilihan seafood premium untuk makan berdua yang istimewa.",
+    "metadata": {
+      "document_id": "P019",
+      "type": "menu",
+      "category": "paket_berdua",
+      "price": 76000,
+      "service_type": "dine_in",
+      "best_seller": true,
+      "active": true,
+      "source": "Paket_Berdua_Gurami.md",
+      "chunk_id": 0
+    }
+  },
+  {
+    "page_content": "# Paket Berkah\n\n![Paling Best Seller]\n\n**Harga:** Rp 210.000\n**Tipe:** Makan di tempat (Dine-in)\n**Porsi:** 4-6 orang\n**Label:** Paling Best Seller\n**Bonus:** Gratis 3 porsi\n\n## Menu Utama\n- 1 ekor ayam kampung\n- 1 ekor gurami besar\n- 2 porsi cahkangkung\n- 1 porsi tahu crispy\n- 1 porsi jamur crispy\n- 1 porsi tahu susu\n- 6 porsi nasi putih\n- 6 porsi es teh\n- Sambal & lalapan\n\n## Deskripsi\nPaket Berkah adalah paket keluarga jumbo untuk 4-6 orang, menggabungkan ayam kampung utuh dan gurami besar dalam satu paket. Lauk pendamping yang lengkap termasuk cahkangkung, tahu crispy, jamur crispy, dan tahu susu. Cocok untuk makan keluarga besar atau arisan.",
+    "metadata": {
+      "document_id": "P023",
+      "type": "menu",
+      "category": "paket_keluarga",
+      "price": 210000,
+      "service_type": "dine_in",
+      "serving_size": "4-6 orang",
+      "best_seller": true,
+      "active": true,
+      "source": "Paket_Berkah.md",
+      "chunk_id": 0
+    }
+  },
+  {
+    "page_content": "# Paket Dahsyat 1\n\n**Harga:** Rp 150.000\n**Tipe:** Makan di tempat (Dine-in)\n**Porsi:** 2-4 orang\n**Bonus:** Gratis 3 porsi\n\n## Menu Utama\n- 1 ekor ayam kampung\n- 2 porsi cahkangkung\n- 1 porsi tahu/jamur crispy\n- 1 porsi tahu susu\n- 4 porsi nasi putih\n- 4 porsi es teh\n- Sambal & lalapan\n\n## Deskripsi\nPaket Dahsyat 1 adalah paket keluarga dengan ayam kampung utuh sebagai menu utama. Dilengkapi aneka lauk pendamping seperti cahkangkung, tahu/jamur crispy, dan tahu susu. Sudah termasuk 4 porsi nasi putih dan 4 porsi es teh. Bonus gratis 3 porsi tambahan menjadikan paket ini sangat hemat untuk makan keluarga.",
+    "metadata": {
+      "document_id": "P021",
+      "type": "menu",
+      "category": "paket_keluarga",
+      "price": 150000,
+      "service_type": "dine_in",
+      "serving_size": "2-4 orang",
+      "active": true,
+      "source": "Paket_Dahsyat_1.md",
+      "chunk_id": 0
+    }
+  },
+  {
+    "page_content": "# Paket Dahsyat 2\n\n![Paling Best Seller]\n\n**Harga:** Rp 150.000\n**Tipe:** Makan di tempat (Dine-in)\n**Porsi:** 2-4 orang\n**Label:** Paling Best Seller\n**Bonus:** Gratis 3 porsi\n\n## Menu Utama\n- 1 ekor gurami besar\n- 1 ekor gurami kecil\n- 2 porsi cahkangkung\n- 1 porsi tahu/jamur crispy\n- 1 porsi tahu susu\n- 4 porsi nasi putih\n- 4 porsi es teh\n- Sambal & lalapan\n\n## Deskripsi\nPaket Dahsyat 2 adalah paket keluarga seafood premium dengan 1 ekor gurami besar dan 1 ekor gurami kecil. Menu best seller ini menawarkan pengalaman makan gurami berlimpah untuk keluarga. Lengkap dengan aneka lauk pendamping, 4 porsi nasi putih, dan 4 porsi es teh.",
+    "metadata": {
+      "document_id": "P022",
+      "type": "menu",
+      "category": "paket_keluarga",
+      "price": 150000,
+      "service_type": "dine_in",
+      "serving_size": "2-4 orang",
+      "best_seller": true,
+      "active": true,
+      "source": "Paket_Dahsyat_2.md",
+      "chunk_id": 0
+    }
+  },
+  {
+    "page_content": "# Paket Family\n\n**Harga:** Rp 270.000\n**Tipe:** Makan di tempat (Dine-in)\n**Porsi:** 7+ orang\n**Bonus:** Gratis 3 porsi\n\n## Menu Utama\n- 2 ekor ayam kampung\n- 1 ekor gurami besar\n- 3 porsi cahkangkung\n- 1 porsi tahu crispy\n- 1 porsi jamur crispy\n- 2 porsi tahu susu\n- 7 porsi nasi putih\n- 7 porsi es teh\n- Sambal & lalapan\n\n## Deskripsi\nPaket Family adalah paket terbesar dari Ayam Bakar Pak D, dirancang untuk rombongan 7 orang atau lebih. Menyajikan 2 ekor ayam kampung dan 1 ekor gurami besar, dilengkapi aneka lauk pendamping berlimpah. Sudah termasuk 7 porsi nasi putih, 7 porsi es teh, dan bonus gratis 3 porsi tambahan. Pilihan terbaik untuk acara makan keluarga besar.",
+    "metadata": {
+      "document_id": "P024",
+      "type": "menu",
+      "category": "paket_keluarga",
+      "price": 270000,
+      "service_type": "dine_in",
+      "serving_size": "7+ orang",
+      "active": true,
+      "source": "Paket_Family.md",
+      "chunk_id": 0
+    }
+  },
+  {
+    "page_content": "# Paket Komplit 1 (Broiler Reguler)\n\n![Paling Best Seller]\n\n**Harga:** Rp 30.000\n**Tipe:** Makan di tempat (Dine-in)\n**Label:** Paling Best Seller\n\n## Menu Utama\n- 1 potong ayam broiler reguler\n- 1 nasi putih\n- 1 cahkangkung\n- 1 es teh\n- Sambal & lalapan\n\n## Pilihan Rasa\n- Bakar Manis\n- Bakar Rempah Pedas\n- Bakar Taliwang\n\n## Deskripsi\nPaket Komplit 1 adalah paket makan lengkap dengan ayam broiler reguler. Sudah termasuk cahkangkung sebagai sayur pendamping dan es teh segar. Paket paling hemat untuk makan kenyang dengan menu komplit tanpa perlu pesan tambahan.",
+    "metadata": {
+      "document_id": "P013",
+      "type": "menu",
+      "category": "paket_komplit",
+      "price": 30000,
+      "service_type": "dine_in",
+      "best_seller": true,
+      "active": true,
+      "source": "Paket_Komplit_1.md",
+      "chunk_id": 0
+    }
+  },
+  {
+    "page_content": "# Paket Komplit 2 (Broiler Jumbo)\n\n![Paling Best Seller]\n\n**Harga:** Rp 32.000\n**Tipe:** Makan di tempat (Dine-in)\n**Label:** Paling Best Seller\n\n## Menu Utama\n- 1 potong ayam broiler jumbo\n- 1 nasi putih\n- 1 cahkangkung\n- 1 es teh\n- Sambal & lalapan\n\n## Pilihan Rasa\n- Bakar Manis\n- Bakar Rempah Pedas\n- Bakar Taliwang\n\n## Deskripsi\nPaket Komplit 2 menghadirkan ayam broiler jumbo dengan porsi lebih besar, lengkap dengan cahkangkung dan es teh. Upgrade dari Paket Komplit 1 bagi yang menginginkan potongan ayam jumbo yang lebih mengenyangkan.",
+    "metadata": {
+      "document_id": "P014",
+      "type": "menu",
+      "category": "paket_komplit",
+      "price": 32000,
+      "service_type": "dine_in",
+      "best_seller": true,
+      "active": true,
+      "source": "Paket_Komplit_2.md",
+      "chunk_id": 0
+    }
+  },
+  {
+    "page_content": "# Paket Komplit 3 (Ayam Kampung)\n\n**Harga:** Rp 34.000\n**Tipe:** Makan di tempat (Dine-in)\n\n## Menu Utama\n- 1 potong ayam kampung\n- 1 nasi putih\n- 1 cahkangkung\n- 1 es teh\n- Sambal & lalapan\n\n## Pilihan Rasa\n- Bakar Manis\n- Bakar Rempah Pedas\n- Bakar Taliwang\n\n## Deskripsi\nPaket Komplit 3 adalah versi premium dengan ayam kampung asli, disajikan lengkap dengan cahkangkung dan es teh. Pilihan tepat bagi pecinta ayam kampung yang ingin menikmati paket makan komplit tanpa repot pesan terpisah.",
+    "metadata": {
+      "document_id": "P015",
+      "type": "menu",
+      "category": "paket_komplit",
+      "price": 34000,
+      "service_type": "dine_in",
+      "active": true,
+      "source": "Paket_Komplit_3.md",
+      "chunk_id": 0
+    }
+  },
+  {
+    "page_content": "# Paket Komplit 5 (Gurami Kecil)\n\n**Harga:** Rp 36.000\n**Tipe:** Makan di tempat (Dine-in)\n\n## Menu Utama\n- 1 ekor gurami kecil\n- 1 nasi putih\n- 1 cahkangkung\n- 1 es teh\n- Sambal & lalapan\n\n## Pilihan Rasa\n- Bakar Manis\n- Bakar Rempah Pedas\n- Bakar Taliwang\n\n## Deskripsi\nPaket Komplit 5 adalah paket komplit paling premium dengan gurami kecil utuh. Ikan gurami segar dibakar sempurna, disajikan komplit dengan cahkangkung dan es teh. Pilihan seafood terlengkap untuk makan di tempat.",
+    "metadata": {
+      "document_id": "P016",
+      "type": "menu",
+      "category": "paket_komplit",
+      "price": 36000,
+      "service_type": "dine_in",
+      "active": true,
+      "source": "Paket_Komplit_5.md",
+      "chunk_id": 0
+    }
+  },
+  {
+    "page_content": "# Rice Bowl\n\n**Harga:** Rp 12.000\n**Tipe:** Makan di tempat (Dine-in)\n\n## Menu Utama\n- 1 potong ayam broiler hemat taliwang\n- 1 nasi putih\n- Sambal & lalapan\n\n## Pilihan Rasa\n- Goreng Original\n- Bakar Manis\n- Bakar Rempah Pedas\n- Bakar Taliwang\n\n## Deskripsi\nRice Bowl adalah menu paling terjangkau dari Ayam Bakar Pak D. Disajikan dengan potongan ayam broiler hemat rasa taliwang, nasi putih, sambal, dan lalapan segar. Porsi pas untuk makan siang cepat dengan cita rasa khas Pak D.",
+    "metadata": {
+      "document_id": "P007",
+      "type": "menu",
+      "category": "satuan",
+      "price": 12000,
+      "service_type": "dine_in",
+      "active": true,
+      "source": "Rice_Bowl.md",
+      "chunk_id": 0
+    }
+  },
+  {
+    "page_content": "# Taliwang — Ayam Kampung 1 Ekor\n\n**Harga:** Rp 64.000\n**Tipe:** Makan di tempat (Dine-in)\n\n## Menu Utama\n- 1 ekor ayam kampung (goreng/bakar)\n\n## Isi Paket\n- 2 potong ayam kampung\n- 2 potong bebek\n\n## Pilihan Rasa\n- Goreng Original\n- Bakar Manis\n- Bakar Rempah Pedas\n- Bakar Taliwang\n\n## Deskripsi\nTaliwang Ayam Kampung 1 Ekor adalah menu taliwang paling premium. Menggunakan ayam kampung utuh yang dimasak dengan bumbu taliwang khas Lombok, menghasilkan rasa pedas gurih yang kaya. Pilihan terbaik untuk pencinta ayam kampung taliwang.",
+    "metadata": {
+      "document_id": "P028",
+      "type": "menu",
+      "category": "taliwang_special",
+      "price": 64000,
+      "service_type": "dine_in",
+      "active": true,
+      "source": "Taliwang_Ayam_Kampung.md",
+      "chunk_id": 0
+    }
+  },
+  {
+    "page_content": "# Taliwang — Ayam Broiler 1 Ekor\n\n![Paling Best Seller]\n\n**Harga:** Rp 55.000\n**Tipe:** Makan di tempat (Dine-in)\n**Label:** Paling Best Seller\n\n## Menu Utama\n- 1 ekor ayam broiler (goreng/bakar)\n\n## Isi Paket\n- 1 potong ayam\n- 1 potong bebek\n\n## Pilihan Rasa\n- Goreng Original\n- Bakar Manis\n- Bakar Rempah Pedas\n- Bakar Taliwang\n\n## Deskripsi\nTaliwang Ayam Broiler 1 Ekor adalah menu taliwang best seller. Ayam broiler utuh dimasak dengan bumbu taliwang yang pedas dan kaya rempah. Tersedia pilihan goreng atau bakar sesuai selera.",
+    "metadata": {
+      "document_id": "P026",
+      "type": "menu",
+      "category": "taliwang_special",
+      "price": 55000,
+      "service_type": "dine_in",
+      "best_seller": true,
+      "active": true,
+      "source": "Taliwang_Broiler.md",
+      "chunk_id": 0
+    }
+  },
+  {
+    "page_content": "# Taliwang — Gurami Besar / Ayam Kampung\n\n![Paling Best Seller]\n\n**Harga:** Rp 57.000\n**Tipe:** Makan di tempat (Dine-in)\n**Label:** Paling Best Seller\n\n## Pilihan Menu\n- 1 ekor gurami besar (goreng/bakar), atau\n- 1 ekor ayam kampung (goreng/bakar)\n\n## Isi Paket\n- 1 potong ayam kampung\n- 2 potong bebek\n\n## Pilihan Rasa\n- Goreng Original\n- Bakar Manis\n- Bakar Rempah Pedas\n- Bakar Taliwang\n\n## Deskripsi\nTaliwang Gurami Besar / Ayam Kampung menawarkan pilihan fleksibel antara gurami besar utuh atau ayam kampung utuh dengan bumbu taliwang. Menu best seller ini menghadirkan pengalaman taliwang premium dengan bahan baku pilihan.",
+    "metadata": {
+      "document_id": "P027",
+      "type": "menu",
+      "category": "taliwang_special",
+      "price": 57000,
+      "service_type": "dine_in",
+      "best_seller": true,
+      "active": true,
+      "source": "Taliwang_Gurami_Kampung.md",
+      "chunk_id": 0
+    }
+  },
+  {
+    "page_content": "# Taliwang Special — Broiler 1 Ekor\n\n![New Flavour] ![Promo Special]\n\n**Harga:** Rp 35.000\n**Tipe:** Makan di tempat (Dine-in)\n**Label:** New Flavour, Promo Special\n\n## Menu Utama\n- 1 ekor broiler reguler (goreng/bakar)\n- 2 potong ayam\n- Sambal & lalapan\n\n## Pilihan Rasa\n- Goreng Original\n- Bakar Manis\n- Bakar Rempah Pedas\n- Bakar Taliwang\n\n## Deskripsi\nTaliwang Special Broiler adalah menu terbaru dari Ayam Bakar Pak D dengan bumbu taliwang yang khas. Harga promo spesial Rp 35.000 untuk 1 ekor ayam broiler reguler. Menu baru yang menghadirkan cita rasa taliwang autentik Lombok di setiap gigitan.",
+    "metadata": {
+      "document_id": "P025",
+      "type": "menu",
+      "category": "taliwang_special",
+      "price": 35000,
+      "service_type": "dine_in",
+      "promo": true,
+      "new_flavour": true,
+      "active": true,
+      "source": "Taliwang_Special_Broiler.md",
+      "chunk_id": 0
+    }
+  },
+  {
     "page_content": "# Catering Ayam Kampung\n\n![Paket Ayam Kampung](/image/ayam%20kampung.png)\n\n**Harga:** Rp 24.000 / box  \n**Minimum Order:** 25 box  \n**Cocok untuk:** Gathering, Corporate Event, Family Event, Birthday\n\n## Menu Utama\n- 1 potong ayam kampung\n- 1 nasi putih\n- Tahu susu\n- Kerupuk\n- Sambal & lalapan\n\n## Deskripsi\nCatering Ayam Kampung adalah pilihan premium yang menghadirkan cita rasa istimewa. Daging ayam kampung pilihan yang dibakar dengan bumbu khas Ayam Bakar Pak D menghasilkan rasa yang kaya dan lezat. Tekstur daging yang empuk dan lemak yang pas membuat setiap gigitan memuaskan. Sempurna untuk acara spesial atau client gathering yang membutuhkan menu eksklusif.",
     "metadata": {
       "document_id": "P004",

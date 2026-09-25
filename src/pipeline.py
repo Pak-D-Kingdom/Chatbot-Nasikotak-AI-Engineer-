@@ -1,5 +1,5 @@
 import uuid
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, List
 from sqlalchemy.orm import Session
 
 from src.config import FAISS_INDEX_DIR, MAX_CONVERSATION_HISTORY, RAG_TOP_K, RAG_MAX_CONTEXT_TOKENS
@@ -134,40 +134,66 @@ class ChatPipeline:
             nearest = self.outlet_service.find_nearest_by_address(location, limit=3)
             if nearest:
                 min_distance = nearest[0]["distance_km"]
-                # Jika jarak > 3 km dan belum ada flag handover dari LLM
-                if min_distance > 3.0 and not llm_response.get("needs_handover"):
-                    llm_response["needs_handover"] = True
-                    llm_response["handover_reason"] = f"Jarak pengiriman > 3 km ({min_distance} km), perlu diskusi ongkir."
+                is_address_question = self._is_outlet_address_inquiry(user_message, history=history)
+
+                if is_address_question or delivery_method == "pickup":
+                    # Tampilkan HANYA jika user menanyakan alamat outlet ATAU pesanan wajib pickup (< 25 box)
+                    outlets_to_show = nearest[:1]
+                    include_cost = (delivery_method == "pickup" and not is_address_question)
+                    outlet_info = self.outlet_service.format_outlet_info(outlets_to_show, include_cost=include_cost)
                     
-                    admin = self.llm._get_next_markom_admin()
-                    admin_phone = admin['phone']
-                    if admin_phone.startswith("0"):
-                        admin_phone = "62" + admin_phone[1:]
-                    elif admin_phone.startswith("+"):
-                        admin_phone = admin_phone[1:]
+                    base_reply = llm_response.get("reply", "").rstrip()
+                    # Bersihkan jika LLM menyebut kalimat template 'otomatis ditampilkan oleh sistem'
+                    import re
+                    base_reply = re.sub(
+                        r"(?i)\s*[^.\n]*(?:otomatis ditampilkan|ditampilkan secara otomatis|ditampilkan oleh sistem)[^.\n]*[\.\!]?",
+                        "",
+                        base_reply
+                    ).rstrip()
                     
-                    from urllib.parse import quote
-                    message = f"Halo Admin, saya ingin diskusi mengenai ongkir pesanan catering ke {location}."
-                    wa_link = f"https://api.whatsapp.com/send?phone={admin_phone}&text={quote(message)}"
-                    
-                    llm_response["assigned_admin"] = admin["name"]
-                    llm_response["handover_link"] = wa_link
-                    if "handover_admin" not in llm_response.get("actions", []):
-                        llm_response.setdefault("actions", []).append("handover_admin")
+                    if re.search(r"(?i)outlet terdekat[^\n]*:\s*$", base_reply):
+                        llm_response["reply"] = f"{base_reply}\n\n{outlet_info}"
+                    else:
+                        llm_response["reply"] = (
+                            f"{base_reply}\n\n"
+                            f"📍 Outlet Terdekat:\n{outlet_info}"
+                        )
+                elif min_distance > 3.0 and not llm_response.get("needs_handover"):
+                    # Jarak > 3 km untuk delivery catering: handover ongkir
+                    # Cegah handover jika respons berkaitan dengan menu dine-in / website
+                    reply_lower = (llm_response.get("reply") or "").lower()
+                    is_dinein_or_website = any(k in reply_lower for k in [
+                        "dine-in", "dine in", "makan di tempat", "hanya tersedia di outlet",
+                        "hanya bisa dipesan melalui website", "melalui website kami"
+                    ])
+
+                    if not is_dinein_or_website:
+                        llm_response["needs_handover"] = True
+                        llm_response["handover_reason"] = f"Jarak pengiriman > 3 km ({min_distance} km), perlu diskusi ongkir."
                         
-                    base_reply = llm_response.get("reply", "").rstrip()
-                    llm_response["reply"] = (
-                        f"{base_reply}\n\nLokasi pengiriman berjarak {min_distance} km dari outlet terdekat. "
-                        f"Untuk hal ini, saya hubungkan ke admin kami untuk diskusi ongkir ya kak 🙏\n"
-                        f"{admin['name']}: {wa_link}"
-                    )
-                elif delivery_method == "pickup":
-                    outlet_info = self.outlet_service.format_outlet_info(nearest)
-                    base_reply = llm_response.get("reply", "").rstrip()
-                    llm_response["reply"] = (
-                        f"{base_reply}\n\n"
-                        f"📍 **Outlet Terdekat dari lokasi kakak:**\n{outlet_info}"
-                    )
+                        admin = self.llm._get_next_markom_admin()
+                        admin_phone = admin['phone']
+                        if admin_phone.startswith("0"):
+                            admin_phone = "62" + admin_phone[1:]
+                        elif admin_phone.startswith("+"):
+                            admin_phone = admin_phone[1:]
+                        
+                        from urllib.parse import quote
+                        message = f"Halo Admin, saya ingin diskusi mengenai ongkir pesanan catering ke {location}."
+                        wa_link = f"https://api.whatsapp.com/send?phone={admin_phone}&text={quote(message)}"
+                        
+                        llm_response["assigned_admin"] = admin["name"]
+                        llm_response["handover_link"] = wa_link
+                        if "handover_admin" not in llm_response.get("actions", []):
+                            llm_response.setdefault("actions", []).append("handover_admin")
+                            
+                        base_reply = llm_response.get("reply", "").rstrip()
+                        llm_response["reply"] = (
+                            f"{base_reply}\n\nLokasi pengiriman berjarak {min_distance} km dari outlet terdekat. "
+                            f"Untuk hal ini, saya hubungkan ke admin kami untuk diskusi ongkir ya kak 🙏\n"
+                            f"{admin['name']}: {wa_link}"
+                        )
+
 
         # --- 6. Update session context ---
         updated_session = self.conv_manager.update_session(session_id, analysis)
@@ -278,3 +304,45 @@ class ChatPipeline:
             result["whatsapp_link"] = whatsapp_link
 
         return result
+
+    def _is_outlet_address_inquiry(self, user_message: str, history: List[Dict[str, Any]] = None) -> bool:
+        """
+        Deteksi apakah user sedang menanyakan alamat/lokasi outlet terdekat.
+        HANYA True jika user secara spesifik menanyakan alamat/lokasi/outlet terdekat,
+        atau user sedang merespons pertanyaan bot sebelumnya mengenai daerah/lokasi outlet.
+        """
+        msg = user_message.lower()
+
+        # 1. Kata kunci langsung mengenai alamat atau cabang/outlet terdekat
+        address_keywords = [
+            "alamat", "almt", "lokasi", "tempat", "posisi",
+            "outlet terdekat", "outlet terdekt", "cabang terdekat", "paling dekat",
+            "ada cabang", "ada outlet", "cabang di", "outlet di"
+        ]
+        if any(kw in msg for kw in address_keywords):
+            return True
+
+        # 2. Pertanyaan "di mana" / "dimana" / "mana" terkait outlet / cabang / warung / makan / beli
+        if any(w in msg for w in ["dimana", "di mana", "ke mana", "kemana", "mana"]):
+            if any(target in msg for target in ["outlet", "otlet", "cabang", "warung", "resto", "pak d", "makan", "beli", "lokasi", "tempat"]):
+                return True
+
+        # 3. Kata "terdekat" jika didampingi konteks mencari outlet/makan
+        if any(w in msg for w in ["terdekat", "terdekt"]) and any(t in msg for t in ["outlet", "otlet", "cabang", "paket", "menu", "pak d", "makan"]):
+            return True
+
+        # 4. Cek riwayat pesan: jika pesan bot terakhir menanyakan lokasi/daerah untuk mencari outlet terdekat
+        if history:
+            last_bot_msg = None
+            for item in reversed(history):
+                sender = item.get("sender") or item.get("role")
+                if sender in ["bot", "assistant"]:
+                    last_bot_msg = (item.get("text") or item.get("content") or "").lower()
+                    break
+            
+            if last_bot_msg:
+                # Bot sebelumnya menanyakan daerah/lokasi untuk mencari outlet terdekat
+                if any(w in last_bot_msg for w in ["outlet", "cabang"]) and any(q in last_bot_msg for q in ["daerah", "lokasi", "mana"]):
+                    return True
+
+        return False

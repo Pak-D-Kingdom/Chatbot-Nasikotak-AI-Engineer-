@@ -139,31 +139,44 @@ class OutletService:
         lat, lng = coords
         return self.find_nearest_outlets(lat, lng, limit)
 
-    def format_outlet_info(self, outlets_with_distance: List[Dict[str, Any]]) -> str:
+    def format_outlet_info(
+        self,
+        outlets_with_distance: List[Dict[str, Any]],
+        include_cost: bool = True
+    ) -> str:
         """Format daftar outlet untuk chat, termasuk jarak dan estimasi ongkir."""
         if not outlets_with_distance:
             return "Maaf, kami tidak dapat menemukan outlet di sekitar lokasi tersebut."
             
         lines = []
+        is_single = len(outlets_with_distance) == 1
         for i, outlet in enumerate(outlets_with_distance, 1):
             name = outlet.get("name", "Outlet Pak D")
             dist = outlet.get("distance_km", 0)
             cost = outlet.get("pickup_cost", 0)
             addr = outlet.get("address", "")
-            hours = outlet.get("operational_hours", "")
+            hours = outlet.get("operational_hours")
             
-            if cost == 0:
-                cost_str = "GRATIS ✅"
-            elif cost == -1:
-                cost_str = "Diskusikan dengan Admin 👨‍💻"
+            hours_str = f" | Buka {hours}" if hours else ""
+            
+            cost_str = ""
+            if include_cost:
+                if cost == 0:
+                    cost_str = " (Ongkir: GRATIS ✅)"
+                elif cost == -1:
+                    cost_str = " (Ongkir: Diskusikan dengan Admin 👨‍💻)"
+                else:
+                    cost_str = f" (Ongkir: Rp {cost:,.0f})".replace(",", ".")
+                    
+            if is_single:
+                line1 = f"📍 {name} — {dist} km{cost_str}"
+                line2 = f"{addr}{hours_str}"
             else:
-                # Format ke rupiah
-                cost_str = f"Rp {cost:,.0f}".replace(",", ".")
-                
-            line1 = f"{i}. 📍 {name} — {dist} km (Ongkir: {cost_str})"
-            line2 = f"   {addr} | Buka {hours}"
+                line1 = f"{i}. 📍 {name} — {dist} km{cost_str}"
+                line2 = f"   {addr}{hours_str}"
             
             lines.append(line1)
             lines.append(line2)
             
         return "\n".join(lines)
+
