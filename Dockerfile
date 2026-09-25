@@ -19,6 +19,9 @@ RUN pip install --default-timeout=1000 --no-cache-dir -r requirements.txt
 # Copy seluruh source code ke dalam container
 COPY . .
 
+# Buat salinan cadangan faiss_index agar bisa dipulihkan saat volume host kosong
+RUN cp -r /app/faiss_index /app/faiss_index_default
+
 # Buat user non-root untuk keamanan, siapkan direktori, dan ubah kepemilikan
 RUN useradd -m -u 1000 appuser \
     && mkdir -p /app/data /app/faiss_index /app/knowledge_base /home/appuser/.cache/huggingface \

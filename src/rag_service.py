@@ -162,6 +162,7 @@ class RAGService:
         """
         Menyimpan index FAISS dan metadata ke disk.
         """
+        os.makedirs(self.index_dir, exist_ok=True)
         index_path = os.path.join(self.index_dir, "index.faiss")
         faiss.write_index(self.index, index_path)
         
@@ -172,14 +173,26 @@ class RAGService:
             
         print(f"Index berhasil disimpan di {self.index_dir}/")
 
-    def load_index(self):
+    def load_index(self, auto_build: bool = True):
         """
         Memuat index FAISS dan metadata dari disk.
+        Jika index atau metadata belum ada dan auto_build=True,
+        otomatis membangun index baru dari knowledge_base dan menyimpannya.
         """
         index_path = os.path.join(self.index_dir, "index.faiss")
         metadata_path = os.path.join(self.index_dir, "metadata.json")
         
         if not os.path.exists(index_path) or not os.path.exists(metadata_path):
+            if auto_build:
+                print(f"[INFO] FAISS index tidak ditemukan di {self.index_dir}. Membangun index otomatis dari knowledge_base...")
+                from src.config import KNOWLEDGE_BASE_DIR
+                docs = self.load_knowledge_base(KNOWLEDGE_BASE_DIR)
+                if not docs:
+                    print(f"[WARNING] Tidak ada file dokumen markdown yang ditemukan di {KNOWLEDGE_BASE_DIR}.")
+                chunked = self.chunk_documents(docs)
+                self.build_index(chunked)
+                self.save_index()
+                return
             raise FileNotFoundError("FAISS index atau metadata tidak ditemukan.")
             
         self.index = faiss.read_index(index_path)
