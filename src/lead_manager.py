@@ -2,8 +2,11 @@ from urllib.parse import quote
 from sqlalchemy.orm import Session
 from src.database import Lead
 from src.config import ORDER_WEB_URL
+from src.outlet_service import OutletService
 
 class LeadManager:
+    def __init__(self):
+        self.outlet_service = OutletService()
 
     def should_capture_lead(self, purchase_intent: str) -> bool:
         """Cek apakah purchase intent sudah cukup tinggi untuk capture lead."""
@@ -52,6 +55,10 @@ class LeadManager:
             parts.append(f"Lokasi: {ctx['location']}")
         if ctx.get("event_date"):
             parts.append(f"Tanggal: {ctx['event_date']}")
+        if ctx.get("reservation_time"):
+            parts.append(f"Jam: {ctx['reservation_time']}")
+        if ctx.get("total_people"):
+            parts.append(f"Orang: {ctx['total_people']} pax")
         return " | ".join(parts) if parts else "Lead dari chatbot"
 
     def generate_whatsapp_link(self, admin_phone: str, session_context: dict, 
@@ -71,7 +78,52 @@ class LeadManager:
         product_str = product_name or session_context.get("selected_product", "-")
         delivery_method_str = session_context.get("delivery_method", "-")
 
-        if "invoice_text" in session_context:
+        if "reservation_text" in session_context or session_context.get("is_reservation") or session_context.get("reservation_time") or session_context.get("total_people"):
+            res_date = session_context.get("event_date", "-")
+            res_time = session_context.get("reservation_time", "-")
+            res_people = session_context.get("total_people", "-")
+            phone = session_context.get("customer_phone") or "-"
+            outlet_name = session_context.get("location", "-")
+            
+            outlet_obj = self.outlet_service.get_outlet_by_name(outlet_name) if outlet_name else None
+            outlet_addr = outlet_obj.get("address", "") if outlet_obj else ""
+            outlet_phone = outlet_obj.get("phone", "") if outlet_obj else ""
+            
+            pax_str = f"{res_people} orang"
+            is_big_group = False
+            try:
+                if int(res_people) >= 15:
+                    is_big_group = True
+                    pax_str += " *(Rombongan Besar)*"
+            except (ValueError, TypeError):
+                pass
+                
+            menu_pilihan = session_context.get("selected_product")
+            menu_line = f"\n• Pilihan Menu: {menu_pilihan}" if menu_pilihan else ""
+            
+            addr_line = f"\n• Alamat Cabang: {outlet_addr}" if outlet_addr else ""
+            branch_phone_line = f"\n• Kontak Cabang: {outlet_phone}" if outlet_phone else ""
+            
+            catatan = "\n\n📌 *Catatan:*"
+            if is_big_group:
+                catatan += f"\n- Rombongan besar ({res_people} orang): Mohon konfirmasi ketersediaan meja panjang / area khusus (lesehan/VIP)."
+            catatan += "\n- Mohon konfirmasi ketersediaan meja untuk waktu kedatangan di atas. Terima kasih!"
+
+            message = (
+                f"Halo Admin Ayam Bakar Pak D, saya ingin konfirmasi reservasi tempat / meja:\n\n"
+                f"📋 *Detail Reservasi:*\n"
+                f"• Nama Pemesan: {name or '-'}\n"
+                f"• No. WhatsApp: {phone}\n"
+                f"• Tanggal: {res_date}\n"
+                f"• Jam Kedatangan: {res_time} WIB\n"
+                f"• Jumlah Orang: {pax_str}\n"
+                f"• Cabang Pilihan: {outlet_name}"
+                f"{addr_line}"
+                f"{branch_phone_line}"
+                f"{menu_line}"
+                f"{catatan}"
+            )
+        elif "invoice_text" in session_context:
             message = "Halo Admin, saya ingin konfirmasi pesanan berikut:\n\n" + session_context["invoice_text"].replace("**", "*")
             # Remove the last line about clicking the button
             message = message.split("\n\nPesanan kakak sudah siap!")[0]

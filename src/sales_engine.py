@@ -45,6 +45,26 @@ class MessageAnalysis(BaseModel):
         description="Metode pengiriman: 'delivery' (antar) atau 'pickup' (ambil di outlet). Null jika belum disebutkan.",
         default=None,
     )
+    reservation_time: Optional[str] = Field(
+        description="Jam atau waktu reservasi makan di tempat/meja, jika ada (contoh: '19:00', '12.30').",
+        default=None,
+    )
+    total_people: Optional[int] = Field(
+        description="Jumlah orang/pax untuk reservasi makan di tempat/meja.",
+        default=None,
+    )
+    customer_name: Optional[str] = Field(
+        description="Nama customer jika disebutkan.",
+        default=None,
+    )
+    customer_phone: Optional[str] = Field(
+        description="Nomor telepon/WA customer jika disebutkan.",
+        default=None,
+    )
+    is_reservation: Optional[bool] = Field(
+        description="Apakah percakapan ini tentang reservasi tempat/meja makan di outlet.",
+        default=None,
+    )
 
 class SalesEngine:
     def __init__(self):
@@ -69,7 +89,9 @@ class SalesEngine:
             location=entities.get("location"),
             event_date=entities.get("event_date"),
             package_name=entities.get("package_name"),
-            delivery_method=entities.get("delivery_method")
+            delivery_method=entities.get("delivery_method"),
+            reservation_time=entities.get("reservation_time"),
+            total_people=entities.get("total_people")
         )
 
     def recommend_products(

@@ -63,6 +63,7 @@ class ChatResponse(BaseModel):
     whatsapp_link: Optional[str] = None
     lead_status: Optional[str] = None
     rag_sources: Optional[List[str]] = None
+    suggested_outlets: Optional[List[dict]] = None
 
 @app.get("/")
 async def root():
@@ -159,7 +160,7 @@ async def get_outlets():
     return pipeline.outlet_service.get_active_outlets()
 
 @app.get("/api/outlets/nearest")
-async def get_nearest_outlets(address: str, limit: int = 3):
+async def get_nearest_outlets(address: str, limit: int = 5):
     """Cari outlet terdekat dari alamat."""
     result = pipeline.outlet_service.find_nearest_by_address(address, limit)
     if result is None:
