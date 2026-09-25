@@ -52,6 +52,10 @@ class LeadManager:
             parts.append(f"Lokasi: {ctx['location']}")
         if ctx.get("event_date"):
             parts.append(f"Tanggal: {ctx['event_date']}")
+        if ctx.get("reservation_time"):
+            parts.append(f"Jam: {ctx['reservation_time']}")
+        if ctx.get("total_people"):
+            parts.append(f"Orang: {ctx['total_people']} pax")
         return " | ".join(parts) if parts else "Lead dari chatbot"
 
     def generate_whatsapp_link(self, admin_phone: str, session_context: dict, 
@@ -71,7 +75,15 @@ class LeadManager:
         product_str = product_name or session_context.get("selected_product", "-")
         delivery_method_str = session_context.get("delivery_method", "-")
 
-        if "invoice_text" in session_context:
+        if "reservation_text" in session_context:
+            message = "Halo Admin, saya ingin konfirmasi reservasi tempat/meja:\n\n" + session_context["reservation_text"].replace("**", "*")
+            message = message.split("\n\nData reservasi")[0]
+            if name:
+                message += f"\n\nNama Pemesan: {name}"
+            phone = session_context.get("customer_phone")
+            if phone:
+                message += f"\nNo. HP: {phone}"
+        elif "invoice_text" in session_context:
             message = "Halo Admin, saya ingin konfirmasi pesanan berikut:\n\n" + session_context["invoice_text"].replace("**", "*")
             # Remove the last line about clicking the button
             message = message.split("\n\nPesanan kakak sudah siap!")[0]

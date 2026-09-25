@@ -211,7 +211,9 @@ document.addEventListener('DOMContentLoaded', () => {
             waBtn.target = '_blank';
             waBtn.className = 'action-btn';
             
-            if (content.includes("Ringkasan Pesanan")) {
+            if (content.includes("Ringkasan Reservasi")) {
+                waBtn.innerHTML = '<i class="fab fa-whatsapp"></i> Konfirmasi Reservasi (WhatsApp)';
+            } else if (content.includes("Ringkasan Pesanan")) {
                 waBtn.innerHTML = '<i class="fab fa-whatsapp"></i> Kirim Pesanan (WhatsApp)';
             } else {
                 waBtn.innerHTML = '<i class="fab fa-whatsapp"></i> Hubungi Admin';

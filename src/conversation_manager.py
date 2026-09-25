@@ -27,6 +27,8 @@ class ConversationManager:
                 "customer_phone": None,
                 "delivery_method": None,
                 "pickup_outlet": None,
+                "reservation_time": None,
+                "total_people": None,
                 "purchase_intent": "LOW",
                 "messages": []
             }
@@ -60,6 +62,22 @@ class ConversationManager:
         delivery_method = getattr(analysis, "delivery_method", None)
         if delivery_method is not None:
             session["delivery_method"] = delivery_method
+
+        reservation_time = getattr(analysis, "reservation_time", None)
+        if reservation_time is not None:
+            session["reservation_time"] = reservation_time
+            
+        total_people = getattr(analysis, "total_people", None)
+        if total_people is not None:
+            session["total_people"] = total_people
+
+        customer_name = getattr(analysis, "customer_name", None)
+        if customer_name is not None:
+            session["customer_name"] = customer_name
+
+        customer_phone = getattr(analysis, "customer_phone", None)
+        if customer_phone is not None:
+            session["customer_phone"] = customer_phone
             
         # Update intent (Bisa naik atau turun, tapi biasanya purchase_intent kita jaga agar tidak mudah turun drastis)
         # Logika sederhana: jika intent baru lebih tinggi secara ordinal, kita update.

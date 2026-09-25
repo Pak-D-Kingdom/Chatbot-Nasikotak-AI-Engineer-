@@ -34,6 +34,8 @@ class Entity(BaseModel):
     customer_phone: Optional[str] = None
     package_name: Optional[str] = None
     delivery_method: Optional[str] = None
+    reservation_time: Optional[str] = None
+    total_people: Optional[int] = None
 
 class GeminiStructuredResponse(BaseModel):
     """Structured response schema untuk LLM (awalnya Gemini, sekarang Groq)"""
@@ -156,7 +158,9 @@ class LLMService:
     "customer_name": null,
     "customer_phone": null,
     "package_name": null,
-    "delivery_method": null
+    "delivery_method": null,
+    "reservation_time": null,
+    "total_people": null
   },
   "actions": ["show_products"],
   "needs_handover": false,
@@ -164,7 +168,7 @@ class LLMService:
 }
 
 CATATAN:
-- intent: pilih TEPAT SATU dari (greeting, product_inquiry, price_inquiry, recommendation, ordering, other)
+- intent: pilih TEPAT SATU dari (greeting, product_inquiry, price_inquiry, recommendation, ordering, reservation, other)
 - purchase_intent: pilih TEPAT SATU dari (low, medium, high, ready_to_order)
 - entities: isi dengan value yang sesuai (bisa berupa angka untuk quantity/budget_per_box, string untuk lainnya) atau null.
 """
@@ -374,14 +378,17 @@ CATATAN:
                 if cur_intent == "ordering" or cur_purchase_intent == "ready_to_order":
                     if "generate_invoice" not in response_json.get("actions", []):
                         response_json.setdefault("actions", []).append("generate_invoice")
+                elif cur_intent == "reservation" and cur_purchase_intent == "ready_to_order":
+                    if "generate_reservation" not in response_json.get("actions", []):
+                        response_json.setdefault("actions", []).append("generate_reservation")
 
                 # --- Cek needs_handover dari model, lalu terapkan safety-net override ---
                 needs_handover = bool(response_json.get("needs_handover", False))
                 handover_reason = response_json.get("handover_reason")
 
-                # Jangan override handover jika customer sedang ordering (bukan komplain)
+                # Jangan override handover jika customer sedang ordering atau reservation (bukan komplain)
                 override_reason = None
-                if cur_intent not in ("ordering",):
+                if cur_intent not in ("ordering", "reservation"):
                     override_reason = check_handover_override(raw_user_message or user_message, updated_entities)
                 if override_reason and not needs_handover:
                     needs_handover = True
