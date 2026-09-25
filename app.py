@@ -1,3 +1,4 @@
+import os
 import uuid
 import uvicorn
 from fastapi import FastAPI, HTTPException, Request, Response, Cookie, Depends, Header
@@ -15,9 +16,24 @@ init_db()
 # Initialize FastAPI app
 app = FastAPI(title="AI Sales Chatbot API")
 
+cors_origins_env = os.getenv("CORS_ORIGINS")
+allowed_origins = [
+    "https://ayambakarpakde.com",
+    "https://www.ayambakarpakde.com",
+    "https://nasikotak.com",
+    "http://localhost:8000",
+    "http://localhost:3000",
+    "http://127.0.0.1:8000",
+]
+if cors_origins_env:
+    for origin in cors_origins_env.split(","):
+        clean_origin = origin.strip()
+        if clean_origin and clean_origin not in allowed_origins:
+            allowed_origins.append(clean_origin)
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://nasikotak.com"],  # Domain Laravel Anda
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
