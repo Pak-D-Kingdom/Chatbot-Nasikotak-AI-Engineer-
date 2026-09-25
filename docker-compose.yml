@@ -1,39 +1,19 @@
 services:
-  # Service 1: 9router (LLM Router)
-  ninerouter:
-    build:
-      context: .
-      dockerfile: Dockerfile.9router
-    container_name: 9router
-    ports:
-      - "127.0.0.1:20128:20128"  # Hanya akses internal
-    volumes:
-      - 9router-data:/root/.9router
-    restart: unless-stopped
-    env_file:
-      - .env
-    environment:
-      - API_KEY=${NINEROUTER_API_KEY}
-
-  # Service 2: Chatbot FastAPI
+  # Service: Chatbot FastAPI
   chatbot:
     build: .
     container_name: chatbot-nasikotak
-    depends_on:
-      - ninerouter
     ports:
       - "127.0.0.1:8000:8000"  # Hanya akses internal (diakses via Nginx)
     restart: unless-stopped
     env_file:
       - .env
     environment:
-      - LLM_BASE_URL=http://ninerouter:20128/v1
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+      - LLM_BASE_URL=${LLM_BASE_URL}
+      - NINEROUTER_API_KEY=${NINEROUTER_API_KEY}
     volumes:
       - ./data:/app/data
+      - ./src:/app/src
       - ./knowledge_base:/app/knowledge_base
       - ./faiss_index:/app/faiss_index
-
-volumes:
-  9router-data:
+      - ./.hf_cache:/home/appuser/.cache/huggingface

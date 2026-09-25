@@ -182,7 +182,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Add Message to DOM
-    function addMessage(content, sender, isMarkdown = false, whatsappLink = null) {
+    function addMessage(content, sender, isMarkdown = false, whatsappLink = null, suggestedOutlets = null) {
         const msgDiv = document.createElement('div');
         msgDiv.className = `message message-${sender}`;
 
@@ -202,6 +202,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
         msgDiv.appendChild(bubbleDiv);
 
+        // Jika ada opsi outlet yang disarankan, tampilkan tombol pilihan interaktif
+        if (sender === 'bot' && suggestedOutlets && suggestedOutlets.length > 0) {
+            const outletsContainer = document.createElement('div');
+            outletsContainer.className = 'suggested-outlets-container';
+
+            suggestedOutlets.forEach((outlet) => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'outlet-select-btn';
+                btn.innerHTML = `<span>📍 <strong>${escapeHtml(outlet.name)}</strong></span> <span style="font-size: 0.8em; opacity: 0.85;">± ${outlet.distance_km} km</span>`;
+                btn.addEventListener('click', () => {
+                    // Disable all buttons in this container to prevent double click
+                    outletsContainer.querySelectorAll('button').forEach(b => {
+                        b.disabled = true;
+                        b.style.pointerEvents = 'none';
+                    });
+                    sendMessage(`Saya pilih ${outlet.name}`);
+                });
+                outletsContainer.appendChild(btn);
+            });
+            bubbleDiv.appendChild(outletsContainer);
+        }
+
         // If bot sends a whatsapp link, append a CTA button
         if (sender === 'bot' && whatsappLink) {
             const btnContainer = document.createElement('div');
@@ -211,7 +234,9 @@ document.addEventListener('DOMContentLoaded', () => {
             waBtn.target = '_blank';
             waBtn.className = 'action-btn';
             
-            if (content.includes("Ringkasan Pesanan")) {
+            if (content.includes("Ringkasan Reservasi")) {
+                waBtn.innerHTML = '<i class="fab fa-whatsapp"></i> Konfirmasi Reservasi (WhatsApp)';
+            } else if (content.includes("Ringkasan Pesanan")) {
                 waBtn.innerHTML = '<i class="fab fa-whatsapp"></i> Kirim Pesanan (WhatsApp)';
             } else {
                 waBtn.innerHTML = '<i class="fab fa-whatsapp"></i> Hubungi Admin';
@@ -300,7 +325,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // Remove typing and add bot response
             removeTyping();
-            addMessage(data.reply, 'bot', true, data.whatsapp_link);
+            addMessage(data.reply, 'bot', true, data.whatsapp_link, data.suggested_outlets);
 
         } catch (error) {
             console.error('Error:', error);
