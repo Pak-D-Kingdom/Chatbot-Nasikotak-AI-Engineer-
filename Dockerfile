@@ -3,6 +3,7 @@ FROM python:3.11-slim
 
 # Set working directory di dalam container
 WORKDIR /app
+ENV PYTHONPATH=/app
 
 # Install dependensi sistem yang mungkin dibutuhkan oleh library (misal faiss)
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -17,8 +18,10 @@ RUN pip install --default-timeout=1000 --no-cache-dir -r requirements.txt
 # Copy seluruh source code ke dalam container
 COPY . .
 
-# Buat user non-root untuk keamanan dan ubah kepemilikan direktori kerja
-RUN useradd -m -u 1000 appuser && chown -R appuser /app
+# Buat user non-root untuk keamanan, siapkan direktori, dan ubah kepemilikan
+RUN useradd -m -u 1000 appuser \
+    && mkdir -p /app/data /app/faiss_index /app/knowledge_base /home/appuser/.cache/huggingface \
+    && chown -R appuser:appuser /app /home/appuser
 
 # Pindah ke user non-root
 USER appuser
