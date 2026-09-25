@@ -61,6 +61,10 @@ class MessageAnalysis(BaseModel):
         description="Nomor telepon/WA customer jika disebutkan.",
         default=None,
     )
+    is_reservation: Optional[bool] = Field(
+        description="Apakah percakapan ini tentang reservasi tempat/meja makan di outlet.",
+        default=None,
+    )
 
 class SalesEngine:
     def __init__(self):

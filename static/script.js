@@ -253,6 +253,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         chatBody.appendChild(msgDiv);
         scrollToBottom();
+
+        // Re-scroll when images finish loading so the latest content isn't pushed out of view
+        msgDiv.querySelectorAll('img').forEach(img => {
+            img.addEventListener('load', () => scrollToBottom());
+        });
     }
 
     // Show/Hide Typing Indicator
@@ -285,7 +290,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Send Message API Call
     async function sendMessage(text) {
-        if (!text.trim() || isWaiting) return;
+        if (!text || !text.trim() || isWaiting) return;
 
         // Clear input
         chatInput.value = '';
@@ -326,6 +331,9 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('Error:', error);
             removeTyping();
             addMessage("Maaf kak, sistem kami sedang sibuk. Bisa dicoba lagi sebentar ya 🙏", 'bot');
+        } finally {
+            removeTyping();
+            chatInput.focus();
         }
     }
 
@@ -334,8 +342,9 @@ document.addEventListener('DOMContentLoaded', () => {
         sendMessage(chatInput.value);
     });
 
-    chatInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
+    chatInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
             sendMessage(chatInput.value);
         }
     });

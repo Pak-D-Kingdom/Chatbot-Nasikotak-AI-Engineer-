@@ -36,6 +36,7 @@ class Entity(BaseModel):
     delivery_method: Optional[str] = None
     reservation_time: Optional[str] = None
     total_people: Optional[int] = None
+    is_reservation: Optional[bool] = None
 
 class GeminiStructuredResponse(BaseModel):
     """Structured response schema untuk LLM (awalnya Gemini, sekarang Groq)"""

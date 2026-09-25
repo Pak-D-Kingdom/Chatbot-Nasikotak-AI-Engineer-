@@ -193,36 +193,46 @@ class OutletService:
         lat, lng = coords
         return self.find_nearest_outlets(lat, lng, limit)
 
-    def format_outlet_info(self, outlets_with_distance: List[Dict[str, Any]], include_cost: bool = False) -> str:
-        """Format daftar 5 outlet untuk chat, termasuk jarak dan alamat lengkap."""
+    def format_outlet_info(
+        self,
+        outlets_with_distance: List[Dict[str, Any]],
+        include_cost: bool = True
+    ) -> str:
+        """Format daftar outlet untuk chat, termasuk jarak dan estimasi ongkir."""
         if not outlets_with_distance:
             return "Maaf, kami tidak dapat menemukan outlet di sekitar lokasi tersebut."
             
         lines = []
+        is_single = len(outlets_with_distance) == 1
         for i, outlet in enumerate(outlets_with_distance, 1):
             name = outlet.get("name", "Outlet Pak D")
             dist = outlet.get("distance_km", 0)
             cost = outlet.get("pickup_cost", 0)
             addr = outlet.get("address", "")
             hours = outlet.get("operational_hours")
+            
             hours_str = f" | Buka {hours}" if hours else ""
             
+            cost_str = ""
             if include_cost:
                 if cost == 0:
-                    cost_str = " (Ongkir Pickup: GRATIS ✅)"
+                    cost_str = " (Ongkir: GRATIS ✅)"
                 elif cost == -1:
-                    cost_str = " (Ongkir: Diskusikan dg Admin 👨‍💻)"
+                    cost_str = " (Ongkir: Diskusikan dengan Admin 👨‍💻)"
                 else:
                     cost_str = f" (Ongkir: Rp {cost:,.0f})".replace(",", ".")
+                    
+            if is_single:
+                line1 = f"📍 {name} — {dist} km{cost_str}"
+                line2 = f"{addr}{hours_str}"
             else:
-                cost_str = ""
-                
-            line1 = f"{i}. 📍 {name} (± {dist} km){cost_str}"
-            line2 = f"   Alamat: {addr}{hours_str}"
+                line1 = f"{i}. 📍 {name} — {dist} km{cost_str}"
+                line2 = f"   {addr}{hours_str}"
             
-            lines.append(f"{line1}\n{line2}")
+            lines.append(line1)
+            lines.append(line2)
             
-        return "\n\n".join(lines)
+        return "\n".join(lines)
 
     def match_outlet_from_input(self, text: str, candidate_outlets: Optional[List[Dict[str, Any]]] = None) -> Optional[Dict[str, Any]]:
         """Mencocokkan pilihan user (misal: 'nomor 1', '1', 'pilihan 2', atau nama cabang) ke data outlet."""
@@ -306,4 +316,5 @@ class OutletService:
             return False, f"Jam kedatangan ({time_str}) di luar jam operasional. Outlet Ayam Bakar Pak D tutup pukul 22.00 WIB."
             
         return True, None
+
 

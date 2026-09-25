@@ -1,5 +1,5 @@
 import uuid
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, List
 from sqlalchemy.orm import Session
 
 from src.config import FAISS_INDEX_DIR, MAX_CONVERSATION_HISTORY, RAG_TOP_K, RAG_MAX_CONTEXT_TOKENS
@@ -44,8 +44,32 @@ class ChatPipeline:
             session_id = str(uuid.uuid4())
         session = self.conv_manager.get_session(session_id)
 
+        user_msg_lower = (user_message or "").lower()
+        reservation_keywords = [
+            "reservasi", "booking", "pesan meja", "booking meja", 
+            "makan di tempat", "dine in", "dine-in", "makan di outlet", 
+            "meja untuk", "makan disana", "makan di sana"
+        ]
+        is_reservation_chat = (
+            bool(session.get("is_reservation", False)) or
+            any(k in user_msg_lower for k in reservation_keywords) or
+            bool(session.get("reservation_time")) or
+            bool(session.get("total_people"))
+        )
+        if is_reservation_chat:
+            session["is_reservation"] = True
+
         # --- 2. RAG Retrieval ---
-        rag_results = self.rag.search(user_message, top_k=RAG_TOP_K)
+        # Jika dalam alur reservasi dan menanyakan menu, utamakan pencarian menu ayam bakar dine-in outlet
+        is_asking_menu = any(w in user_msg_lower for w in [
+            "menu", "makan", "paket", "harga", "ayam", "rekomendasi", "pilihan", "tersedia", "ada apa", "apa saja"
+        ])
+        if is_reservation_chat and is_asking_menu:
+            rag_query = f"menu ayam bakar paket komplit paket keluarga dahsyat dine in outlet makan di tempat {user_message}"
+        else:
+            rag_query = user_message
+
+        rag_results = self.rag.search(rag_query, top_k=RAG_TOP_K)
         rag_context = self.rag.construct_context(rag_results, max_chars=RAG_MAX_CONTEXT_TOKENS)
 
         # --- 3+4. LLM Call with history ---
@@ -70,16 +94,28 @@ class ChatPipeline:
             "delivery_method": session.get("delivery_method"),
             "reservation_time": session.get("reservation_time"),
             "total_people": session.get("total_people"),
+            "is_reservation": is_reservation_chat,
         }
 
         # Prepend RAG context to user message for grounding
+        reservation_note = ""
+        if is_reservation_chat:
+            reservation_note = (
+                "[KONTEKS KHUSUS: ALUR RESERVASI TEMPAT / MEJA (DINE-IN)]\n"
+                "Customer sedang dalam proses RESERVASI MEJA untuk makan di outlet Ayam Bakar Pak D.\n"
+                "Jika customer menanyakan menu/makanan: Sajikan MENU AYAM BAKAR DINE-IN OUTLET (Paket Komplit, Paket Keluarga/Dahsyat/Family, olahan Ayam Bakar khas Pak D), BUKAN nasi kotak katering dan JANGAN sebut syarat minimum 20 box.\n\n"
+            )
+
         augmented_message = user_message
         if rag_context:
             augmented_message = (
+                f"{reservation_note}"
                 f"[KONTEKS DARI KNOWLEDGE BASE]\n{rag_context}\n"
                 f"[END KONTEKS]\n\n"
                 f"Pesan customer: {user_message}"
             )
+        elif reservation_note:
+            augmented_message = f"{reservation_note}Pesan customer: {user_message}"
 
         llm_response = self.llm.chat_with_history(
             user_message=augmented_message,
@@ -87,6 +123,7 @@ class ChatPipeline:
             collected_entities=collected_entities,
             raw_user_message=user_message
         )
+
 
         # Jika LLMService gagal total (lihat chat_with_history's except block),
         # ia return {"error": "..."} tanpa key "reply". Tanpa penanganan ini,
@@ -129,12 +166,17 @@ class ChatPipeline:
         delivery_method = entities.get("delivery_method") or session.get("delivery_method")
         location = entities.get("location") or session.get("location")
         quantity = entities.get("quantity") or session.get("quantity")
-        user_msg_lower = (user_message or "").lower()
         is_reservation = (
+            is_reservation_chat or
+            session.get("is_reservation", False) or
             "generate_reservation" in llm_response.get("actions", []) or 
             llm_response.get("intent") == "reservation" or 
             analysis.intent == "reservation"
         )
+        if is_reservation:
+            session["is_reservation"] = True
+            analysis.is_reservation = True
+
         is_outlet_inquiry = any(k in user_msg_lower for k in [
             "cabang", "outlet", "lokasi", "terdekat", "dimana", "di mana", "alamat"
         ])
@@ -160,7 +202,6 @@ class ChatPipeline:
             if nearest:
                 session["candidate_outlets"] = nearest
                 min_distance = nearest[0]["distance_km"]
-                
                 # Cek apakah user sudah memilih cabang spesifik (misal: "Pak D - Rungkut 2" atau "Rungkut 2")
                 exact_outlet_chosen = any(
                     o["name"].lower() in location.lower() or 
@@ -168,11 +209,17 @@ class ChatPipeline:
                     for o in self.outlet_service.outlets
                 )
 
+                is_address_question = self._is_outlet_address_inquiry(user_message, history=history)
+
                 # Kasus 1: Delivery Katering dengan jarak > 3 km -> Handover admin diskusi ongkir
-                if delivery_method == "delivery" and min_distance > 3.0 and not llm_response.get("needs_handover"):
+                reply_lower = (llm_response.get("reply") or "").lower()
+                is_dinein_or_website = any(k in reply_lower for k in [
+                    "dine-in", "dine in", "makan di tempat", "hanya tersedia di outlet",
+                    "hanya bisa dipesan melalui website", "melalui website kami"
+                ])
+                if delivery_method == "delivery" and min_distance > 3.0 and not is_reservation and not is_dinein_or_website and not llm_response.get("needs_handover"):
                     llm_response["needs_handover"] = True
                     llm_response["handover_reason"] = f"Jarak pengiriman > 3 km ({min_distance} km), perlu diskusi ongkir."
-                    
                     admin = self.llm._get_next_markom_admin()
                     admin_phone = admin['phone']
                     if admin_phone.startswith("0"):
@@ -196,34 +243,38 @@ class ChatPipeline:
                         f"{admin['name']}: {wa_link}"
                     )
                 # Kasus 2: Tanya cabang, pickup, atau reservasi meja di mana user memberikan alamat tujuan tapi belum memilih 1 cabang spesifik
-                elif not exact_outlet_chosen and (delivery_method == "pickup" or is_reservation or is_outlet_inquiry or entities.get("location")):
+                elif not exact_outlet_chosen and (delivery_method == "pickup" or is_reservation or is_outlet_inquiry or is_address_question or entities.get("location")):
                     llm_response["suggested_outlets"] = [
                         {"name": o["name"], "distance_km": o["distance_km"]} for o in nearest
                     ]
+                    include_cost = (delivery_method == "pickup" and not is_reservation and not is_address_question)
                     outlet_info = self.outlet_service.format_outlet_info(
                         nearest, 
-                        include_cost=(delivery_method == "pickup")
+                        include_cost=include_cost
                     )
                     base_reply = llm_response.get("reply", "").rstrip()
+                    # Bersihkan jika LLM menyebut kalimat template 'otomatis ditampilkan oleh sistem'
+                    import re
+                    base_reply = re.sub(
+                        r"(?i)\s*[^.\n]*(?:otomatis ditampilkan|ditampilkan secara otomatis|ditampilkan oleh sistem)[^.\n]*[\.\!]?",
+                        "",
+                        base_reply
+                    ).rstrip()
                     # Hanya append jika daftar outlet belum ada di reply LLM
                     if "📍 Pak D -" not in base_reply and "1. 📍" not in base_reply:
-                        llm_response["reply"] = (
-                            f"{base_reply}\n\n"
-                            f"📍 **5 Outlet Ayam Bakar Pak D Terdekat dari lokasi yang dituju ({location}):**\n"
-                            f"{outlet_info}\n\n"
-                            f"Dari 5 pilihan cabang di atas, cabang mana yang paling ingin kakak tuju?"
-                        )
-                elif delivery_method == "pickup":
-                    llm_response["suggested_outlets"] = [
-                        {"name": o["name"], "distance_km": o["distance_km"]} for o in nearest
-                    ]
-                    outlet_info = self.outlet_service.format_outlet_info(nearest, include_cost=True)
-                    base_reply = llm_response.get("reply", "").rstrip()
-                    if "📍 Pak D -" not in base_reply and "1. 📍" not in base_reply:
-                        llm_response["reply"] = (
-                            f"{base_reply}\n\n"
-                            f"📍 **Outlet Terdekat dari lokasi kakak:**\n{outlet_info}"
-                        )
+                        if is_reservation:
+                            llm_response["reply"] = (
+                                f"{base_reply}\n\n"
+                                f"📍 **5 Outlet Ayam Bakar Pak D Terdekat dari lokasi tujuan ({location}):**\n"
+                                f"{outlet_info}\n\n"
+                                f"Dari 5 pilihan cabang di atas, cabang mana yang ingin kakak pilih untuk reservasi?"
+                            )
+                        else:
+                            llm_response["reply"] = (
+                                f"{base_reply}\n\n"
+                                f"📍 **Outlet Terdekat dari lokasi ({location}):**\n"
+                                f"{outlet_info}"
+                            )
 
         # Validasi jam operasional untuk reservasi meja (10:00 - 21:30 WIB)
         if is_reservation:
@@ -236,6 +287,7 @@ class ChatPipeline:
                     session["reservation_time"] = None
                     base_reply = llm_response.get("reply", "").rstrip()
                     llm_response["reply"] = f"{base_reply}\n\n⚠️ {time_warn} Boleh dibantu sesuaikan jam kedatangannya ya kak 🙏"
+
 
         # --- 6. Update session context ---
         updated_session = self.conv_manager.update_session(session_id, analysis)
@@ -292,6 +344,7 @@ class ChatPipeline:
 
         # --- 6.6 Reservation Generation ---
         is_reservation = (
+            session.get("is_reservation", False) or
             "generate_reservation" in llm_response.get("actions", []) or 
             llm_response.get("intent") == "reservation" or 
             analysis.intent == "reservation"
@@ -302,6 +355,7 @@ class ChatPipeline:
             res_people = updated_session.get("total_people")
             res_name = updated_session.get("customer_name")
             res_outlet = updated_session.get("location")
+            menu_pilihan = updated_session.get("selected_product")
             
             # Cek apakah cabang sudah dipilih secara spesifik dari daftar outlet
             chosen_outlet_obj = None
@@ -316,15 +370,18 @@ class ChatPipeline:
             # 5. Cabang outlet spesifik sudah dipilih (bukan masih bertanya alamat tujuan/opsi)
             if res_date and res_time and res_people and res_name and chosen_outlet_obj:
                 outlet_name = chosen_outlet_obj["name"]
+                menu_line = f"• Pilihan Menu: {menu_pilihan}\n" if menu_pilihan else ""
                 reservation_text = (
                     f"📋 **Ringkasan Reservasi Tempat**\n"
                     f"• Nama: {res_name}\n"
                     f"• Tanggal: {res_date}\n"
                     f"• Jam: {res_time}\n"
                     f"• Jumlah: {res_people} orang\n"
-                    f"• Cabang Outlet: {outlet_name}\n\n"
+                    f"• Cabang Outlet: {outlet_name}\n"
+                    f"{menu_line}\n"
                     f"Data reservasi kakak sudah kami siapkan! Silakan klik tombol di bawah ini untuk konfirmasi langsung ke Admin WhatsApp kami ya kak 👇"
                 )
+
                 
                 updated_session["reservation_text"] = reservation_text
                 updated_session["purchase_intent"] = "READY_TO_ORDER"
@@ -351,8 +408,9 @@ class ChatPipeline:
         lead_saved = None
         whatsapp_link = None
         current_intent = updated_session.get("purchase_intent", "LOW")
-        if self.lead_manager.should_capture_lead(current_intent) and db:
-            lead_saved = self.lead_manager.save_lead(db, updated_session)
+        if self.lead_manager.should_capture_lead(current_intent):
+            if db:
+                lead_saved = self.lead_manager.save_lead(db, updated_session)
             # Generate WhatsApp link if admin assigned
             assigned_admin = llm_response.get("assigned_admin")
             if not assigned_admin:
@@ -385,9 +443,69 @@ class ChatPipeline:
         if lead_saved:
             result["lead_id"] = lead_saved.id
             result["lead_status"] = "captured"
-        if whatsapp_link:
+        # Hanya sertakan whatsapp_link ke frontend jika:
+        # 1. Terjadi handover admin (handover_link)
+        # 2. Ringkasan invoice pesanan catering sudah lengkap (invoice_text)
+        # 3. Ringkasan reservasi meja sudah lengkap (reservation_text)
+        show_wa_button = False
+        if llm_response.get("needs_handover") and llm_response.get("handover_link"):
+            whatsapp_link = llm_response.get("handover_link")
+            show_wa_button = True
+        elif "invoice_text" in updated_session or "reservation_text" in updated_session:
+            show_wa_button = True
+
+        if show_wa_button and not whatsapp_link:
+            admin = self.llm._get_next_markom_admin()
+            admin_phone = admin["phone"]
+            whatsapp_link = self.lead_manager.generate_whatsapp_link(
+                admin_phone, updated_session
+            )
+
+        if show_wa_button and whatsapp_link:
             result["whatsapp_link"] = whatsapp_link
         if "suggested_outlets" in llm_response:
             result["suggested_outlets"] = llm_response["suggested_outlets"]
 
         return result
+
+    def _is_outlet_address_inquiry(self, user_message: str, history: List[Dict[str, Any]] = None) -> bool:
+        """
+        Deteksi apakah user sedang menanyakan alamat/lokasi outlet terdekat.
+        HANYA True jika user secara spesifik menanyakan alamat/lokasi/outlet terdekat,
+        atau user sedang merespons pertanyaan bot sebelumnya mengenai daerah/lokasi outlet.
+        """
+        msg = user_message.lower()
+
+        # 1. Kata kunci langsung mengenai alamat atau cabang/outlet terdekat
+        address_keywords = [
+            "alamat", "almt", "lokasi", "tempat", "posisi",
+            "outlet terdekat", "outlet terdekt", "cabang terdekat", "paling dekat",
+            "ada cabang", "ada outlet", "cabang di", "outlet di"
+        ]
+        if any(kw in msg for kw in address_keywords):
+            return True
+
+        # 2. Pertanyaan "di mana" / "dimana" / "mana" terkait outlet / cabang / warung / makan / beli
+        if any(w in msg for w in ["dimana", "di mana", "ke mana", "kemana", "mana"]):
+            if any(target in msg for target in ["outlet", "otlet", "cabang", "warung", "resto", "pak d", "makan", "beli", "lokasi", "tempat"]):
+                return True
+
+        # 3. Kata "terdekat" jika didampingi konteks mencari outlet/makan
+        if any(w in msg for w in ["terdekat", "terdekt"]) and any(t in msg for t in ["outlet", "otlet", "cabang", "paket", "menu", "pak d", "makan"]):
+            return True
+
+        # 4. Cek riwayat pesan: jika pesan bot terakhir menanyakan lokasi/daerah untuk mencari outlet terdekat
+        if history:
+            last_bot_msg = None
+            for item in reversed(history):
+                sender = item.get("sender") or item.get("role")
+                if sender in ["bot", "assistant"]:
+                    last_bot_msg = (item.get("text") or item.get("content") or "").lower()
+                    break
+            
+            if last_bot_msg:
+                # Bot sebelumnya menanyakan daerah/lokasi untuk mencari outlet terdekat
+                if any(w in last_bot_msg for w in ["outlet", "cabang"]) and any(q in last_bot_msg for q in ["daerah", "lokasi", "mana"]):
+                    return True
+
+        return False

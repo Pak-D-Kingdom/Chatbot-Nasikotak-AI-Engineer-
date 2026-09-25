@@ -29,6 +29,7 @@ class ConversationManager:
                 "pickup_outlet": None,
                 "reservation_time": None,
                 "total_people": None,
+                "is_reservation": False,
                 "purchase_intent": "LOW",
                 "messages": []
             }
@@ -78,6 +79,9 @@ class ConversationManager:
         customer_phone = getattr(analysis, "customer_phone", None)
         if customer_phone is not None:
             session["customer_phone"] = customer_phone
+            
+        if getattr(analysis, "is_reservation", False) or getattr(analysis, "intent", "") == "reservation" or getattr(analysis, "reservation_time", None) or getattr(analysis, "total_people", None):
+            session["is_reservation"] = True
             
         # Update intent (Bisa naik atau turun, tapi biasanya purchase_intent kita jaga agar tidak mudah turun drastis)
         # Logika sederhana: jika intent baru lebih tinggi secara ordinal, kita update.

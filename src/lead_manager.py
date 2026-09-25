@@ -78,7 +78,7 @@ class LeadManager:
         product_str = product_name or session_context.get("selected_product", "-")
         delivery_method_str = session_context.get("delivery_method", "-")
 
-        if "reservation_text" in session_context:
+        if "reservation_text" in session_context or session_context.get("is_reservation") or session_context.get("reservation_time") or session_context.get("total_people"):
             res_date = session_context.get("event_date", "-")
             res_time = session_context.get("reservation_time", "-")
             res_people = session_context.get("total_people", "-")
@@ -98,6 +98,9 @@ class LeadManager:
             except (ValueError, TypeError):
                 pass
                 
+            menu_pilihan = session_context.get("selected_product")
+            menu_line = f"\n• Pilihan Menu: {menu_pilihan}" if menu_pilihan else ""
+            
             addr_line = f"\n• Alamat Cabang: {outlet_addr}" if outlet_addr else ""
             branch_phone_line = f"\n• Kontak Cabang: {outlet_phone}" if outlet_phone else ""
             
@@ -117,6 +120,7 @@ class LeadManager:
                 f"• Cabang Pilihan: {outlet_name}"
                 f"{addr_line}"
                 f"{branch_phone_line}"
+                f"{menu_line}"
                 f"{catatan}"
             )
         elif "invoice_text" in session_context:
