@@ -139,7 +139,7 @@ class OutletService:
         lat, lng = coords
         return self.find_nearest_outlets(lat, lng, limit)
 
-    def format_outlet_info(self, outlets_with_distance: List[Dict[str, Any]]) -> str:
+    def format_outlet_info(self, outlets_with_distance: List[Dict[str, Any]], delivery_method: str = "pickup") -> str:
         """Format daftar outlet untuk chat, termasuk jarak dan estimasi ongkir."""
         if not outlets_with_distance:
             return "Maaf, kami tidak dapat menemukan outlet di sekitar lokasi tersebut."
@@ -160,7 +160,9 @@ class OutletService:
                 # Format ke rupiah
                 cost_str = f"Rp {cost:,.0f}".replace(",", ".")
                 
-            line1 = f"{i}. 📍 {name} — {dist} km (Ongkir: {cost_str})"
+            cost_label = "Ongkir" if delivery_method == "delivery" else "Ongkir"
+                
+            line1 = f"{i}. 📍 {name} — {dist} km ({cost_label}: {cost_str})"
             line2 = f"   {addr} | Buka {hours}"
             
             lines.append(line1)

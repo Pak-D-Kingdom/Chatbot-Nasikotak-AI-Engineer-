@@ -9,7 +9,6 @@ from typing import Optional, List, Dict, Any
 
 from src.pipeline import ChatPipeline
 from src.database import SessionLocal, init_db, UserForm
-
 # Initialize database
 init_db()
 
@@ -18,7 +17,7 @@ app = FastAPI(title="AI Sales Chatbot API")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://yourdomain.com"],  # Domain Laravel Anda
+    allow_origins=["https://nasikotak.com"],  # Domain Laravel Anda
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
