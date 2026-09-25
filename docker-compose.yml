@@ -4,7 +4,7 @@ services:
     build: .
     container_name: chatbot-nasikotak
     ports:
-      - "127.0.0.1:8001:8001"  # Hanya akses internal (diakses via Nginx)
+      - "8001:8001"
     restart: unless-stopped
     env_file:
       - .env
