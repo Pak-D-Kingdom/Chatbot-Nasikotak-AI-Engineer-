@@ -13,7 +13,6 @@ services:
       - NINEROUTER_API_KEY=${NINEROUTER_API_KEY}
     volumes:
       - ./data:/app/data
-      - ./src:/app/src
       - ./knowledge_base:/app/knowledge_base
       - ./faiss_index:/app/faiss_index
       - ./.hf_cache:/home/appuser/.cache/huggingface
