@@ -5,9 +5,10 @@ FROM python:3.11-slim
 WORKDIR /app
 ENV PYTHONPATH=/app
 
-# Install dependensi sistem yang mungkin dibutuhkan oleh library (misal faiss)
+# Install dependensi sistem yang mungkin dibutuhkan oleh library (misal faiss) dan gosu
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
+    gosu \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements.txt dan install dependensi Python
@@ -23,11 +24,15 @@ RUN useradd -m -u 1000 appuser \
     && mkdir -p /app/data /app/faiss_index /app/knowledge_base /home/appuser/.cache/huggingface \
     && chown -R appuser:appuser /app /home/appuser
 
-# Pindah ke user non-root
-USER appuser
+# Setup entrypoint script untuk menangani permission volume secara otomatis
+COPY docker-entrypoint.sh /usr/local/bin/
+RUN sed -i 's/\r$//' /usr/local/bin/docker-entrypoint.sh \
+    && chmod +x /usr/local/bin/docker-entrypoint.sh
 
 # Expose port 8001 untuk FastAPI
 EXPOSE 8001
+
+ENTRYPOINT ["docker-entrypoint.sh"]
 
 # Perintah untuk menjalankan aplikasi
 CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8001"]
