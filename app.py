@@ -64,6 +64,7 @@ class ChatResponse(BaseModel):
     whatsapp_link: Optional[str] = None
     lead_status: Optional[str] = None
     rag_sources: Optional[List[str]] = None
+    suggested_outlets: Optional[List[dict]] = None
 
 @app.get("/")
 async def root():

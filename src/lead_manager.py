@@ -2,8 +2,11 @@ from urllib.parse import quote
 from sqlalchemy.orm import Session
 from src.database import Lead
 from src.config import ORDER_WEB_URL
+from src.outlet_service import OutletService
 
 class LeadManager:
+    def __init__(self):
+        self.outlet_service = OutletService()
 
     def should_capture_lead(self, purchase_intent: str) -> bool:
         """Cek apakah purchase intent sudah cukup tinggi untuk capture lead."""
@@ -76,13 +79,46 @@ class LeadManager:
         delivery_method_str = session_context.get("delivery_method", "-")
 
         if "reservation_text" in session_context:
-            message = "Halo Admin, saya ingin konfirmasi reservasi tempat/meja:\n\n" + session_context["reservation_text"].replace("**", "*")
-            message = message.split("\n\nData reservasi")[0]
-            if name:
-                message += f"\n\nNama Pemesan: {name}"
-            phone = session_context.get("customer_phone")
-            if phone:
-                message += f"\nNo. HP: {phone}"
+            res_date = session_context.get("event_date", "-")
+            res_time = session_context.get("reservation_time", "-")
+            res_people = session_context.get("total_people", "-")
+            phone = session_context.get("customer_phone") or "-"
+            outlet_name = session_context.get("location", "-")
+            
+            outlet_obj = self.outlet_service.get_outlet_by_name(outlet_name) if outlet_name else None
+            outlet_addr = outlet_obj.get("address", "") if outlet_obj else ""
+            outlet_phone = outlet_obj.get("phone", "") if outlet_obj else ""
+            
+            pax_str = f"{res_people} orang"
+            is_big_group = False
+            try:
+                if int(res_people) >= 15:
+                    is_big_group = True
+                    pax_str += " *(Rombongan Besar)*"
+            except (ValueError, TypeError):
+                pass
+                
+            addr_line = f"\n• Alamat Cabang: {outlet_addr}" if outlet_addr else ""
+            branch_phone_line = f"\n• Kontak Cabang: {outlet_phone}" if outlet_phone else ""
+            
+            catatan = "\n\n📌 *Catatan:*"
+            if is_big_group:
+                catatan += f"\n- Rombongan besar ({res_people} orang): Mohon konfirmasi ketersediaan meja panjang / area khusus (lesehan/VIP)."
+            catatan += "\n- Mohon konfirmasi ketersediaan meja untuk waktu kedatangan di atas. Terima kasih!"
+
+            message = (
+                f"Halo Admin Ayam Bakar Pak D, saya ingin konfirmasi reservasi tempat / meja:\n\n"
+                f"📋 *Detail Reservasi:*\n"
+                f"• Nama Pemesan: {name or '-'}\n"
+                f"• No. WhatsApp: {phone}\n"
+                f"• Tanggal: {res_date}\n"
+                f"• Jam Kedatangan: {res_time} WIB\n"
+                f"• Jumlah Orang: {pax_str}\n"
+                f"• Cabang Pilihan: {outlet_name}"
+                f"{addr_line}"
+                f"{branch_phone_line}"
+                f"{catatan}"
+            )
         elif "invoice_text" in session_context:
             message = "Halo Admin, saya ingin konfirmasi pesanan berikut:\n\n" + session_context["invoice_text"].replace("**", "*")
             # Remove the last line about clicking the button

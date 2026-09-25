@@ -197,6 +197,9 @@ class ChatPipeline:
                     )
                 # Kasus 2: Tanya cabang, pickup, atau reservasi meja di mana user memberikan alamat tujuan tapi belum memilih 1 cabang spesifik
                 elif not exact_outlet_chosen and (delivery_method == "pickup" or is_reservation or is_outlet_inquiry or entities.get("location")):
+                    llm_response["suggested_outlets"] = [
+                        {"name": o["name"], "distance_km": o["distance_km"]} for o in nearest
+                    ]
                     outlet_info = self.outlet_service.format_outlet_info(
                         nearest, 
                         include_cost=(delivery_method == "pickup")
@@ -211,6 +214,9 @@ class ChatPipeline:
                             f"Dari 5 pilihan cabang di atas, cabang mana yang paling ingin kakak tuju?"
                         )
                 elif delivery_method == "pickup":
+                    llm_response["suggested_outlets"] = [
+                        {"name": o["name"], "distance_km": o["distance_km"]} for o in nearest
+                    ]
                     outlet_info = self.outlet_service.format_outlet_info(nearest, include_cost=True)
                     base_reply = llm_response.get("reply", "").rstrip()
                     if "📍 Pak D -" not in base_reply and "1. 📍" not in base_reply:
@@ -218,6 +224,18 @@ class ChatPipeline:
                             f"{base_reply}\n\n"
                             f"📍 **Outlet Terdekat dari lokasi kakak:**\n{outlet_info}"
                         )
+
+        # Validasi jam operasional untuk reservasi meja (10:00 - 21:30 WIB)
+        if is_reservation:
+            raw_res_time = entities.get("reservation_time") or session.get("reservation_time")
+            if raw_res_time:
+                is_valid_time, time_warn = self.outlet_service.validate_reservation_time(raw_res_time)
+                if not is_valid_time:
+                    analysis.reservation_time = None
+                    entities["reservation_time"] = None
+                    session["reservation_time"] = None
+                    base_reply = llm_response.get("reply", "").rstrip()
+                    llm_response["reply"] = f"{base_reply}\n\n⚠️ {time_warn} Boleh dibantu sesuaikan jam kedatangannya ya kak 🙏"
 
         # --- 6. Update session context ---
         updated_session = self.conv_manager.update_session(session_id, analysis)
@@ -369,5 +387,7 @@ class ChatPipeline:
             result["lead_status"] = "captured"
         if whatsapp_link:
             result["whatsapp_link"] = whatsapp_link
+        if "suggested_outlets" in llm_response:
+            result["suggested_outlets"] = llm_response["suggested_outlets"]
 
         return result

@@ -54,12 +54,12 @@ JIKA SUDAH LENGKAP: Konfirmasi bahwa pesanan siap dibuat (set intent="ordering")
 
 ALUR RESERVASI TEMPAT / MEJA (DINE-IN):
 Jika user ingin reservasi / booking meja / makan di outlet Ayam Bakar Pak D:
-PASTIKAN 4 data ini sudah lengkap:
+PASTIKAN 5 data ini sudah lengkap:
 1. Nama Pemesan (customer_name)
 2. Tanggal Reservasi (event_date)
-3. Jam Reservasi (reservation_time, contoh: 12.00, 19.00)
-4. Total Orang / Pax (total_people, contoh: 4 orang)
-(Jika user belum tahu cabangnya atau belum menyebutkan cabang outlet yang diinginkan: tanyakan alamat/area yang dituju — tegaskan: alamat tujuan acara/kantor/makan, BUKAN alamat rumah — agar sistem dapat mencarikan 5 outlet terdekat).
+3. Jam Reservasi (reservation_time, contoh: 12.00, 19.00 — JAM OPERASIONAL OUTLET: 10.00 s/d 22.00 WIB. Jika customer minta jam di luar rentang ini, minta customer menyesuaikan jamnya secara ramah).
+4. Total Orang / Pax (total_people, contoh: 4 orang, 23 orang)
+5. Cabang Outlet (location, misal: Pak D - Rungkut 2). Jika belum tahu cabang yang dituju, tanyakan alamat/area yang dituju — tegaskan: alamat tujuan acara/kantor/makan, BUKAN alamat rumah — agar sistem dapat mencarikan 5 outlet terdekat.
 JIKA ADA YANG BELUM LENGKAP: Tanyakan data reservasi yang masih kurang dengan ramah dan santai. JANGAN buat ringkasan reservasi jika data belum lengkap.
 JIKA SUDAH LENGKAP: Konfirmasi bahwa data reservasi sudah siap (set intent="reservation"), dan sampaikan bahwa sistem akan membuatkan ringkasan reservasi untuk dikonfirmasi ke Admin WhatsApp. Ini BUKAN alasan handover ke admin (needs_handover tetap false).
 
@@ -206,7 +206,7 @@ ANCHOR_RULES = """ATURAN:
 14. MENU SPESIAL & WEBSITE: Jika pesan TERAKHIR customer menanyakan atau ingin memesan menu di LUAR 6 paket reguler (Ayam Bakar, Ayam Goreng, Ayam Bawang Putih, Udang, Cumi, Kerang, Kepiting, Bebek spesial, Sayur Mayur, Aneka Bumbu, atau produk lain di luar 6 paket resmi): JANGAN proses sebagai pesanan chatbot, JANGAN isi package_name dengan nama menu tsb, informasikan bahwa menu tersebut hanya bisa dipesan LANGSUNG MELALUI WEBSITE. Ini BUKAN handover admin — needs_handover tetap false, KECUALI kasusnya juga cocok poin SCOPE & HANDOVER lain (mis. event besar).
 15. EVENT BESAR: Jika customer menyebutkan event besar (nikahan, seminar, expo, gathering korporat skala besar, dll) — baik di pesan terakhir maupun konteks yang relevan dengan pesan terakhir — WAJIB set needs_handover=true dengan handover_reason yang menyebutkan "Admin Markom", dan reply menyampaikan bahwa untuk event tsb akan dibantu langsung oleh tim Admin Marketing/Komunikasi.
 16. WAKTU PESAN (HARI-H vs H-1): Jika event_date yang diketahui/disebutkan = TANGGAL HARI INI, DAN pesan TERAKHIR customer membahas/ingin memesan MENU SPESIAL (bukan salah satu dari 6 paket reguler): informasikan bahwa menu spesial tidak bisa dipesan untuk hari-H (minimal harus dipesan H-1 via website), lalu tawarkan alternatif menu reguler yang bisa untuk hari-H. Menu REGULER tetap bisa dipesan untuk hari-H tanpa batasan ini.
-17. RESERVASI TEMPAT / MEJA: Jika customer ingin reservasi / booking meja / makan di outlet, set intent="reservation". Ekstrak nama (customer_name), tanggal (event_date), jam (reservation_time, misal "19.00", "12:30"), total orang (total_people, misal 4), dan cabang outlet jika disebut (location). Jika data belum lengkap, tanyakan yang kurang dengan ramah. Jika cabang belum tahu, tanyakan alamat/area tujuan (bukan alamat rumah) untuk mencarikan 5 outlet terdekat. Jika data sudah lengkap, konfirmasi data reservasi. Ini BUKAN alasan handover (needs_handover tetap false).
+17. RESERVASI TEMPAT / MEJA: Jika customer ingin reservasi / booking meja / makan di outlet, set intent="reservation". Ekstrak nama (customer_name), tanggal (event_date), jam (reservation_time, misal "19.00", "12:30" — JAM OPERASIONAL: 10.00-22.00 WIB), total orang (total_people, misal 4), dan cabang outlet jika disebut (location). Jika jam di luar 10.00-22.00 WIB, minta penyesuaian jam. Jika data belum lengkap atau cabang belum dipilih, tanyakan yang kurang dengan ramah. Jika cabang belum tahu, tanyakan alamat/area tujuan (bukan alamat rumah) untuk mencarikan 5 outlet terdekat. Hanya konfirmasi jika semua 5 data sudah lengkap. Ini BUKAN alasan handover (needs_handover tetap false).
 18. OUTLET & ALAMAT TUJUAN: Jika customer menanyakan cabang/outlet atau belum tahu cabang yang dituju (untuk reservasi meja, makan di tempat, maupun katering/pickup): JANGAN tebak atau sebutkan semua cabang. Tanyakan alamat atau area yang dituju (tegaskan: alamat tujuan acara/kantor/makan, BUKAN alamat rumah). Begitu customer memberikan alamat/area tujuan, ekstrak ke location. Sistem backend akan menyajikan 5 opsi outlet terdekat dari alamat tersebut.
 """
 

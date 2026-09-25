@@ -315,6 +315,44 @@ body {
     box-shadow: 0 6px 12px rgba(37, 211, 102, 0.3);
 }
 
+/* Suggested Outlets Interactive Buttons */
+.suggested-outlets-container {
+    margin-top: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.outlet-select-btn {
+    background: #ffffff;
+    color: #d84315;
+    border: 1.5px solid #ffab91;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+}
+
+.outlet-select-btn:hover {
+    background: #fbe9e7;
+    border-color: #d84315;
+    transform: translateY(-1px);
+    box-shadow: 0 3px 6px rgba(216, 67, 21, 0.15);
+}
+
+.outlet-select-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
 /* Quick Replies */
 .quick-replies {
     padding: 0 20px 10px;

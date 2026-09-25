@@ -258,3 +258,52 @@ class OutletService:
                 
         return None
 
+    def get_outlet_by_name(self, name: str) -> Optional[Dict[str, Any]]:
+        """Mencari data outlet berdasarkan nama atau id."""
+        if not name:
+            return None
+        return self.match_outlet_from_input(name)
+
+    def validate_reservation_time(self, time_str: str) -> Tuple[bool, Optional[str]]:
+        """
+        Validasi apakah jam reservasi berada dalam rentang jam operasional (10:00 - 21:30 WIB).
+        Return (is_valid, warning_message).
+        """
+        if not time_str:
+            return True, None
+            
+        import re
+        text = time_str.lower().strip()
+        hour = None
+        minute = 0
+        
+        # Coba format HH:MM atau HH.MM
+        m = re.search(r'(\d{1,2})[:.](\d{2})', text)
+        if m:
+            hour = int(m.group(1))
+            minute = int(m.group(2))
+        else:
+            # Coba format angka (misal "jam 4 sore", "jam 7 malam", "16")
+            m2 = re.search(r'(\d{1,2})', text)
+            if m2:
+                hour = int(m2.group(1))
+                
+        if hour is None:
+            return True, None
+            
+        # Konversi 12-hour ke 24-hour jika ada penanda sore/malam
+        if any(w in text for w in ["sore", "malam", "pm"]) and hour < 12:
+            hour += 12
+        elif any(w in text for w in ["pagi", "am"]) and hour == 12:
+            hour = 0
+            
+        time_decimal = hour + (minute / 60.0)
+        
+        # Jam operasional standar: 10:00 s/d 21:30 WIB
+        if time_decimal < 10.0:
+            return False, f"Jam kedatangan ({time_str}) di luar jam operasional. Outlet Ayam Bakar Pak D baru buka mulai pukul 10.00 WIB."
+        elif time_decimal > 21.5:
+            return False, f"Jam kedatangan ({time_str}) di luar jam operasional. Outlet Ayam Bakar Pak D tutup pukul 22.00 WIB."
+            
+        return True, None
+
