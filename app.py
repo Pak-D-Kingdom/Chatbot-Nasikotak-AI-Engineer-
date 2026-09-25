@@ -1,3 +1,4 @@
+import os
 import uuid
 import uvicorn
 from fastapi import FastAPI, HTTPException, Request, Response, Cookie, Depends, Header
@@ -15,9 +16,24 @@ init_db()
 # Initialize FastAPI app
 app = FastAPI(title="AI Sales Chatbot API")
 
+cors_origins_env = os.getenv("CORS_ORIGINS")
+allowed_origins = [
+    "https://ayambakarpakde.com",
+    "https://www.ayambakarpakde.com",
+    "https://nasikotak.com",
+    "http://localhost:8001",
+    "http://localhost:3000",
+    "http://127.0.0.1:8001",
+]
+if cors_origins_env:
+    for origin in cors_origins_env.split(","):
+        clean_origin = origin.strip()
+        if clean_origin and clean_origin not in allowed_origins:
+            allowed_origins.append(clean_origin)
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://nasikotak.com"],  # Domain Laravel Anda
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -168,4 +184,4 @@ async def get_nearest_outlets(address: str, limit: int = 5):
     return result
 
 if __name__ == "__main__":
-    uvicorn.run("app:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("app:app", host="0.0.0.0", port=8001, reload=True)
