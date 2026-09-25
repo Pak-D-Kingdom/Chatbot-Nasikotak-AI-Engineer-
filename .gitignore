@@ -1,5 +1,10 @@
 # Byte-compiled / optimized / DLL files
 data/nasikotak.db
+notebooks/data/nasikotak.db
+*.db
+*.sqlite3
+data/*.db
+notebooks/data/*.db
 prompt.md
 scratch/
 PRODUCT REQUIREMENT DOCUMENT (PRD).md
