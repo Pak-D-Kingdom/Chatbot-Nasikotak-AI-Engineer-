@@ -1,14 +1,21 @@
 /**
  * Ayam Bakar Pak D - AI Sales Chatbot Embeddable Widget
  * 
- * Penggunaan di WordPress / Website:
- * <script src="https://api-chatbot.domainanda.com/static/widget.js" defer></script>
+ * Penggunaan di WordPress / Website Eksternal:
+ * <script>
+ *   window.AYAMBAKAR_CHATBOT_API_URL = "https://domain-backend-anda.com"; // Opsional jika backend beda domain
+ * </script>
+ * <script src="https://domain-backend-anda.com/static/widget.js" defer></script>
  */
 
 (function () {
     'use strict';
 
-    // 1. Tentukan API Base URL secara otomatis dari lokasi script dimuat
+    // Cegah double injection
+    if (window.__ABPD_WIDGET_INITIALIZED__) return;
+    window.__ABPD_WIDGET_INITIALIZED__ = true;
+
+    // 1. Tentukan API Base URL secara dinamis
     let apiBaseUrl = window.AYAMBAKAR_CHATBOT_API_URL || '';
     if (!apiBaseUrl) {
         const currentScript = document.currentScript || (function () {
@@ -32,9 +39,10 @@
             apiBaseUrl = window.location.origin;
         }
     }
+    apiBaseUrl = apiBaseUrl.replace(/\/+$/, '');
 
-    // 2. Inject External Font & Icons (Outfit & FontAwesome)
-    function injectHeadDependencies() {
+    // 2. Inject External Font & Icons ke Document Head
+    function injectGlobalDependencies() {
         if (!document.getElementById('abpd-font-outfit')) {
             const linkOutfit = document.createElement('link');
             linkOutfit.id = 'abpd-font-outfit';
@@ -51,927 +59,985 @@
             document.head.appendChild(linkFA);
         }
     }
+    injectGlobalDependencies();
 
-    // 3. Inject Scoped CSS (Khusus untuk Chatbot agar tidak bentrok dengan tema WordPress)
-    function injectScopedCSS() {
-        if (document.getElementById('abpd-widget-styles')) return;
+    // 3. Inisialisasi Shadow Host
+    const hostElement = document.createElement('div');
+    hostElement.id = 'abpd-chatbot-widget-host';
+    hostElement.style.position = 'fixed';
+    hostElement.style.bottom = '0';
+    hostElement.style.right = '0';
+    hostElement.style.zIndex = '2147483647';
+    hostElement.style.pointerEvents = 'none';
 
-        const style = document.createElement('style');
-        style.id = 'abpd-widget-styles';
-        style.textContent = `
-            #abpd-widget-root {
-                font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-                font-size: 16px;
-                color: #2D3748;
-                line-height: 1.5;
+    document.body.appendChild(hostElement);
+
+    const shadow = hostElement.attachShadow({ mode: 'open' });
+
+    // Inject FontAwesome & Outfit langsung ke dalam Shadow DOM
+    const linkOutfitShadow = document.createElement('link');
+    linkOutfitShadow.rel = 'stylesheet';
+    linkOutfitShadow.href = 'https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap';
+    shadow.appendChild(linkOutfitShadow);
+
+    const linkFAShadow = document.createElement('link');
+    linkFAShadow.rel = 'stylesheet';
+    linkFAShadow.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css';
+    shadow.appendChild(linkFAShadow);
+
+    // 4. Inject Stylesheet ke dalam Shadow DOM
+    const style = document.createElement('style');
+    style.textContent = `
+        :host {
+            --primary-color: #FF6B00;
+            --primary-gradient: linear-gradient(135deg, #FF8A00 0%, #FF5C00 100%);
+            --bg-color: #F8F9FA;
+            --chat-bg: #FFFFFF;
+            --text-main: #2D3748;
+            --text-muted: #718096;
+            --bot-msg-bg: #F1F3F5;
+            --user-msg-bg: var(--primary-color);
+            --user-msg-text: #FFFFFF;
+            --shadow-sm: 0 4px 6px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 10px 25px rgba(255, 107, 0, 0.15);
+            --border-radius-lg: 20px;
+            --border-radius-sm: 12px;
+            font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-size: 16px;
+            color: var(--text-main);
+            box-sizing: border-box;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: inherit;
+        }
+
+        /* Tombol Floating Chat (Toggle) */
+        .chat-toggle-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: var(--shadow-lg);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: auto;
+            outline: none;
+        }
+
+        .chat-toggle-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .chat-toggle-btn.hidden {
+            display: none !important;
+        }
+
+        /* Container Chat Popup */
+        .chat-container {
+            position: fixed;
+            bottom: 100px;
+            right: 30px;
+            width: 380px;
+            height: 600px;
+            max-height: calc(100vh - 120px);
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            border-radius: var(--border-radius-lg);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+            display: flex;
+            flex-direction: column;
+            transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform-origin: bottom right;
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            overflow: hidden;
+            pointer-events: auto;
+        }
+
+        .chat-container.hidden {
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(0.8) translateY(50px);
+        }
+
+        /* Header Chat */
+        .chat-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            background: var(--primary-gradient);
+            color: white;
+            border-top-left-radius: var(--border-radius-lg);
+            border-top-right-radius: var(--border-radius-lg);
+            flex-shrink: 0;
+        }
+
+        .header-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .avatar {
+            position: relative;
+            width: 40px;
+            height: 40px;
+        }
+
+        .avatar img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid white;
+            object-fit: cover;
+            display: block;
+        }
+
+        .online-indicator {
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            width: 10px;
+            height: 10px;
+            background-color: #4CAF50;
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+
+        .header-text h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin: 0;
+            color: white;
+            line-height: 1.2;
+        }
+
+        .header-text p {
+            font-size: 0.8rem;
+            opacity: 0.9;
+            margin: 2px 0 0 0;
+            color: white;
+            line-height: 1.2;
+        }
+
+        .chat-close-btn {
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            opacity: 0.8;
+            transition: opacity 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4px;
+            outline: none;
+        }
+
+        .chat-close-btn:hover {
+            opacity: 1;
+        }
+
+        /* Chat Body */
+        .chat-body {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            scroll-behavior: smooth;
+            background: #FFFFFF;
+        }
+
+        .chat-body::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chat-body::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .chat-body::-webkit-scrollbar-thumb {
+            background: #E2E8F0;
+            border-radius: 10px;
+        }
+
+        /* Balon Pesan */
+        .message {
+            max-width: 85%;
+            display: flex;
+            flex-direction: column;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message-bubble {
+            padding: 12px 16px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            word-wrap: break-word;
+        }
+
+        .message-bot {
+            align-self: flex-start;
+        }
+
+        .message-bot .message-bubble {
+            background-color: var(--bot-msg-bg);
+            color: var(--text-main);
+            border-radius: var(--border-radius-sm) var(--border-radius-sm) var(--border-radius-sm) 4px;
+        }
+
+        .message-user {
+            align-self: flex-end;
+        }
+
+        .message-user .message-bubble {
+            background: var(--primary-gradient);
+            color: var(--user-msg-text);
+            border-radius: var(--border-radius-sm) var(--border-radius-sm) 4px var(--border-radius-sm);
+            box-shadow: 0 4px 10px rgba(255, 107, 0, 0.2);
+        }
+
+        .message-time {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+            align-self: flex-end;
+        }
+
+        .message-bot .message-time {
+            align-self: flex-start;
+        }
+
+        /* Format Konten Pesan Bot */
+        .message-bot .message-bubble p {
+            margin-bottom: 8px;
+        }
+        .message-bot .message-bubble p:last-child {
+            margin-bottom: 0;
+        }
+        .message-bot .message-bubble ul, .message-bot .message-bubble ol {
+            margin-left: 20px;
+            margin-bottom: 8px;
+        }
+        .message-bot .message-bubble strong {
+            font-weight: 600;
+        }
+        .message-bot .message-bubble img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin-top: 8px;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        /* Tombol Konfirmasi WhatsApp */
+        .action-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background-color: #25D366;
+            color: white !important;
+            padding: 10px 16px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-top: 10px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 6px rgba(37, 211, 102, 0.2);
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(37, 211, 102, 0.3);
+        }
+
+        /* Tombol Pilihan 5 Outlet Terdekat */
+        .suggested-outlets-container {
+            margin-top: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+        .outlet-select-btn {
+            background: #ffffff;
+            color: #d84315;
+            border: 1.5px solid #ffab91;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+            outline: none;
+        }
+
+        .outlet-select-btn:hover {
+            background: #fbe9e7;
+            border-color: #d84315;
+            transform: translateY(-1px);
+            box-shadow: 0 3px 6px rgba(216, 67, 21, 0.15);
+        }
+
+        .outlet-select-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Quick Replies */
+        .quick-replies {
+            padding: 0 20px 10px;
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            white-space: nowrap;
+            background: #FFFFFF;
+            flex-shrink: 0;
+        }
+
+        .quick-replies::-webkit-scrollbar {
+            display: none;
+        }
+
+        .quick-reply-btn {
+            background: white;
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+            padding: 6px 12px;
+            border-radius: 16px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex-shrink: 0;
+            outline: none;
+        }
+
+        .quick-reply-btn:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        /* Chat Footer & Input */
+        .chat-footer {
+            padding: 16px 20px;
+            background: white;
+            border-top: 1px solid #E2E8F0;
+            border-bottom-left-radius: var(--border-radius-lg);
+            border-bottom-right-radius: var(--border-radius-lg);
+            flex-shrink: 0;
+        }
+
+        .input-container {
+            display: flex;
+            gap: 10px;
+            background: #F8F9FA;
+            padding: 8px;
+            border-radius: 24px;
+            border: 1px solid #E2E8F0;
+            transition: border-color 0.2s;
+        }
+
+        .input-container:focus-within {
+            border-color: var(--primary-color);
+            background: white;
+        }
+
+        .chat-input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            padding: 8px 12px;
+            font-size: 0.95rem;
+            color: var(--text-main);
+            outline: none;
+        }
+
+        .chat-send-btn {
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s;
+            outline: none;
+            font-size: 14px;
+        }
+
+        .chat-send-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .chat-send-btn:disabled {
+            background: #CBD5E0;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .footer-branding {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+
+        /* Typing Indicator */
+        .typing-indicator {
+            display: flex;
+            gap: 4px;
+            padding: 12px 16px;
+            background-color: var(--bot-msg-bg);
+            border-radius: var(--border-radius-sm) var(--border-radius-sm) var(--border-radius-sm) 4px;
+            align-self: flex-start;
+            margin-bottom: 16px;
+        }
+
+        .typing-dot {
+            width: 6px;
+            height: 6px;
+            background-color: var(--text-muted);
+            border-radius: 50%;
+            animation: typing 1.4s infinite ease-in-out;
+        }
+
+        .typing-dot:nth-child(1) { animation-delay: 0s; }
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typing {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-4px); }
+        }
+
+        /* Pre-Chat Registration Form */
+        .pre-chat-form {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 30px 20px;
+            background: white;
+            justify-content: center;
+            gap: 20px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .pre-chat-greeting {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .pre-chat-greeting h4 {
+            font-size: 1.4rem;
+            color: var(--primary-color);
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .pre-chat-greeting p {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group input {
+            padding: 12px 16px;
+            border: 1px solid #E2E8F0;
+            border-radius: var(--border-radius-sm);
+            font-size: 0.95rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            outline: none;
+            color: var(--text-main);
+            background: white;
+        }
+
+        .form-group input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.1);
+        }
+
+        .start-chat-btn {
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: var(--border-radius-sm);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 10px rgba(255, 107, 0, 0.2);
+            margin-top: 10px;
+            outline: none;
+        }
+
+        .start-chat-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(255, 107, 0, 0.3);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Mobile Viewport */
+        @media (max-width: 480px) {
+            .chat-container {
+                width: 100vw;
+                height: 100vh;
+                max-height: 100vh;
+                bottom: 0;
+                right: 0;
+                border-radius: 0;
+                transform-origin: bottom center;
             }
 
-            #abpd-widget-root * {
-                box-sizing: border-box;
-                margin: 0;
-                padding: 0;
+            .chat-header {
+                border-radius: 0;
             }
 
-            /* Tombol Floating Toggle */
-            #abpd-toggle-btn {
-                position: fixed;
-                bottom: 25px;
-                right: 25px;
-                width: 62px;
-                height: 62px;
-                border-radius: 50%;
-                background: linear-gradient(135deg, #FF8A00 0%, #FF5C00 100%);
-                color: #ffffff;
-                border: none;
-                font-size: 26px;
-                cursor: pointer;
-                box-shadow: 0 10px 25px rgba(255, 107, 0, 0.35);
-                z-index: 999998;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease;
-                outline: none;
+            .chat-footer {
+                border-radius: 0;
+                padding-bottom: 24px;
             }
 
-            #abpd-toggle-btn:hover {
-                transform: scale(1.08);
-                box-shadow: 0 12px 30px rgba(255, 107, 0, 0.45);
+            .chat-toggle-btn.hidden {
+                transform: translateY(100px);
             }
+        }
+    `;
 
-            #abpd-toggle-btn.abpd-hidden {
-                display: none !important;
-            }
+    shadow.appendChild(style);
 
-            /* Container Chat Popup */
-            #abpd-chat-container {
-                position: fixed;
-                bottom: 95px;
-                right: 25px;
-                width: 390px;
-                height: 620px;
-                max-height: calc(100vh - 110px);
-                background: #FFFFFF;
-                border-radius: 20px;
-                box-shadow: 0 15px 40px rgba(0, 0, 0, 0.16);
-                display: flex;
-                flex-direction: column;
-                z-index: 999999;
-                transition: opacity 0.28s ease, transform 0.28s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-                transform-origin: bottom right;
-                border: 1px solid rgba(0, 0, 0, 0.08);
-                overflow: hidden;
-            }
+    // 5. Inject HTML Widget persis seperti index.html
+    const widgetHTML = `
+        <!-- Floating Chat Toggle Button -->
+        <button id="chat-toggle-btn" class="chat-toggle-btn" aria-label="Buka Chat AI Ayam Bakar Pak D">
+            <i class="fas fa-comment-dots"></i>
+        </button>
 
-            #abpd-chat-container.abpd-hidden {
-                opacity: 0;
-                pointer-events: none;
-                transform: scale(0.85) translateY(40px);
-            }
-
-            /* Header */
-            .abpd-chat-header {
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                padding: 16px 20px;
-                background: linear-gradient(135deg, #FF8A00 0%, #FF5C00 100%);
-                color: #ffffff;
-            }
-
-            .abpd-header-info {
-                display: flex;
-                align-items: center;
-                gap: 12px;
-            }
-
-            .abpd-avatar {
-                position: relative;
-            }
-
-            .abpd-avatar img {
-                width: 42px;
-                height: 42px;
-                border-radius: 50%;
-                border: 2px solid #ffffff;
-                display: block;
-            }
-
-            .abpd-online-indicator {
-                position: absolute;
-                bottom: 1px;
-                right: 1px;
-                width: 11px;
-                height: 11px;
-                background-color: #22c55e;
-                border-radius: 50%;
-                border: 2px solid #ffffff;
-            }
-
-            .abpd-header-text h3 {
-                font-size: 1.05rem;
-                font-weight: 600;
-                margin: 0;
-                color: #ffffff;
-                line-height: 1.2;
-            }
-
-            .abpd-header-text p {
-                font-size: 0.82rem;
-                opacity: 0.92;
-                margin: 3px 0 0 0;
-                color: #ffffff;
-            }
-
-            .abpd-close-btn {
-                background: transparent;
-                border: none;
-                color: #ffffff;
-                font-size: 1.3rem;
-                cursor: pointer;
-                opacity: 0.85;
-                padding: 4px;
-                transition: opacity 0.2s;
-                outline: none;
-            }
-
-            .abpd-close-btn:hover {
-                opacity: 1;
-            }
-
-            /* Pre-Chat Form */
-            .abpd-prechat-form {
-                flex: 1;
-                display: flex;
-                flex-direction: column;
-                padding: 30px 24px;
-                background: #ffffff;
-                justify-content: center;
-                gap: 18px;
-            }
-
-            .abpd-prechat-greeting {
-                text-align: center;
-                margin-bottom: 8px;
-            }
-
-            .abpd-prechat-greeting h4 {
-                font-size: 1.35rem;
-                color: #FF6B00;
-                margin-bottom: 6px;
-                font-weight: 700;
-            }
-
-            .abpd-prechat-greeting p {
-                font-size: 0.9rem;
-                color: #718096;
-            }
-
-            .abpd-form-group {
-                display: flex;
-                flex-direction: column;
-            }
-
-            .abpd-form-group input {
-                padding: 13px 16px;
-                border: 1px solid #E2E8F0;
-                border-radius: 12px;
-                font-family: inherit;
-                font-size: 0.95rem;
-                transition: border-color 0.2s, box-shadow 0.2s;
-                outline: none;
-                width: 100%;
-                background: #fdfdfd;
-            }
-
-            .abpd-form-group input:focus {
-                border-color: #FF6B00;
-                box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.12);
-                background: #ffffff;
-            }
-
-            .abpd-start-btn {
-                background: linear-gradient(135deg, #FF8A00 0%, #FF5C00 100%);
-                color: #ffffff;
-                border: none;
-                padding: 14px;
-                border-radius: 12px;
-                font-family: inherit;
-                font-size: 1rem;
-                font-weight: 600;
-                cursor: pointer;
-                transition: transform 0.2s, box-shadow 0.2s;
-                box-shadow: 0 4px 12px rgba(255, 107, 0, 0.25);
-                margin-top: 6px;
-                outline: none;
-            }
-
-            .abpd-start-btn:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 6px 16px rgba(255, 107, 0, 0.35);
-            }
-
-            .abpd-start-btn:disabled {
-                opacity: 0.65;
-                cursor: not-allowed;
-                transform: none;
-            }
-
-            /* Chat Body */
-            .abpd-chat-body {
-                flex: 1;
-                padding: 18px;
-                overflow-y: auto;
-                display: flex;
-                flex-direction: column;
-                gap: 14px;
-                background-color: #fafafa;
-                scroll-behavior: smooth;
-            }
-
-            .abpd-chat-body::-webkit-scrollbar {
-                width: 5px;
-            }
-
-            .abpd-chat-body::-webkit-scrollbar-thumb {
-                background: #CBD5E0;
-                border-radius: 10px;
-            }
-
-            /* Messages */
-            .abpd-msg {
-                max-width: 85%;
-                display: flex;
-                flex-direction: column;
-                animation: abpdFadeIn 0.25s ease;
-            }
-
-            @keyframes abpdFadeIn {
-                from { opacity: 0; transform: translateY(8px); }
-                to { opacity: 1; transform: translateY(0); }
-            }
-
-            .abpd-msg-bot {
-                align-self: flex-start;
-            }
-
-            .abpd-msg-user {
-                align-self: flex-end;
-            }
-
-            .abpd-bubble {
-                padding: 12px 16px;
-                font-size: 0.93rem;
-                line-height: 1.5;
-                word-wrap: break-word;
-            }
-
-            .abpd-msg-bot .abpd-bubble {
-                background-color: #FFFFFF;
-                color: #2D3748;
-                border-radius: 14px 14px 14px 4px;
-                border: 1px solid #edf2f7;
-                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.04);
-            }
-
-            .abpd-msg-user .abpd-bubble {
-                background: linear-gradient(135deg, #FF8A00 0%, #FF5C00 100%);
-                color: #ffffff;
-                border-radius: 14px 14px 4px 14px;
-                box-shadow: 0 4px 12px rgba(255, 107, 0, 0.2);
-            }
-
-            .abpd-time {
-                font-size: 0.68rem;
-                color: #A0AEC0;
-                margin-top: 4px;
-            }
-
-            .abpd-msg-bot .abpd-time { align-self: flex-start; }
-            .abpd-msg-user .abpd-time { align-self: flex-end; }
-
-            .abpd-bubble img {
-                max-width: 100%;
-                height: auto;
-                border-radius: 8px;
-                margin-top: 8px;
-                margin-bottom: 8px;
-                display: block;
-                box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-            }
-
-            /* WhatsApp Action Button */
-            .abpd-wa-btn {
-                display: inline-flex;
-                align-items: center;
-                gap: 8px;
-                background-color: #25D366;
-                color: #ffffff !important;
-                padding: 10px 16px;
-                border-radius: 10px;
-                text-decoration: none !important;
-                font-weight: 600;
-                font-size: 0.88rem;
-                margin-top: 10px;
-                transition: transform 0.2s, box-shadow 0.2s;
-                box-shadow: 0 4px 8px rgba(37, 211, 102, 0.25);
-            }
-
-            .abpd-wa-btn:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 6px 14px rgba(37, 211, 102, 0.35);
-            }
-
-            /* Suggested Outlets Buttons */
-            .abpd-outlets-container {
-                margin-top: 10px;
-                display: flex;
-                flex-direction: column;
-                gap: 6px;
-            }
-
-            .abpd-outlet-btn {
-                background: #ffffff;
-                color: #d84315;
-                border: 1.5px solid #ffab91;
-                padding: 8px 12px;
-                border-radius: 8px;
-                font-size: 0.84rem;
-                font-weight: 500;
-                cursor: pointer;
-                text-align: left;
-                transition: all 0.2s ease;
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                box-shadow: 0 2px 4px rgba(0,0,0,0.04);
-                outline: none;
-            }
-
-            .abpd-outlet-btn:hover {
-                background: #fbe9e7;
-                border-color: #d84315;
-                transform: translateY(-1px);
-            }
-
-            .abpd-outlet-btn:disabled {
-                opacity: 0.6;
-                cursor: not-allowed;
-                transform: none;
-            }
-
-            /* Quick Replies */
-            .abpd-quick-replies {
-                padding: 8px 16px;
-                display: flex;
-                gap: 8px;
-                overflow-x: auto;
-                scrollbar-width: none;
-                white-space: nowrap;
-                background: #fafafa;
-                border-top: 1px solid #edf2f7;
-            }
-
-            .abpd-quick-replies::-webkit-scrollbar {
-                display: none;
-            }
-
-            .abpd-qr-btn {
-                background: #ffffff;
-                border: 1px solid #FF8A00;
-                color: #FF6B00;
-                padding: 6px 13px;
-                border-radius: 16px;
-                font-size: 0.82rem;
-                font-family: inherit;
-                cursor: pointer;
-                transition: all 0.2s;
-                flex-shrink: 0;
-                outline: none;
-            }
-
-            .abpd-qr-btn:hover {
-                background: #FF6B00;
-                color: #ffffff;
-            }
-
-            /* Chat Footer */
-            .abpd-chat-footer {
-                padding: 14px 18px;
-                background: #ffffff;
-                border-top: 1px solid #E2E8F0;
-            }
-
-            .abpd-input-container {
-                display: flex;
-                gap: 8px;
-                background: #F8F9FA;
-                padding: 6px 8px;
-                border-radius: 24px;
-                border: 1px solid #E2E8F0;
-                transition: border-color 0.2s;
-            }
-
-            .abpd-input-container:focus-within {
-                border-color: #FF6B00;
-                background: #ffffff;
-            }
-
-            #abpd-input {
-                flex: 1;
-                border: none;
-                background: transparent;
-                padding: 8px 12px;
-                font-family: inherit;
-                font-size: 0.92rem;
-                color: #2D3748;
-                outline: none;
-            }
-
-            .abpd-send-btn {
-                background: linear-gradient(135deg, #FF8A00 0%, #FF5C00 100%);
-                color: #ffffff;
-                border: none;
-                width: 38px;
-                height: 38px;
-                border-radius: 50%;
-                cursor: pointer;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                transition: transform 0.2s;
-                outline: none;
-                flex-shrink: 0;
-            }
-
-            .abpd-send-btn:hover {
-                transform: scale(1.06);
-            }
-
-            .abpd-send-btn:disabled {
-                background: #CBD5E0;
-                cursor: not-allowed;
-                transform: none;
-            }
-
-            .abpd-branding {
-                text-align: center;
-                margin-top: 8px;
-                font-size: 0.68rem;
-                color: #A0AEC0;
-            }
-
-            /* Typing Indicator */
-            .abpd-typing {
-                display: flex;
-                gap: 5px;
-                padding: 12px 16px;
-                background-color: #FFFFFF;
-                border-radius: 14px 14px 14px 4px;
-                align-self: flex-start;
-                margin-bottom: 4px;
-                border: 1px solid #edf2f7;
-            }
-
-            .abpd-dot {
-                width: 6px;
-                height: 6px;
-                background-color: #A0AEC0;
-                border-radius: 50%;
-                animation: abpdTyping 1.4s infinite ease-in-out;
-            }
-
-            .abpd-dot:nth-child(1) { animation-delay: 0s; }
-            .abpd-dot:nth-child(2) { animation-delay: 0.2s; }
-            .abpd-dot:nth-child(3) { animation-delay: 0.4s; }
-
-            @keyframes abpdTyping {
-                0%, 100% { transform: translateY(0); }
-                50% { transform: translateY(-4px); }
-            }
-
-            .abpd-hidden {
-                display: none !important;
-            }
-
-            /* Mobile Responsive */
-            @media (max-width: 480px) {
-                #abpd-chat-container {
-                    width: 100% !important;
-                    height: 100% !important;
-                    max-height: 100vh !important;
-                    bottom: 0 !important;
-                    right: 0 !important;
-                    border-radius: 0 !important;
-                }
-                .abpd-chat-footer {
-                    padding-bottom: 24px;
-                }
-            }
-        `;
-        document.head.appendChild(style);
-    }
-
-    // 4. Inject Markup HTML Widget ke dalam Body
-    function injectWidgetHTML() {
-        if (document.getElementById('abpd-widget-root')) return;
-
-        const root = document.createElement('div');
-        root.id = 'abpd-widget-root';
-        root.innerHTML = `
-            <!-- Tombol Toggle Chat -->
-            <button id="abpd-toggle-btn" aria-label="Buka Chat AI Ayam Bakar Pak D">
-                <i class="fas fa-comment-dots"></i>
-            </button>
-
-            <!-- Container Chat Widget -->
-            <div id="abpd-chat-container" class="abpd-hidden">
-                <!-- Header -->
-                <div class="abpd-chat-header">
-                    <div class="abpd-header-info">
-                        <div class="abpd-avatar">
-                            <img src="https://ui-avatars.com/api/?name=AI&background=FF8A00&color=fff" alt="AI Avatar">
-                            <div class="abpd-online-indicator"></div>
-                        </div>
-                        <div class="abpd-header-text">
-                            <h3>AI Sales Assistant</h3>
-                            <p>Ayam Bakar Pak D</p>
-                        </div>
+        <!-- Chat Container Window -->
+        <div id="chat-container" class="chat-container hidden">
+            <!-- Header -->
+            <div class="chat-header">
+                <div class="header-info">
+                    <div class="avatar">
+                        <img src="https://ui-avatars.com/api/?name=AI&background=FF8A00&color=fff" alt="AI Avatar">
+                        <div class="online-indicator"></div>
                     </div>
-                    <button id="abpd-close-btn" class="abpd-close-btn" aria-label="Tutup Chat">
-                        <i class="fas fa-times"></i>
+                    <div class="header-text">
+                        <h3>AI Sales Assistant</h3>
+                        <p>Ayam Bakar Pak D</p>
+                    </div>
+                </div>
+                <button id="chat-close-btn" class="chat-close-btn" aria-label="Tutup Chat">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <!-- Pre-Chat Registration Form -->
+            <div id="pre-chat-form" class="pre-chat-form">
+                <div class="pre-chat-greeting">
+                    <h4>Selamat Datang!</h4>
+                    <p>Silakan isi data diri Anda untuk memulai.</p>
+                </div>
+                <div class="form-group">
+                    <input type="text" id="user-name" placeholder="Nama Anda" required autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <input type="tel" id="user-phone" placeholder="No. Telepon / WA" required autocomplete="off">
+                </div>
+                <button id="start-chat-btn" class="start-chat-btn">Mulai Chat</button>
+            </div>
+
+            <!-- Chat Message Body -->
+            <div id="chat-body" class="chat-body hidden"></div>
+
+            <!-- Quick Reply Chips -->
+            <div id="quick-replies" class="quick-replies hidden">
+                <button class="quick-reply-btn" data-text="Ada paket catering apa saja?">Lihat Paket</button>
+                <button class="quick-reply-btn" data-text="Apakah ada promo saat ini?">Promo</button>
+                <button class="quick-reply-btn" data-text="Saya punya budget 25rb per box">Budget 25rb</button>
+            </div>
+
+            <!-- Chat Footer Input -->
+            <div id="chat-footer" class="chat-footer hidden">
+                <div class="input-container">
+                    <input type="text" id="chat-input" class="chat-input" placeholder="Tulis pesan..." autocomplete="off">
+                    <button id="chat-send-btn" class="chat-send-btn" aria-label="Kirim Pesan">
+                        <i class="fas fa-paper-plane"></i>
                     </button>
                 </div>
-
-                <!-- Pre-Chat Form -->
-                <div id="abpd-prechat" class="abpd-prechat-form">
-                    <div class="abpd-prechat-greeting">
-                        <h4>Selamat Datang!</h4>
-                        <p>Silakan isi data diri Anda untuk memulai pesanan atau bertanya info catering.</p>
-                    </div>
-                    <div class="abpd-form-group">
-                        <input type="text" id="abpd-user-name" placeholder="Nama Anda" required autocomplete="name">
-                    </div>
-                    <div class="abpd-form-group">
-                        <input type="tel" id="abpd-user-phone" placeholder="No. Telepon / WhatsApp" required autocomplete="tel">
-                    </div>
-                    <button id="abpd-start-btn" class="abpd-start-btn">Mulai Chat</button>
-                </div>
-
-                <!-- Chat Body -->
-                <div id="abpd-chat-body" class="abpd-chat-body abpd-hidden"></div>
-
-                <!-- Quick Replies -->
-                <div id="abpd-quick-replies" class="abpd-quick-replies abpd-hidden">
-                    <button class="abpd-qr-btn" data-text="Ada paket catering apa saja?">Lihat Paket</button>
-                    <button class="abpd-qr-btn" data-text="Apakah ada promo saat ini?">Promo</button>
-                    <button class="abpd-qr-btn" data-text="Saya punya budget 25rb per box">Budget 25rb</button>
-                </div>
-
-                <!-- Chat Footer -->
-                <div id="abpd-chat-footer" class="abpd-chat-footer abpd-hidden">
-                    <div class="abpd-input-container">
-                        <input type="text" id="abpd-input" placeholder="Tulis pesan..." autocomplete="off">
-                        <button id="abpd-send-btn" class="abpd-send-btn" aria-label="Kirim Pesan">
-                            <i class="fas fa-paper-plane"></i>
-                        </button>
-                    </div>
-                    <div class="abpd-branding">
-                        <span>AI Assistant Ayam Bakar Pak D</span>
-                    </div>
+                <div class="footer-branding">
+                    <span>AI Chatbot Ayam Bakar Pak D</span>
                 </div>
             </div>
-        `;
-        document.body.appendChild(root);
+        </div>
+    `;
+
+    const widgetWrapper = document.createElement('div');
+    widgetWrapper.innerHTML = widgetHTML;
+    shadow.appendChild(widgetWrapper);
+
+    // 6. Query Elemen-Elemen dari Shadow DOM
+    const chatToggleBtn = shadow.getElementById('chat-toggle-btn');
+    const chatContainer = shadow.getElementById('chat-container');
+    const chatCloseBtn = shadow.getElementById('chat-close-btn');
+    const chatBody = shadow.getElementById('chat-body');
+    const chatInput = shadow.getElementById('chat-input');
+    const chatSendBtn = shadow.getElementById('chat-send-btn');
+    const quickReplies = shadow.querySelectorAll('.quick-reply-btn');
+    const preChatForm = shadow.getElementById('pre-chat-form');
+    const userNameInput = shadow.getElementById('user-name');
+    const userPhoneInput = shadow.getElementById('user-phone');
+    const startChatBtn = shadow.getElementById('start-chat-btn');
+    const chatFooter = shadow.getElementById('chat-footer');
+    const quickRepliesContainer = shadow.getElementById('quick-replies');
+
+    let isWaiting = false;
+
+    // 7. Helper Functions (Text escaping, Linkify, Markdown Parsing)
+    function escapeHtml(str) {
+        return str
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
     }
 
-    // 5. Inisialisasi Logika & Event Handler Chatbot
-    function initChatLogic() {
-        const toggleBtn = document.getElementById('abpd-toggle-btn');
-        const container = document.getElementById('abpd-chat-container');
-        const closeBtn = document.getElementById('abpd-close-btn');
-        const prechatForm = document.getElementById('abpd-prechat');
-        const nameInput = document.getElementById('abpd-user-name');
-        const phoneInput = document.getElementById('abpd-user-phone');
-        const startBtn = document.getElementById('abpd-start-btn');
-        const chatBody = document.getElementById('abpd-chat-body');
-        const quickReplies = document.getElementById('abpd-quick-replies');
-        const chatFooter = document.getElementById('abpd-chat-footer');
-        const chatInput = document.getElementById('abpd-input');
-        const sendBtn = document.getElementById('abpd-send-btn');
+    function stripMarkdownBold(str) {
+        return str.replace(/\*\*(.*?)\*\*/g, '$1');
+    }
 
-        let isWaiting = false;
+    function linkify(str) {
+        const urlRegex = /(https?:\/\/[^\s<]+)/g;
+        return str.replace(urlRegex, '<a href="$1" target="_blank" rel="noopener noreferrer" style="color: #e65100; font-weight: bold; text-decoration: underline;">$1</a>');
+    }
 
-        function escapeHtml(str) {
-            return str
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#39;');
+    function renderBotContent(content) {
+        content = stripMarkdownBold(content);
+
+        const imageRegex = /!\[([^\]]*)\]\(([^)\s]+)\)/g;
+        let lastIndex = 0;
+        let html = '';
+        let match;
+
+        while ((match = imageRegex.exec(content)) !== null) {
+            const textBefore = content.slice(lastIndex, match.index);
+            html += linkify(escapeHtml(textBefore)).replace(/\n/g, '<br>');
+
+            const alt = escapeHtml(match[1]);
+            const url = escapeHtml(match[2]);
+            html += `<img src="${url}" alt="${alt}" loading="lazy">`;
+
+            lastIndex = imageRegex.lastIndex;
         }
 
-        function stripMarkdownBold(str) {
-            return str.replace(/\*\*(.*?)\*\*/g, '$1');
+        const textAfter = content.slice(lastIndex);
+        html += linkify(escapeHtml(textAfter)).replace(/\n/g, '<br>');
+
+        return html;
+    }
+
+    function playNotificationSound() {
+        try {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            if (!AudioContext) return;
+            const ctx = new AudioContext();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(587.33, ctx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.12);
+            gain.gain.setValueAtTime(0.08, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.2);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start();
+            osc.stop(ctx.currentTime + 0.2);
+        } catch (e) {
+            // Audio context mungkin diblokir browser sebelum ada interaksi user
+        }
+    }
+
+    // 8. Event Handlers & Logika Chat
+    startChatBtn.addEventListener('click', async () => {
+        const name = userNameInput.value.trim();
+        const phone = userPhoneInput.value.trim();
+
+        if (!name || !phone) {
+            alert('Mohon isi nama dan nomor telepon Anda.');
+            return;
         }
 
-        function linkify(str) {
-            const urlRegex = /(https?:\/\/[^\s<]+)/g;
-            return str.replace(urlRegex, '<a href="$1" target="_blank" rel="noopener noreferrer" style="color: #e65100; font-weight: bold; text-decoration: underline;">$1</a>');
-        }
+        startChatBtn.disabled = true;
+        startChatBtn.textContent = 'Memulai...';
 
-        // Render konten bot (gambar diproses dan otomatis menggunakan apiBaseUrl)
-        function renderBotContent(content) {
-            content = stripMarkdownBold(content);
+        try {
+            const res = await fetch(`${apiBaseUrl}/api/session/new`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ customer_name: name, customer_phone: phone })
+            });
+            const data = await res.json();
 
-            const imageRegex = /!\[([^\]]*)\]\(([^)\s]+)\)/g;
-            let lastIndex = 0;
-            let html = '';
-            let match;
-
-            while ((match = imageRegex.exec(content)) !== null) {
-                const textBefore = content.slice(lastIndex, match.index);
-                html += linkify(escapeHtml(textBefore)).replace(/\n/g, '<br>');
-
-                const alt = escapeHtml(match[1]);
-                let url = escapeHtml(match[2]);
-
-                // Pastikan gambar produk mengarah ke backend FastAPI
-                if (url.startsWith('/image') || url.startsWith('/static')) {
-                    url = apiBaseUrl + url;
-                }
-
-                html += `<img src="${url}" alt="${alt}" loading="lazy">`;
-                lastIndex = imageRegex.lastIndex;
+            if (data.session_id) {
+                sessionStorage.setItem('nasikotak_session', data.session_id);
             }
 
-            const textAfter = content.slice(lastIndex);
-            html += linkify(escapeHtml(textAfter)).replace(/\n/g, '<br>');
-            return html;
+            showChatUI(name);
+        } catch (e) {
+            console.error("Gagal membuat session:", e);
+            alert('Gagal memulai chat. Silakan coba lagi.');
+            startChatBtn.disabled = false;
+            startChatBtn.textContent = 'Mulai Chat';
         }
+    });
 
-        function scrollToBottom() {
-            chatBody.scrollTop = chatBody.scrollHeight;
-        }
+    function showChatUI(customerName) {
+        preChatForm.classList.add('hidden');
+        chatBody.classList.remove('hidden');
+        chatFooter.classList.remove('hidden');
+        if (quickRepliesContainer) quickRepliesContainer.classList.remove('hidden');
 
-        function getCurrentTime() {
-            const now = new Date();
-            return now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-        }
-
-        function showChatUI(customerName) {
-            prechatForm.classList.add('abpd-hidden');
-            chatBody.classList.remove('abpd-hidden');
-            chatFooter.classList.remove('abpd-hidden');
-            if (quickReplies) quickReplies.classList.remove('abpd-hidden');
-
-            setTimeout(() => {
-                if (chatBody.children.length === 0) {
-                    const greetingName = customerName ? customerName : 'Kak';
-                    addMessage(`Halo kak ${greetingName}! 👋 Saya Asisten AI Ayam Bakar Pak D. Ada yang bisa dibantu soal pesanan catering untuk acara kakak?`, 'bot');
-                }
-            }, 400);
-        }
-
-        async function toggleChat() {
-            container.classList.toggle('abpd-hidden');
-            if (!container.classList.contains('abpd-hidden')) {
-                toggleBtn.classList.add('abpd-hidden');
-
-                const sessionId = sessionStorage.getItem('nasikotak_session') || '';
-                if (!sessionId) {
-                    prechatForm.classList.remove('abpd-hidden');
-                    chatBody.classList.add('abpd-hidden');
-                    chatFooter.classList.add('abpd-hidden');
-                    return;
-                }
-
-                try {
-                    const res = await fetch(`${apiBaseUrl}/api/session`, {
-                        headers: { 'X-Session-ID': sessionId }
-                    });
-                    const data = await res.json();
-
-                    if (data.authenticated) {
-                        showChatUI(data.user.name);
-                        chatInput.focus();
-                        scrollToBottom();
-                    } else {
-                        prechatForm.classList.remove('abpd-hidden');
-                        chatBody.classList.add('abpd-hidden');
-                        chatFooter.classList.add('abpd-hidden');
-                    }
-                } catch (e) {
-                    prechatForm.classList.remove('abpd-hidden');
-                    chatBody.classList.add('abpd-hidden');
-                    chatFooter.classList.add('abpd-hidden');
-                }
-            } else {
-                toggleBtn.classList.remove('abpd-hidden');
+        setTimeout(() => {
+            if (chatBody.children.length === 0) {
+                const greetingName = customerName ? customerName : 'Kak';
+                addMessage(`Halo kak ${greetingName}! 👋 Saya Asisten AI Ayam Bakar Pak D. Ada yang bisa dibantu soal pesanan catering atau reservasi meja?`, 'bot');
             }
-        }
+        }, 500);
+    }
 
-        toggleBtn.addEventListener('click', toggleChat);
-        closeBtn.addEventListener('click', toggleChat);
-
-        // Pre-chat form submit
-        startBtn.addEventListener('click', async () => {
-            const name = nameInput.value.trim();
-            const phone = phoneInput.value.trim();
-
-            if (!name || !phone) {
-                alert('Mohon isi nama dan nomor telepon Anda terlebih dahulu.');
-                return;
-            }
-
-            startBtn.disabled = true;
-            startBtn.textContent = 'Memulai...';
+    async function toggleChat() {
+        chatContainer.classList.toggle('hidden');
+        if (!chatContainer.classList.contains('hidden')) {
+            chatToggleBtn.classList.add('hidden');
 
             try {
-                const res = await fetch(`${apiBaseUrl}/api/session/new`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ customer_name: name, customer_phone: phone })
+                const res = await fetch(`${apiBaseUrl}/api/session`, {
+                    headers: {
+                        'X-Session-ID': sessionStorage.getItem('nasikotak_session') || ''
+                    }
                 });
-
-                if (!res.ok) throw new Error('Gagal inisialisasi sesi');
                 const data = await res.json();
 
-                if (data.session_id) {
-                    sessionStorage.setItem('nasikotak_session', data.session_id);
+                if (data.authenticated) {
+                    showChatUI(data.customer_name);
+                } else {
+                    preChatForm.classList.remove('hidden');
+                    chatBody.classList.add('hidden');
+                    chatFooter.classList.add('hidden');
+                    if (quickRepliesContainer) quickRepliesContainer.classList.add('hidden');
                 }
-
-                showChatUI(name);
             } catch (e) {
-                console.error("Gagal membuat sesi:", e);
-                alert('Gagal menghubungkan ke server chatbot. Silakan coba lagi.');
-            } finally {
-                startBtn.disabled = false;
-                startBtn.textContent = 'Mulai Chat';
+                console.error("Gagal memeriksa sesi:", e);
+                preChatForm.classList.remove('hidden');
+                chatBody.classList.add('hidden');
+                chatFooter.classList.add('hidden');
+                if (quickRepliesContainer) quickRepliesContainer.classList.add('hidden');
             }
+        } else {
+            chatToggleBtn.classList.remove('hidden');
+        }
+    }
+
+    chatToggleBtn.addEventListener('click', toggleChat);
+    chatCloseBtn.addEventListener('click', toggleChat);
+
+    quickReplies.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const text = btn.getAttribute('data-text');
+            chatInput.value = text;
+            sendMessage();
         });
+    });
 
-        function addMessage(content, sender, whatsappLink = null, suggestedOutlets = null) {
-            const msgDiv = document.createElement('div');
-            msgDiv.className = `abpd-msg abpd-msg-${sender}`;
+    chatSendBtn.addEventListener('click', sendMessage);
+    chatInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            sendMessage();
+        }
+    });
 
-            const bubbleDiv = document.createElement('div');
-            bubbleDiv.className = 'abpd-bubble';
+    async function sendMessage() {
+        const text = chatInput.value.trim();
+        if (!text || isWaiting) return;
 
-            if (sender === 'bot') {
-                bubbleDiv.innerHTML = renderBotContent(content);
-            } else {
-                bubbleDiv.innerHTML = escapeHtml(content).replace(/\n/g, '<br>');
+        addMessage(text, 'user');
+        chatInput.value = '';
+
+        const typingIndicator = showTypingIndicator();
+        isWaiting = true;
+        chatSendBtn.disabled = true;
+
+        try {
+            const res = await fetch(`${apiBaseUrl}/api/chat`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Session-ID': sessionStorage.getItem('nasikotak_session') || ''
+                },
+                body: JSON.stringify({ message: text })
+            });
+
+            if (!res.ok) {
+                if (res.status === 401) {
+                    removeTypingIndicator(typingIndicator);
+                    sessionStorage.removeItem('nasikotak_session');
+                    preChatForm.classList.remove('hidden');
+                    chatBody.classList.add('hidden');
+                    chatFooter.classList.add('hidden');
+                    if (quickRepliesContainer) quickRepliesContainer.classList.add('hidden');
+                    alert('Sesi telah berakhir. Silakan isi form kembali.');
+                    return;
+                }
+                throw new Error(`HTTP error! status: ${res.status}`);
             }
 
-            msgDiv.appendChild(bubbleDiv);
+            const data = await res.json();
+            removeTypingIndicator(typingIndicator);
 
-            // Suggested Outlets Buttons
-            if (sender === 'bot' && suggestedOutlets && suggestedOutlets.length > 0) {
+            if (data.session_id) {
+                sessionStorage.setItem('nasikotak_session', data.session_id);
+            }
+
+            addMessage(data.reply, 'bot', data.whatsapp_link, data.suggested_outlets);
+
+        } catch (e) {
+            console.error("Error sending message:", e);
+            removeTypingIndicator(typingIndicator);
+            addMessage("Maaf kak, terjadi kendala teknis. Mohon dicoba lagi sebentar ya 🙏", 'bot');
+        } finally {
+            isWaiting = false;
+            chatSendBtn.disabled = false;
+            chatInput.focus();
+        }
+    }
+
+    function addMessage(text, sender, whatsappLink = null, suggestedOutlets = null) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message message-${sender}`;
+
+        const bubbleDiv = document.createElement('div');
+        bubbleDiv.className = 'message-bubble';
+
+        if (sender === 'bot') {
+            bubbleDiv.innerHTML = renderBotContent(text);
+
+            // Tombol Interaktif Pilihan Outlet Terdekat
+            if (suggestedOutlets && suggestedOutlets.length > 0) {
                 const outletsContainer = document.createElement('div');
-                outletsContainer.className = 'abpd-outlets-container';
+                outletsContainer.className = 'suggested-outlets-container';
 
-                suggestedOutlets.forEach((outlet) => {
+                suggestedOutlets.forEach(outlet => {
                     const btn = document.createElement('button');
-                    btn.type = 'button';
-                    btn.className = 'abpd-outlet-btn';
-                    btn.innerHTML = `<span>📍 <strong>${escapeHtml(outlet.name)}</strong></span> <span style="font-size: 0.8em; opacity: 0.85;">± ${outlet.distance_km} km</span>`;
-                    btn.addEventListener('click', () => {
-                        outletsContainer.querySelectorAll('button').forEach(b => {
-                            b.disabled = true;
-                            b.style.pointerEvents = 'none';
-                        });
-                        sendMessage(`Saya pilih ${outlet.name}`);
-                    });
+                    btn.className = 'outlet-select-btn';
+                    btn.innerHTML = `<span>📍 ${escapeHtml(outlet.name)}</span> <span style="font-size: 0.8rem; color: #ff5722;">Pilih &rarr;</span>`;
+                    btn.onclick = () => {
+                        outletsContainer.querySelectorAll('button').forEach(b => b.disabled = true);
+                        chatInput.value = `Saya pilih ${outlet.name}`;
+                        sendMessage();
+                    };
                     outletsContainer.appendChild(btn);
                 });
+
                 bubbleDiv.appendChild(outletsContainer);
             }
 
-            // WhatsApp Action Button
-            if (sender === 'bot' && whatsappLink) {
-                const btnContainer = document.createElement('div');
-                btnContainer.style.marginTop = '10px';
+            // Tombol Konfirmasi WhatsApp
+            if (whatsappLink) {
                 const waBtn = document.createElement('a');
                 waBtn.href = whatsappLink;
                 waBtn.target = '_blank';
                 waBtn.rel = 'noopener noreferrer';
-                waBtn.className = 'abpd-wa-btn';
+                waBtn.className = 'action-btn';
 
-                if (content.includes("Ringkasan Reservasi")) {
-                    waBtn.innerHTML = '<i class="fab fa-whatsapp"></i> Konfirmasi Reservasi (WhatsApp)';
-                } else if (content.includes("Ringkasan Pesanan")) {
-                    waBtn.innerHTML = '<i class="fab fa-whatsapp"></i> Kirim Pesanan (WhatsApp)';
-                } else {
-                    waBtn.innerHTML = '<i class="fab fa-whatsapp"></i> Hubungi Admin';
-                }
+                const isReservation = text.includes('Ringkasan Reservasi') || whatsappLink.includes('reservasi');
+                const btnLabel = isReservation ? 'Konfirmasi Reservasi (WhatsApp)' : 'Hubungi Admin (WhatsApp)';
 
-                btnContainer.appendChild(waBtn);
-                bubbleDiv.appendChild(btnContainer);
+                waBtn.innerHTML = `
+                    <i class="fab fa-whatsapp" style="font-size: 1.15rem;"></i>
+                    <span>${btnLabel}</span>
+                `;
+                bubbleDiv.appendChild(waBtn);
             }
-
-            const timeDiv = document.createElement('div');
-            timeDiv.className = 'abpd-time';
-            timeDiv.textContent = getCurrentTime();
-            msgDiv.appendChild(timeDiv);
-
-            chatBody.appendChild(msgDiv);
-            scrollToBottom();
-
-            // Auto-scroll ulang saat gambar bot selesai dimuat
-            msgDiv.querySelectorAll('img').forEach(img => {
-                img.addEventListener('load', () => scrollToBottom());
-            });
+        } else {
+            bubbleDiv.textContent = text;
         }
 
-        function showTyping() {
-            isWaiting = true;
-            sendBtn.disabled = true;
+        const timeDiv = document.createElement('div');
+        timeDiv.className = 'message-time';
+        const now = new Date();
+        timeDiv.textContent = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
 
-            const typingDiv = document.createElement('div');
-            typingDiv.className = 'abpd-typing';
-            typingDiv.id = 'abpd-typing-indicator';
+        messageDiv.appendChild(bubbleDiv);
+        messageDiv.appendChild(timeDiv);
 
-            for (let i = 0; i < 3; i++) {
-                const dot = document.createElement('div');
-                dot.className = 'abpd-dot';
-                typingDiv.appendChild(dot);
-            }
+        chatBody.appendChild(messageDiv);
+        chatBody.scrollTop = chatBody.scrollHeight;
 
-            chatBody.appendChild(typingDiv);
-            scrollToBottom();
+        if (sender === 'bot') {
+            playNotificationSound();
         }
-
-        function removeTyping() {
-            isWaiting = false;
-            sendBtn.disabled = false;
-            const typing = document.getElementById('abpd-typing-indicator');
-            if (typing) typing.remove();
-        }
-
-        async function sendMessage(text) {
-            if (!text || !text.trim() || isWaiting) return;
-
-            chatInput.value = '';
-            addMessage(text, 'user');
-
-            if (quickReplies) quickReplies.style.display = 'none';
-            showTyping();
-
-            try {
-                const response = await fetch(`${apiBaseUrl}/api/chat`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-Session-ID': sessionStorage.getItem('nasikotak_session') || ''
-                    },
-                    body: JSON.stringify({ message: text })
-                });
-
-                if (!response.ok) throw new Error('Respon server gagal');
-
-                const data = await response.json();
-                removeTyping();
-                addMessage(data.reply, 'bot', data.whatsapp_link, data.suggested_outlets);
-            } catch (err) {
-                console.error("Chatbot Error:", err);
-                removeTyping();
-                addMessage("Maaf kak, sistem kami sedang sibuk atau terjadi gangguan koneksi. Bisa dicoba lagi sebentar ya 🙏", 'bot');
-            } finally {
-                removeTyping();
-                chatInput.focus();
-            }
-        }
-
-        sendBtn.addEventListener('click', () => sendMessage(chatInput.value));
-
-        chatInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                sendMessage(chatInput.value);
-            }
-        });
-
-        // Quick Replies Click
-        document.querySelectorAll('.abpd-qr-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const text = btn.getAttribute('data-text');
-                sendMessage(text);
-            });
-        });
     }
 
-    // Inisialisasi saat DOM siap
-    function init() {
-        injectHeadDependencies();
-        injectScopedCSS();
-        injectWidgetHTML();
-        initChatLogic();
+    function showTypingIndicator() {
+        const indicator = document.createElement('div');
+        indicator.className = 'typing-indicator';
+        indicator.innerHTML = `
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+        `;
+        chatBody.appendChild(indicator);
+        chatBody.scrollTop = chatBody.scrollHeight;
+        return indicator;
     }
 
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', init);
-    } else {
-        init();
+    function removeTypingIndicator(indicator) {
+        if (indicator && indicator.parentNode) {
+            indicator.parentNode.removeChild(indicator);
+        }
     }
+
 })();
