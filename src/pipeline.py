@@ -202,6 +202,8 @@ class ChatPipeline:
             if nearest:
                 session["candidate_outlets"] = nearest
                 min_distance = nearest[0]["distance_km"]
+                outlet_info = self.outlet_service.format_outlet_info(nearest, include_cost=True)
+                
                 # Cek apakah user sudah memilih cabang spesifik (misal: "Pak D - Rungkut 2" atau "Rungkut 2")
                 exact_outlet_chosen = any(
                     o["name"].lower() in location.lower() or 
@@ -237,10 +239,24 @@ class ChatPipeline:
                         llm_response.setdefault("actions", []).append("handover_admin")
                         
                     base_reply = llm_response.get("reply", "").rstrip()
+                    
+                    teks_pengantar = "📍 **Outlet Terdekat dari lokasi kakak:**"
+                    if delivery_method == "delivery":
+                        teks_pengantar = "📍 **Pesanan akan dikirim dari outlet terdekat kami:**"
+                        
                     llm_response["reply"] = (
-                        f"{base_reply}\n\nLokasi pengiriman berjarak {min_distance} km dari outlet terdekat. "
-                        f"Untuk hal ini, saya hubungkan ke admin kami untuk diskusi ongkir ya kak 🙏\n"
+                        f"{base_reply}\n\n{teks_pengantar}\n{outlet_info}\n\n"
+                        f"Namun karena lokasi pengiriman berjarak {min_distance} km (> 3 km), "
+                        f"untuk hal ini saya hubungkan ke admin kami untuk diskusi ongkir ya kak 🙏\n"
                         f"{admin['name']}: {wa_link}"
+                    )
+                elif delivery_method == "delivery":
+                    base_reply = llm_response.get("reply", "").rstrip()
+                    teks_pengantar = "📍 **Pesanan akan dikirim dari outlet terdekat kami:**"
+                        
+                    llm_response["reply"] = (
+                        f"{base_reply}\n\n"
+                        f"{teks_pengantar}\n{outlet_info}"
                     )
                 # Kasus 2: Tanya cabang, pickup, atau reservasi meja di mana user memberikan alamat tujuan tapi belum memilih 1 cabang spesifik
                 elif not exact_outlet_chosen and (delivery_method == "pickup" or is_reservation or is_outlet_inquiry or is_address_question or entities.get("location")):
@@ -310,19 +326,32 @@ class ChatPipeline:
                     final_price = product.price # harga satuan
                     
                     ongkir = 0
+                    if 'nearest' in locals() and nearest:
+                        ongkir = nearest[0].get("pickup_cost", 0)
+
                     if delivery_method == "pickup":
                         if 'nearest' in locals() and nearest:
-                            ongkir = nearest[0].get("pickup_cost", 0)
                             outlet_name = nearest[0].get("name", "Outlet")
                             deliv_str = f"Pickup di {outlet_name}"
                         else:
-                            ongkir = 0
                             deliv_str = f"Pickup di outlet terdekat (Menunggu konfirmasi)"
                     else:
-                        deliv_str = f"Delivery ke {updated_session.get('location', '-')}"
+                        if 'nearest' in locals() and nearest:
+                            outlet_name = nearest[0].get("name", "Outlet")
+                            deliv_str = f"Delivery dari {outlet_name} ke {updated_session.get('location', '-')}"
+                        else:
+                            deliv_str = f"Delivery ke {updated_session.get('location', '-')}"
                     
-                    grand_total = total_price + ongkir
-                    ongkir_str = f"Rp{ongkir:,.0f}" if ongkir > 0 else "Konfirmasi Admin" if delivery_method != "pickup" else "GRATIS"
+                    # Cegah pengurangan grand total jika ongkir = -1 (diskusikan admin)
+                    tambah_ongkir = ongkir if ongkir > 0 else 0
+                    grand_total = total_price + tambah_ongkir
+                    
+                    if ongkir == -1:
+                        ongkir_str = "Konfirmasi Admin"
+                    elif ongkir == 0:
+                        ongkir_str = "GRATIS"
+                    else:
+                        ongkir_str = f"Rp{ongkir:,.0f}"
                     
                     invoice_text = (
                         f"📝 **Ringkasan Pesanan**\n"

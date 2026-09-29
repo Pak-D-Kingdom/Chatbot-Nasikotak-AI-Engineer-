@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uji Coba Widget Chatbot Ayam Bakar Pak D</title>
+    <!-- Font & Styling untuk Mockup Website WordPress -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8fafc;
+            color: #334155;
+            line-height: 1.6;
+        }
+
+        /* Navbar Mockup */
+        .navbar {
+            background-color: #ffffff;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 18px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.3rem;
+            color: #ea580c;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .navbar-nav {
+            display: flex;
+            gap: 24px;
+            list-style: none;
+        }
+        .navbar-nav a {
+            text-decoration: none;
+            color: #475569;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: color 0.2s;
+        }
+        .navbar-nav a:hover {
+            color: #ea580c;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
+            padding: 80px 40px;
+            text-align: center;
+            border-bottom: 1px solid #fed7aa;
+        }
+        .hero h1 {
+            font-size: 2.5rem;
+            color: #9a3412;
+            margin-bottom: 16px;
+        }
+        .hero p {
+            font-size: 1.15rem;
+            color: #7c2d12;
+            max-width: 650px;
+            margin: 0 auto 30px auto;
+        }
+        .badge {
+            display: inline-block;
+            background-color: #f97316;
+            color: white;
+            padding: 6px 16px;
+            border-radius: 9999px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        /* Content / Features */
+        .container {
+            max-width: 1100px;
+            margin: 50px auto;
+            padding: 0 20px;
+        }
+        .info-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+        }
+        .info-card h2 {
+            font-size: 1.4rem;
+            color: #0f172a;
+            margin-bottom: 12px;
+        }
+        .info-card ul {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+        .info-card li {
+            margin-bottom: 8px;
+        }
+
+        .highlight-box {
+            background-color: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            padding: 16px 20px;
+            border-radius: 4px;
+            margin-top: 20px;
+            font-size: 0.95rem;
+            color: #1e40af;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 40px;
+            color: #94a3b8;
+            font-size: 0.9rem;
+            border-top: 1px solid #e2e8f0;
+            margin-top: 60px;
+            background: white;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header / Navbar Mockup -->
+    <nav class="navbar">
+        <div class="navbar-brand">
+            🍗 Ayam Bakar Pak D
+        </div>
+        <ul class="navbar-nav">
+            <li><a href="#">Beranda</a></li>
+            <li><a href="#">Menu Kami</a></li>
+            <li><a href="#">Lokasi Outlet</a></li>
+            <li><a href="#">Kontak</a></li>
+        </ul>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="hero">
+        <div class="badge">WordPress Embed Demo</div>
+        <h1>Halaman Uji Coba Widget Chatbot</h1>
+        <p>Halaman ini mensimulasikan website WordPress yang telah dipasangi script <code>widget.js</code>. Anda dapat melihat tombol chat mengambang (*floating button*) di pojok kanan bawah.</p>
+    </header>
+
+    <!-- Content Section -->
+    <main class="container">
+        <div class="info-card">
+            <h2>💡 Cara Menguji Tampilan Widget:</h2>
+            <ul>
+                <li>Perhatikan <strong>tombol mengambang (floating button) oranye</strong> di pojok kanan bawah layar.</li>
+                <li>Klik tombol tersebut untuk membuka <strong>pop-up jendela obrolan AI</strong> dari <code>widget.js</code>.</li>
+                <li>Isi nama & nomor WhatsApp (atau klik lewati jika ada tombol lewati).</li>
+                <li>Coba lakukan percakapan, tanyakan menu rekomendasi, reservasi meja, atau menu best seller untuk menguji tampilan balon chat, tombol outlet, dan tombol WhatsApp.</li>
+            </ul>
+
+            <div class="highlight-box">
+                ℹ️ <strong>Backend API Target:</strong> Widget ini terhubung ke server lokal <code>http://127.0.0.1:8000</code>.
+            </div>
+        </div>
+
+        <div class="info-card">
+            <h2>📦 Rincian Elemen Widget (`widget.js`):</h2>
+            <p>Widget ini membawa tampilan mandiri yang mencakup:</p>
+            <ul>
+                <li><strong>Floating Button:</strong> Tombol bulat dengan ikon pesan di sudut kanan bawah.</li>
+                <li><strong>Chat Window Popup:</strong> Header bertema Ayam Bakar Pak D, area percakapan interaktif, dan kotak input pesan.</li>
+                <li><strong>Interactive Buttons:</strong> Tombol pemilihan 5 outlet terdekat.</li>
+                <li><strong>Action Link:</strong> Tombol konfirmasi langsung ke WhatsApp Admin.</li>
+            </ul>
+        </div>
+    </main>
+
+    <footer>
+        &copy; 2026 Ayam Bakar Pak D &bull; Testing Environment
+    </footer>
+
+    <!-- ========================================== -->
+    <!-- INTEGRASI WIDGET.JS AYAM BAKAR PAK D      -->
+    <!-- ========================================== -->
+    <script>
+        // Konfigurasi endpoint backend lokal
+        window.AYAMBAKAR_CHATBOT_API_URL = "http://127.0.0.1:8000";
+    </script>
+    <script src="/static/widget.js" defer></script>
+</body>
+</html>
