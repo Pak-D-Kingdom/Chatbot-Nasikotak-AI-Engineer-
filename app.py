@@ -1,4 +1,5 @@
 import os
+import re
 import uuid
 import uvicorn
 from fastapi import FastAPI, HTTPException, Request, Response, Cookie, Depends, Header
@@ -111,32 +112,57 @@ async def get_session(x_session_id: Optional[str] = Header(None, alias="X-Sessio
 
 @app.post("/api/session/new")
 async def new_session(request: SessionCreateRequest, response: Response):
+    # Bersihkan dan validasi nomor telepon (+62 / 62 / 08 / 8 dikonversi ke 08)
+    cleaned_phone = re.sub(r'[\s\-\(\)\.]+', '', request.customer_phone.strip())
+    if cleaned_phone.startswith('+62'):
+        cleaned_phone = cleaned_phone[3:]
+        if cleaned_phone.startswith('0'):
+            cleaned_phone = cleaned_phone[1:]
+        cleaned_phone = '0' + cleaned_phone
+    elif cleaned_phone.startswith('62'):
+        cleaned_phone = cleaned_phone[2:]
+        if cleaned_phone.startswith('0'):
+            cleaned_phone = cleaned_phone[1:]
+        cleaned_phone = '0' + cleaned_phone
+    elif cleaned_phone.startswith('8'):
+        cleaned_phone = '0' + cleaned_phone
+
+    if not re.match(r'^08[1-9][0-9]{7,11}$', cleaned_phone):
+        raise HTTPException(
+            status_code=400,
+            detail="Nomor WhatsApp tidak valid. Mohon masukkan nomor yang diawali 08... (minimal 10 digit, contoh: 08123456789)."
+        )
+
+    customer_name = request.customer_name.strip()
+    if not customer_name:
+        raise HTTPException(status_code=400, detail="Nama wajib diisi.")
+
     db = SessionLocal()
     try:
         # Check if phone already exists
-        existing_user = db.query(UserForm).filter(UserForm.phone == request.customer_phone).first()
+        existing_user = db.query(UserForm).filter(UserForm.phone == cleaned_phone).first()
         
         if existing_user:
             session_id = existing_user.session_id
             session = pipeline.conv_manager.get_session(session_id)
-            session["customer_name"] = existing_user.name
-            session["customer_phone"] = existing_user.phone
+            session["customer_name"] = customer_name
+            session["customer_phone"] = cleaned_phone
+            existing_user.name = customer_name
+            db.commit()
         else:
             session_id = str(uuid.uuid4())
             session = pipeline.conv_manager.get_session(session_id)
-            session["customer_name"] = request.customer_name
-            session["customer_phone"] = request.customer_phone
+            session["customer_name"] = customer_name
+            session["customer_phone"] = cleaned_phone
             
             new_form = UserForm(
                 session_id=session_id,
-                name=request.customer_name,
-                phone=request.customer_phone
+                name=customer_name,
+                phone=cleaned_phone
             )
             db.add(new_form)
             db.commit()
             
-        # Removed cookie setting, session_id will be stored in sessionStorage by frontend
-        
         return {"status": "success", "session_id": session_id}
     except Exception as e:
         print(f"Error saving user form: {e}")

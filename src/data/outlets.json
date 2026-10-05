@@ -61,11 +61,11 @@
   },
   {
     "id": "outlet-07",
-    "name": "Pak D - Sepande (Sidoarjo)",
-    "address": "Jl. Raya Sepande, RT.01/RW.01, Krajan, Sepande, Kec. Candi, Kabupaten Sidoarjo, Jawa Timur 61271",
-    "lat": -7.4612857,
-    "lng": 112.6894592,
-    "phone": "085731983210",
+    "name": "Pak D - Lidah Kulon",
+    "address": "Jl. Lontar Lidah Kulon, Lidah Kulon, Lakarsantri (Depan Sentral PKL Lidah Kulon), Kec. Lakarsantri, Surabaya, Jawa Timur 60213",
+    "lat": -7.3057696,
+    "lng": 112.6617396,
+    "phone": "083850091300",
     "operational_hours": null,
     "active": true
   },
@@ -206,6 +206,26 @@
     "lat": -7.2647782,
     "lng": 112.6627705,
     "phone": "085859658951",
+    "operational_hours": null,
+    "active": true
+  },
+  {
+    "id": "outlet-23",
+    "name": "Pak D - Lidah Mertua (Wonokromo)",
+    "address": "Jl. Jetis Baru No.5, Wonokromo, Surabaya, Jawa Timur 60243",
+    "lat": -7.308041,
+    "lng": 112.7337177,
+    "phone": "085731125574",
+    "operational_hours": null,
+    "active": true
+  },
+  {
+    "id": "outlet-24",
+    "name": "Pak D - Karang Ploso (Malang)",
+    "address": "Jl. Raya Dipenogoro No.88, Ngambon, Girimoyo, Kec. Karang Ploso, Kabupaten Malang, Jawa Timur 65152",
+    "lat": -7.8912127,
+    "lng": 112.5936132,
+    "phone": "085731957797",
     "operational_hours": null,
     "active": true
   }

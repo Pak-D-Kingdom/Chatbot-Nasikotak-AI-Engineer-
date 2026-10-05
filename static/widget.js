@@ -595,6 +595,22 @@
             box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.1);
         }
 
+        .form-group input.input-error {
+            border-color: #E53E3E !important;
+            background-color: #FFF5F5 !important;
+        }
+
+        .form-group input.input-error:focus {
+            box-shadow: 0 0 0 3px rgba(229, 62, 62, 0.2) !important;
+        }
+
+        .error-text {
+            color: #E53E3E;
+            font-size: 0.8rem;
+            margin-top: 4px;
+            line-height: 1.3;
+        }
+
         .start-chat-btn {
             background: var(--primary-gradient);
             color: white;
@@ -682,9 +698,11 @@
                 </div>
                 <div class="form-group">
                     <input type="text" id="user-name" placeholder="Nama Anda" required autocomplete="off">
+                    <span id="name-error" class="error-text hidden"></span>
                 </div>
                 <div class="form-group">
-                    <input type="tel" id="user-phone" placeholder="No. Telepon / WA" required autocomplete="off">
+                    <input type="tel" id="user-phone" placeholder="No. WhatsApp (contoh: 08123456789)" required autocomplete="off">
+                    <span id="phone-error" class="error-text hidden"></span>
                 </div>
                 <button id="start-chat-btn" class="start-chat-btn">Mulai Chat</button>
             </div>
@@ -729,11 +747,46 @@
     const preChatForm = shadow.getElementById('pre-chat-form');
     const userNameInput = shadow.getElementById('user-name');
     const userPhoneInput = shadow.getElementById('user-phone');
+    const nameError = shadow.getElementById('name-error');
+    const phoneError = shadow.getElementById('phone-error');
     const startChatBtn = shadow.getElementById('start-chat-btn');
     const chatFooter = shadow.getElementById('chat-footer');
     const quickRepliesContainer = shadow.getElementById('quick-replies');
 
     let isWaiting = false;
+
+    function showError(inputEl, errorEl, message) {
+        if (inputEl) inputEl.classList.add('input-error');
+        if (errorEl) {
+            errorEl.textContent = message;
+            errorEl.classList.remove('hidden');
+        }
+    }
+
+    function clearError(inputEl, errorEl) {
+        if (inputEl) inputEl.classList.remove('input-error');
+        if (errorEl) {
+            errorEl.textContent = '';
+            errorEl.classList.add('hidden');
+        }
+    }
+
+    if (userNameInput) {
+        userNameInput.addEventListener('input', () => clearError(userNameInput, nameError));
+        userNameInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') userPhoneInput ? userPhoneInput.focus() : startChatBtn.click();
+        });
+    }
+
+    if (userPhoneInput) {
+        userPhoneInput.addEventListener('input', () => {
+            clearError(userPhoneInput, phoneError);
+            userPhoneInput.value = userPhoneInput.value.replace(/[^0-9+\-\s]/g, '');
+        });
+        userPhoneInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') startChatBtn.click();
+        });
+    }
 
     // 7. Helper Functions (Text escaping, Linkify, Markdown Parsing)
     function escapeHtml(str) {
@@ -800,15 +853,61 @@
         }
     }
 
+    function formatAndValidatePhone(phone) {
+        let cleaned = phone.replace(/[\s\-\(\)\.]+/g, '');
+        if (cleaned.startsWith('+62')) {
+            cleaned = cleaned.slice(3);
+            if (cleaned.startsWith('0')) cleaned = cleaned.slice(1);
+            cleaned = '0' + cleaned;
+        } else if (cleaned.startsWith('62')) {
+            cleaned = cleaned.slice(2);
+            if (cleaned.startsWith('0')) cleaned = cleaned.slice(1);
+            cleaned = '0' + cleaned;
+        } else if (cleaned.startsWith('8')) {
+            cleaned = '0' + cleaned;
+        }
+
+        // Format valid: diawali 08, minimal 10 digit, maksimal 14 digit
+        const phoneRegex = /^08[1-9][0-9]{7,11}$/;
+        if (!phoneRegex.test(cleaned)) {
+            return null;
+        }
+        return cleaned;
+    }
+
     // 8. Event Handlers & Logika Chat
     startChatBtn.addEventListener('click', async () => {
-        const name = userNameInput.value.trim();
-        const phone = userPhoneInput.value.trim();
+        clearError(userNameInput, nameError);
+        clearError(userPhoneInput, phoneError);
 
-        if (!name || !phone) {
-            alert('Mohon isi nama dan nomor telepon Anda.');
+        const name = userNameInput.value.trim();
+        const rawPhone = userPhoneInput.value.trim();
+
+        let hasError = false;
+
+        if (!name) {
+            showError(userNameInput, nameError, 'Nama wajib diisi.');
+            userNameInput.focus();
+            hasError = true;
+        }
+
+        if (!rawPhone) {
+            showError(userPhoneInput, phoneError, 'Nomor WhatsApp wajib diisi.');
+            if (!hasError) userPhoneInput.focus();
+            hasError = true;
+        }
+
+        if (hasError) return;
+
+        const validPhone = formatAndValidatePhone(rawPhone);
+        if (!validPhone) {
+            showError(userPhoneInput, phoneError, 'Format salah! Wajib nomor WhatsApp (diawali 08... / +62 / 62, minimal 10 digit). Contoh: 08123456789');
+            userPhoneInput.focus();
             return;
         }
+
+        // Update input tampilan ke format standar 08...
+        userPhoneInput.value = validPhone;
 
         startChatBtn.disabled = true;
         startChatBtn.textContent = 'Memulai...';
@@ -817,8 +916,14 @@
             const res = await fetch(`${apiBaseUrl}/api/session/new`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ customer_name: name, customer_phone: phone })
+                body: JSON.stringify({ customer_name: name, customer_phone: validPhone })
             });
+
+            if (!res.ok) {
+                const errData = await res.json().catch(() => ({}));
+                throw new Error(errData.detail || 'Gagal memulai chat.');
+            }
+
             const data = await res.json();
 
             if (data.session_id) {
@@ -828,7 +933,7 @@
             showChatUI(name);
         } catch (e) {
             console.error("Gagal membuat session:", e);
-            alert('Gagal memulai chat. Silakan coba lagi.');
+            showError(userPhoneInput, phoneError, e.message || 'Gagal memulai chat. Silakan coba lagi.');
             startChatBtn.disabled = false;
             startChatBtn.textContent = 'Mulai Chat';
         }
