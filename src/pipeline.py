@@ -196,6 +196,31 @@ class ChatPipeline:
             session["location"] = matched_outlet["name"]
             session["pickup_outlet"] = matched_outlet["name"]
 
+        # Cek jika customer bertanya tentang Surabaya secara umum ("surabayanya mana?", "surabaya mana?", dll)
+        is_surabaya_area_question = any(p in user_msg_lower for p in [
+            "surabayanya mana", "surabaya mana", "di surabaya mana", "surabaya di mana",
+            "surabaya sebelah mana", "surabaya bagian mana"
+        ]) or (
+            ("surabaya" in user_msg_lower or "sby" in user_msg_lower) and
+            any(k in user_msg_lower for k in ["mana", "dimana", "di mana"]) and
+            not any(dir_word in user_msg_lower for dir_word in ["timur", "barat", "utara", "selatan", "pusat"]) and
+            not any(d.lower() in user_msg_lower for d in [
+                "bulak", "kenjeran", "krembangan", "semampir", "pabean", "dukuh pakis", "gayungan", 
+                "jambangan", "karang pilang", "karangpilang", "sawahan", "wiyung", "wonocolo", "wonokromo", 
+                "gubeng", "gunung anyar", "mulyorejo", "mulyosari", "rungkut", "sukolilo", "keputih", 
+                "tambaksari", "tenggilis", "asem rowo", "asemrowo", "benowo", "lakarsantri", "pakal", 
+                "sambikerep", "lontar", "manukan", "tandes", "sukomanunggal", "bubutan", "genteng", "simokerto", "tegalsari"
+            ])
+        )
+
+        if is_surabaya_area_question:
+            location = None
+            entities["location"] = None
+            session["location"] = None
+            reply_lower = (llm_response.get("reply") or "").lower()
+            if not ("timur" in reply_lower and "barat" in reply_lower and "utara" in reply_lower and "selatan" in reply_lower):
+                llm_response["reply"] = "Surabaya mana kak? Timur, Barat, Utara, Selatan, atau Pusat? Boleh sebutkan nama daerah atau kecamatannya ya kak agar saya bantu carikan cabang yang paling dekat."
+
         # Cek outlet terdekat jika ada lokasi/alamat tujuan
         if location:
             nearest = self.outlet_service.find_nearest_by_address(location, limit=5)
