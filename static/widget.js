@@ -117,17 +117,64 @@
             font-family: inherit;
         }
 
-        /* Tombol Floating Chat (Toggle) */
-        .chat-toggle-btn {
+        /* Floating Button Group (WhatsApp, Instagram, Chatbot AI) */
+        .floating-btn-group {
             position: fixed;
             bottom: 30px;
             right: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            z-index: 1000;
+            pointer-events: auto;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        .floating-btn-group.hidden {
+            display: none !important;
+        }
+
+        .floating-btn {
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            text-decoration: none;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+            border: 2px solid #ffffff;
+            transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.25s ease;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .floating-btn:hover {
+            transform: scale(1.12);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+        }
+
+        .btn-instagram {
+            background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%);
+            font-size: 22px;
+        }
+
+        .btn-whatsapp {
+            background: #25D366;
+            font-size: 24px;
+        }
+
+        /* Tombol Floating Chat (Toggle) */
+        .chat-toggle-btn {
+            position: relative;
             width: 60px;
             height: 60px;
             border-radius: 50%;
             background: var(--primary-gradient);
             color: white;
-            border: none;
+            border: 2.5px solid #ffffff;
             font-size: 24px;
             cursor: pointer;
             box-shadow: var(--shadow-lg);
@@ -135,12 +182,32 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            pointer-events: auto;
             outline: none;
         }
 
         .chat-toggle-btn:hover {
             transform: scale(1.1);
+        }
+
+        .chatbot-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            min-width: 22px;
+            height: 22px;
+            padding: 0 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 999px;
+            background: #ffffff;
+            color: var(--primary-color, #FF6B00);
+            border: 2px solid var(--primary-color, #FF6B00);
+            font-size: 10px;
+            font-weight: 800;
+            line-height: 1;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+            pointer-events: none;
         }
 
         .chat-toggle-btn.hidden {
@@ -666,10 +733,24 @@
 
     // 5. Inject HTML Widget persis seperti index.html
     const widgetHTML = `
-        <!-- Floating Chat Toggle Button -->
-        <button id="chat-toggle-btn" class="chat-toggle-btn" aria-label="Buka Chat AI Ayam Bakar Pak D">
-            <i class="fas fa-comment-dots"></i>
-        </button>
+        <!-- Floating Action Button Stack (Instagram, WhatsApp, AI Chat) -->
+        <div id="floating-btn-group" class="floating-btn-group">
+            <!-- Instagram Button -->
+            <a href="https://www.instagram.com/ayambakarpakd?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw%3D%3D" target="_blank" rel="noopener noreferrer" class="floating-btn btn-instagram" aria-label="Instagram Ayam Bakar Pak D" title="Instagram @ayambakarpakd">
+                <i class="fab fa-instagram"></i>
+            </a>
+
+            <!-- WhatsApp Button -->
+            <a href="https://api.whatsapp.com/send?phone=628881111158" target="_blank" rel="noopener noreferrer" class="floating-btn btn-whatsapp" aria-label="WhatsApp Ayam Bakar Pak D" title="WhatsApp Customer Service">
+                <i class="fab fa-whatsapp"></i>
+            </a>
+
+            <!-- Floating Chat Toggle Button -->
+            <button id="chat-toggle-btn" class="chat-toggle-btn" aria-label="Buka Chat AI Ayam Bakar Pak D" title="Chat dengan AI Assistant">
+                <i class="fas fa-comment-dots"></i>
+                <span class="chatbot-badge">AI</span>
+            </button>
+        </div>
 
         <!-- Chat Container Window -->
         <div id="chat-container" class="chat-container hidden">
@@ -737,6 +818,7 @@
     shadow.appendChild(widgetWrapper);
 
     // 6. Query Elemen-Elemen dari Shadow DOM
+    const floatingBtnGroup = shadow.getElementById('floating-btn-group');
     const chatToggleBtn = shadow.getElementById('chat-toggle-btn');
     const chatContainer = shadow.getElementById('chat-container');
     const chatCloseBtn = shadow.getElementById('chat-close-btn');
@@ -956,7 +1038,8 @@
     async function toggleChat() {
         chatContainer.classList.toggle('hidden');
         if (!chatContainer.classList.contains('hidden')) {
-            chatToggleBtn.classList.add('hidden');
+            if (floatingBtnGroup) floatingBtnGroup.classList.add('hidden');
+            else chatToggleBtn.classList.add('hidden');
 
             try {
                 const res = await fetch(`${apiBaseUrl}/api/session`, {
@@ -982,7 +1065,8 @@
                 if (quickRepliesContainer) quickRepliesContainer.classList.add('hidden');
             }
         } else {
-            chatToggleBtn.classList.remove('hidden');
+            if (floatingBtnGroup) floatingBtnGroup.classList.remove('hidden');
+            else chatToggleBtn.classList.remove('hidden');
         }
     }
 
