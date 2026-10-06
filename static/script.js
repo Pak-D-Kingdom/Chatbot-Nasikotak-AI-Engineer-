@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     // DOM Elements
+    const floatingBtnGroup = document.getElementById('floating-btn-group');
     const chatToggleBtn = document.getElementById('chat-toggle-btn');
     const chatContainer = document.getElementById('chat-container');
     const chatCloseBtn = document.getElementById('chat-close-btn');
@@ -226,7 +227,8 @@ document.addEventListener('DOMContentLoaded', () => {
     async function toggleChat() {
         chatContainer.classList.toggle('hidden');
         if (!chatContainer.classList.contains('hidden')) {
-            chatToggleBtn.classList.add('hidden');
+            if (floatingBtnGroup) floatingBtnGroup.classList.add('hidden');
+            else chatToggleBtn.classList.add('hidden');
             
             try {
                 const res = await fetch('/api/session', {
@@ -252,7 +254,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 chatFooter.classList.add('hidden');
             }
         } else {
-            chatToggleBtn.classList.remove('hidden');
+            if (floatingBtnGroup) floatingBtnGroup.classList.remove('hidden');
+            else chatToggleBtn.classList.remove('hidden');
         }
     }
 
