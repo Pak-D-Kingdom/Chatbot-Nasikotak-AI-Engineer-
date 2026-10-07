@@ -748,7 +748,6 @@
             <!-- Floating Chat Toggle Button -->
             <button id="chat-toggle-btn" class="chat-toggle-btn" aria-label="Buka Chat AI Ayam Bakar Pak D" title="Chat dengan AI Assistant">
                 <i class="fas fa-comment-dots"></i>
-                <span class="chatbot-badge">AI</span>
             </button>
         </div>
 
